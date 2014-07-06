@@ -28,7 +28,7 @@ function designLine(startPoint, endPoint) {
                ', length: ' + line.length.toFixed(2);
     showText(text, front.lastPoint, getAngle(line.start, front.lastPoint), front.context);
 
-    var text = line.angle.deg.toFixed(2) + "\xB0"
+    var text = line.angle.deg.toFixed(2) + "&deg;";//"\xB0"
     showText(text, line.start, new Angle(line.angle.rad + Math.PI), front.context);
   }
 
