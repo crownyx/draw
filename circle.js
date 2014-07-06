@@ -1,17 +1,13 @@
 function designCir(radStart, radEnd) {
-  displayHelpText('circle', 'c', [
-    '[R]: set radius length'
-  ]);
-
   var circle = new Circle(radStart, radEnd);
   var startAxis = new AxisPair(radStart);
 
   showCircle();
   showInfo();
 
-  front.eventListeners.add('mousemove', 'setEnd', function() {
-    circle.radius.setEnd(front.lastPoint);
-  });
+  displayHelpText('circle', 'c', [
+    '[R]: set radius length'
+  ]);
 
   function showCircle() {
     circle.draw(front.context);
@@ -19,19 +15,19 @@ function designCir(radStart, radEnd) {
     startAxis.sketch(front.context);
   }
 
-  function showInfo(e) {
-    var currPoint = (e ? getPoint(e) : front.lastPoint);
-
+  function showInfo() {
     new AxisPair(circle.center).sketch(front.context);
     circle.radius.sketch(front.context);
 
     var text = 'center x: ' + circle.center.x + ', y: ' + circle.center.y + ', radius length: ' + circle.radius.length.toFixed(2);
-    showText(text, currPoint, getAngle(radStart, currPoint), front.context);
+    showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
   }
 
+  front.eventListeners.add('mousemove', 'setEnd', function() {
+    circle.radius.setEnd(front.lastPoint);
+  });
   front.eventListeners.add('mousemove', 'showCircle', showCircle);
   front.eventListeners.add('mousemove', 'showInfo', showInfo);
-
   front.eventListeners.add('click', 'saveCir', function() { circle.complete(); });
 
   window.eventListeners.add('keydown', 'circleCommands', function(e) {
