@@ -68,7 +68,7 @@ home: 36,
 left_arrow: 37,
 up_arrow: 38,
 right_arrow: 39,
-down_arrow: 40,
+down_arrow:	40,
 insert: 45,
 delete: 46,
 zero: 48,
@@ -187,18 +187,18 @@ Circle.prototype = new Shape;
 Circle.prototype.constructor = Circle;
 Circle.prototype.draw = function(context) {
 context.beginPath();
-context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI);
+context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
 context.stroke();
 }
 var front, back;
 window.addEventListener('load', function() {
 front = new Canvas('frontlayer');
-back = new Canvas('backlayer');
-front.canvas.width = this.innerWidth - 202;
+back  = new Canvas('backlayer');
+front.canvas.width  = this.innerWidth  - 202;
 front.canvas.height = this.innerHeight - 40;
-back.canvas.width = this.innerWidth - 202;
-back.canvas.height = this.innerHeight - 40;
-document.getElementById('infopanel').style.width = this.innerWidth - front.canvas.width - 42 + 'px';
+back.canvas.width   = this.innerWidth  - 202;
+back.canvas.height  = this.innerHeight - 40;
+document.getElementById('infopanel').style.width  = this.innerWidth - front.canvas.width - 42 + 'px';
 document.getElementById('infopanel').style.height = this.innerHeight - 40 + 'px';
 this.eventListeners = new EventListenerCollection(this);
 init();
@@ -309,7 +309,7 @@ ellipse.draw(front.context);
 front.eventListeners.add('click', 'setEllipseRotation', function(e) {
 front.eventListeners.remove('setEllipseRotation');
 front.eventListeners.remove('setRadiiEnds');
-var origRot = new Line(radStart, getPoint(e)).angle;
+var origRot  = new Line(radStart, getPoint(e)).angle;
 front.eventListeners.add('mousemove', 'rotateEllipse', function(e) {
 var currAngle = getAngle(radStart, getPoint(e));
 ellipse.rotation = new Angle(currAngle.rad - origRot.rad);
@@ -332,7 +332,7 @@ context.save();
 context.translate(this.center.x, this.center.y);
 context.rotate(this.rotation.rad);
 context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
-context.arc(0, 0, this.semiMinor.length, 0, 2 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI);
+context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
 context.restore();
 context.stroke();
 }
@@ -357,10 +357,10 @@ var hypotenuse = new Line(lineStart, lineEnd).length;
 var rotation = (function() {
 var refAngle = Math.acos(adjacent / hypotenuse);
 switch(getQuadrant(lineStart, lineEnd)) {
-case 1: return refAngle; break;
-case 2: return Math.PI - refAngle; break;
-case 3: return Math.PI + refAngle; break;
-case 4: return 2 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI - refAngle; break;
+case 1: return refAngle;               break;
+case 2: return Math.PI - refAngle;     break;
+case 3: return Math.PI + refAngle;     break;
+case 4: return 2 * Math.PI - refAngle; break;
 }
 })();
 return new Angle(rotation);
@@ -377,17 +377,17 @@ return 4;
 }
 }
 function Angle(rad) {
-var _rad = ((rad || 0) + 2 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI) % (2 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI);
+var _rad = ((rad || 0) + 2 * Math.PI) % (2 * Math.PI);
 return {
 rad: _rad,
-deg: (_rad / Math.PI all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js 180),
-quadrant: Math.ceil(_rad / (0.5 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI)) || 4
+deg: (_rad / Math.PI * 180),
+quadrant: Math.ceil(_rad / (0.5 * Math.PI)) || 4
 };
 }
 function designLine(startPoint, endPoint) {
 var line = new Line(startPoint, endPoint);
 var startAxis = new AxisPair(line.start);
-var arcAngle = new Arc(line.start, 15, new Angle(0), line.angle);
+var arcAngle  = new Arc(line.start, 15, new Angle(0), line.angle);
 showLine();
 showInfo();
 displayHelpText('line', 'l', [
@@ -401,10 +401,10 @@ arcAngle.endAngle = line.angle;
 arcAngle.sketch(front.context);
 }
 function showInfo() {
-var text = 'x: ' + line.start.x.toFixed(2) +
-', y: ' + line.start.y.toFixed(2) +
-' to x: ' + line.end.x.toFixed(2) +
-', y: ' + line.end.y.toFixed(2) +
+var text = 'x: '        + line.start.x.toFixed(2) +
+', y: '      + line.start.y.toFixed(2) +
+' to x: '    + line.end.x.toFixed(2)   +
+', y: '      + line.end.y.toFixed(2)   +
 ', length: ' + line.length.toFixed(2);
 showText(text, front.lastPoint, getAngle(line.start, front.lastPoint), front.context);
 var text = line.angle.deg.toFixed(2) + "xB0"
@@ -431,7 +431,7 @@ showInfo();
 break;
 case charCodes['r']:
 getInput({ main: 'enter rotation: ', subtext: '(in degrees)' }, function(input) {
-line.fixedRotation = new Angle(parseInt(input) / 180 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI);
+line.fixedRotation = new Angle(parseInt(input) / 180 * Math.PI);
 line.setEnd(front.lastPoint);
 front.clear();
 front.showAxes();
@@ -449,17 +449,17 @@ break;
 function Line(start, end) {
 Shape.call(this);
 this.start = start;
-this.end = end;
+this.end   = end;
 }
 Line.prototype = new Shape;
 Line.prototype.constructor = Line;
 Line.prototype.setEnd = function(point) {
 if(this.fixedLength || this.fixedRotation) {
 var rotation = this.fixedRotation || new Line(this.start, point).angle;
-var length = this.fixedLength || new Line(this.start, point).length;
+var length   = this.fixedLength || new Line(this.start, point).length;
 this.end = new Point(
-this.start.x + Math.cos(rotation.rad) all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js length,
-this.start.y + Math.sin(rotation.rad) all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js length
+this.start.x + Math.cos(rotation.rad) * length,
+this.start.y + Math.sin(rotation.rad) * length
 );
 } else {
 this.end = point;
@@ -536,7 +536,7 @@ displayHelpText('rectangle', 'r', [
 '[L]: set length',
 '[R]: set rotation'
 ]);
-function refAngle() { return (rect.diagonal.angle.quadrant - 1) / 2 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI; }
+function refAngle() { return (rect.diagonal.angle.quadrant - 1) / 2 * Math.PI; }
 var rect = new Rectangle(diagStart, diagEnd);
 var startAxis = new AxisPair(rect.diagonal.start);
 var arcAngle = new Arc(rect.diagonal.start, 15, new Angle(refAngle()), new Angle(refAngle() + rect.rotation.rad));
@@ -597,7 +597,7 @@ cleanUp();
 break;
 case charCodes['r']:
 getInput({ main: 'enter rotation: ', subtext: '(in degrees)' }, function(input) {
-rect.fixedRotation = new Angle(parseInt(input) / 180 all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js Math.PI);
+rect.fixedRotation = new Angle(parseInt(input) / 180 * Math.PI);
 cleanUp();
 });
 break;
@@ -636,15 +636,15 @@ this._rotation = angle;
 Rectangle.prototype.setEnd = function(point) {
 var quad = (this.inRotation ? this.diagonal.angle : getAngle(this.diagonal.start, point)).quadrant;
 var x = this.fixedLength ?
-this.diagonal.start.x + (quad == 2 || quad == 3 ? -1 : 1) all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js this.length :
+this.diagonal.start.x + (quad == 2 || quad == 3 ? -1 : 1) * this.length :
 point.x;
 var y = this.fixedHeight ?
-this.diagonal.start.y + (quad == 3 || quad == 4 ? -1 : 1) all arc.js canvas.js charcodes.js circle.js draw.css draw.html draw.js ellipse.js geometric.js gp.sh line.js polyfills.js rectangle.js shape.js specs.txt summary_text.js text.js utilities.js this.height :
+this.diagonal.start.y + (quad == 3 || quad == 4 ? -1 : 1) * this.height :
 point.y;
 this.diagonal.setEnd(new Point(x, y));
 }
 Rectangle.prototype.draw = function(context) {
-var width = this.diagonal.end.x - this.diagonal.start.x,
+var width  = this.diagonal.end.x - this.diagonal.start.x,
 height = this.diagonal.end.y - this.diagonal.start.y;
 context.save();
 context.translate(this.diagonal.start.x, this.diagonal.start.y);
