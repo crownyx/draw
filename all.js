@@ -170,10 +170,7 @@ var text = 'center x: ' + circle.center.x + ', y: ' + circle.center.y + ', radiu
 showText(text, currPoint, getAngle(radStart, currPoint), front.context);
 }
 front.eventListeners.add('mousemove', 'showInfo', showInfo);
-front.eventListeners.add('click', 'saveCir', function(e) {
-front.stopDrawing(true);
-circle.draw(back.context);
-});
+front.eventListeners.add('click', 'saveCir', function() { circle.complete() });
 }
 /////////////
 // Circle: //
@@ -415,7 +412,7 @@ line.setEnd(front.lastPoint);
 });
 front.eventListeners.add('mousemove', 'showLine', showLine);
 front.eventListeners.add('mousemove', 'showInfo', showInfo);
-front.eventListeners.add('click', 'saveLine', line.complete.bind(line));
+front.eventListeners.add('click', 'saveLine', function() { line.complete() });
 window.eventListeners.add('keydown', 'lineCommands', function(e) {
 if(e.shiftKey) {
 switch(e.which) {
