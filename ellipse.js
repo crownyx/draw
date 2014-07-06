@@ -29,7 +29,7 @@ function designEllipse(radStart, radEnd) {
       new Line({ x: 0, y: 0 }, { x: 0, y: -ellipse.yAxis.length }).sketch(front.context);
     front.context.restore();
 
-    var text = ellipse.rotation.deg.toFixed(2) + "\xB0";
+    var text = ellipse.rotation.deg.toFixed(2) + unescape("%B0");
     showText(text, radStart, new Angle(getAngle(radStart, front.lastPoint).rad + Math.PI), front.context);
   }
 

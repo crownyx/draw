@@ -28,7 +28,7 @@ function designRect(diagStart, diagEnd) {
     var text = 'length: ' + rect.length + ', height: ' + rect.height;
     showText(text, front.lastPoint, getAngle(rect.diagonal.start, front.lastPoint), front.context);
 
-    var text = rect.rotation.deg.toFixed(2) + "\xB0"
+    var text = rect.rotation.deg.toFixed(2) + unescape("%B0")
     showText(text, rect.diagonal.start, new Angle(rect.rotation.rad + Math.PI), front.context);
   }
 
