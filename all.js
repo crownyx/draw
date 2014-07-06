@@ -152,27 +152,26 @@ close_braket: 221,
 single_quote: 222
 }
 function designCir(radStart, radEnd) {
-displayHelpText('circle', 'c', [
-'[R]: set radius length'
-]);
 var circle = new Circle(radStart, radEnd);
 var startAxis = new AxisPair(radStart);
 showCircle();
 showInfo();
-front.eventListeners.add('mousemove', 'setEnd', function() {
-circle.radius.setEnd(front.lastPoint);
-});
+displayHelpText('circle', 'c', [
+'[R]: set radius length'
+]);
 function showCircle() {
 circle.draw(front.context);
 startAxis.sketch(front.context);
 }
-function showInfo(e) {
-var currPoint = (e ? getPoint(e) : front.lastPoint);
+function showInfo() {
 new AxisPair(circle.center).sketch(front.context);
 circle.radius.sketch(front.context);
 var text = 'center x: ' + circle.center.x + ', y: ' + circle.center.y + ', radius length: ' + circle.radius.length.toFixed(2);
-showText(text, currPoint, getAngle(radStart, currPoint), front.context);
+showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
 }
+front.eventListeners.add('mousemove', 'setEnd', function() {
+circle.radius.setEnd(front.lastPoint);
+});
 front.eventListeners.add('mousemove', 'showCircle', showCircle);
 front.eventListeners.add('mousemove', 'showInfo', showInfo);
 front.eventListeners.add('click', 'saveCir', function() { circle.complete(); });
@@ -298,16 +297,22 @@ front.eventListeners.add('mousemove', 'showPos', front.showPos.bind(front));
 }
 function designEllipse(radStart, radEnd) {
 var ellipse = new Ellipse(radStart, radEnd);
+var startAxis = new AxisPair(radStart);
+var arcAngle = new Arc(radStart, 15, new Angle(0), ellipse.rotation);
+showEllipse();
+showInfo();
+function showEllipse() {
 ellipse.draw(front.context);
-function showInfo(e) {
-var currPoint = (e ? getPoint(e) : front.lastPoint);
-new AxisPair(ellipse.center).sketch(front.context);
-new Arc(ellipse.center, 15, new Angle(0), ellipse.rotation).sketch(front.context);
+startAxis.sketch(front.context);
+arcAngle.endAngle = ellipse.rotation;
+arcAngle.sketch(front.context);
+}
+function showInfo() {
 var text = 'center x: ' + ellipse.center.x +
 ', y: ' + ellipse.center.y +
 ', semimajor axis length: ' + ellipse.semiMajor.length.toFixed(2) +
 ', semiminor axis length: ' + ellipse.semiMinor.length.toFixed(2);
-showText(text, currPoint, getAngle(radStart, currPoint), front.context);
+showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
 front.context.save();
 front.context.translate(ellipse.center.x, ellipse.center.y);
 front.context.rotate(ellipse.rotation.rad);
@@ -315,36 +320,48 @@ new Line({ x: 0, y: 0 }, { x: ellipse.xAxis.length, y: 0 }).sketch(front.context
 new Line({ x: 0, y: 0 }, { x: 0, y: -ellipse.yAxis.length }).sketch(front.context);
 front.context.restore();
 var text = ellipse.rotation.deg.toFixed(2) + "xB0";
-showText(text, radStart, new Angle(getAngle(radStart, currPoint).rad + Math.PI), front.context);
+showText(text, radStart, new Angle(getAngle(radStart, front.lastPoint).rad + Math.PI), front.context);
 }
+front.eventListeners.add('mousemove', 'showEllipse', showEllipse);
 front.eventListeners.add('mousemove', 'showInfo', showInfo);
-front.eventListeners.add('mousemove', 'setRadiiEnds', function(e) {
-var currPoint = getPoint(e);
-ellipse.xAxis.end.x = currPoint.x;
-ellipse.yAxis.end.y = currPoint.y
-ellipse.draw(front.context);
+front.eventListeners.add('mousemove', 'setRadiiEnds', function() {
+ellipse.xAxis.end.x = front.lastPoint.x;
+ellipse.yAxis.end.y = front.lastPoint.y
 });
-front.eventListeners.add('click', 'setEllipseRotation', function(e) {
+front.eventListeners.add('click', 'setEllipseRotation', function() {
 front.eventListeners.remove('setEllipseRotation');
 front.eventListeners.remove('setRadiiEnds');
-var origRot  = new Line(radStart, getPoint(e)).angle;
-front.eventListeners.add('mousemove', 'rotateEllipse', function(e) {
-var currAngle = getAngle(radStart, getPoint(e));
+var origRot = new Line(radStart, front.lastPoint).angle;
+front.eventListeners.add('mousemove', 'rotateEllipse', function() {
+var currAngle = getAngle(radStart, front.lastPoint);
 ellipse.rotation = new Angle(currAngle.rad - origRot.rad);
-ellipse.draw(front.context);
 });
-front.eventListeners.add('click', 'complete', ellipse.complete);
+front.eventListeners.add('click', 'complete', function() { ellipse.complete() });
 });
 }
+//////////////
+// Ellipse: //
+//////////////
 function Ellipse(radStart, radEnd) {
-return Shape({
-center: radStart,
-xAxis: new Line(radStart, { x: radEnd.x, y: radStart.y }),
-yAxis: new Line(radStart, { x: radStart.x, y: radEnd.y }),
-get semiMajor() { return this.yAxis.length >= this.xAxis.length ? this.yAxis : this.xAxis; },
-get semiMinor() { return this.yAxis.length >= this.xAxis.length ? this.xAxis : this.yAxis; },
-rotation: new Angle(0),
-draw: function(context) {
+Shape.call(this);
+this.center = radStart;
+this.xAxis = new Line(radStart, { x: radEnd.x, y: radStart.y });
+this.yAxis = new Line(radStart, { x: radStart.x, y: radEnd.y });
+this.rotation = new Angle(0);
+}
+Ellipse.prototype = new Shape;
+Ellipse.prototype.constructor = Ellipse;
+Object.defineProperty(Ellipse.prototype, 'semiMajor', {
+get: function() {
+return this.yAxis.length >= this.xAxis.length ? this.yAxis : this.xAxis;
+}
+});
+Object.defineProperty(Ellipse.prototype, 'semiMinor', {
+get: function() {
+return this.yAxis.length >= this.xAxis.length ? this.xAxis : this.yAxis;
+}
+});
+Ellipse.prototype.draw = function(context) {
 context.beginPath();
 context.save();
 context.translate(this.center.x, this.center.y);
@@ -353,8 +370,6 @@ context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / thi
 context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
 context.restore();
 context.stroke();
-}
-});
 }
 function Point(x, y) {
 this.x = x;
