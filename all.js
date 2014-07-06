@@ -1,56 +1,3 @@
-function Arc(radiusStart, radiusLength, startAngle, endAngle) {
-return {
-center: radiusStart,
-startAngle: startAngle,
-endAngle: endAngle,
-draw: function(context) {
-context.beginPath();
-context.arc(this.center.x, this.center.y, radiusLength, this.startAngle.rad, this.endAngle.rad, false);
-context.stroke();
-},
-sketch: function(context) {
-context.save();
-context.strokeStyle = "blue";
-context.lineWidth = 0.5;
-context.setLineDash([5]);
-this.draw(context);
-context.restore();
-}
-};
-}
-function EventListenerCollection(receiver) {
-return {
-added: [],
-add: function(eventType, callbackName, callback) {
-receiver.addEventListener(eventType, callback, false);
-this.added.push({ eventType: eventType, callbackName: callbackName, callback: callback });
-},
-remove: function(callbackName) {
-var index = this.added.findIndex(function(cb) { return cb.callbackName == callbackName; });
-var cb = this.added[index];
-receiver.removeEventListener(cb.eventType, cb.callback, false);
-this.added.splice(index, 1);
-return cb;
-},
-clear: function() {
-var had = this.added;
-this.added.forEach(function(eventListener) {
-receiver.removeEventListener(eventListener.eventType, eventListener.callback, false);
-});
-this.added = [];
-return had;
-}
-};
-}
-function Canvas(id) {
-var _canvas = document.getElementById(id);
-this.canvas = _canvas;
-this.context = _canvas.getContext('2d');
-this.clear = function() {
-this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-};
-this.eventListeners = new EventListenerCollection(_canvas)
-}
 var charCodes = {
 backspace: 8,
 tab: 9,
@@ -151,61 +98,38 @@ back_slash: 220,
 close_braket: 221,
 single_quote: 222
 }
-function designCir(radStart, radEnd) {
-var circle = new Circle(radStart, radEnd);
-var startAxis = new AxisPair(radStart);
-showCircle();
-showInfo();
-displayHelpText('circle', 'c', [
-'[R]: set radius length'
-]);
-function showCircle() {
-circle.draw(front.context);
-startAxis.sketch(front.context);
-}
-function showInfo() {
-new AxisPair(circle.center).sketch(front.context);
-circle.radius.sketch(front.context);
-var text = 'center x: ' + circle.center.x + ', y: ' + circle.center.y + ', radius length: ' + circle.radius.length.toFixed(2);
-showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
-}
-front.eventListeners.add('mousemove', 'setEnd', function() {
-circle.radius.setEnd(front.lastPoint);
+function EventListenerCollection(receiver) {
+return {
+added: [],
+add: function(eventType, callbackName, callback) {
+receiver.addEventListener(eventType, callback, false);
+this.added.push({ eventType: eventType, callbackName: callbackName, callback: callback });
+},
+remove: function(callbackName) {
+var index = this.added.findIndex(function(cb) { return cb.callbackName == callbackName; });
+var cb = this.added[index];
+receiver.removeEventListener(cb.eventType, cb.callback, false);
+this.added.splice(index, 1);
+return cb;
+},
+clear: function() {
+var had = this.added;
+this.added.forEach(function(eventListener) {
+receiver.removeEventListener(eventListener.eventType, eventListener.callback, false);
 });
-front.eventListeners.add('mousemove', 'showCircle', showCircle);
-front.eventListeners.add('mousemove', 'showInfo', showInfo);
-front.eventListeners.add('click', 'saveCir', function() { circle.complete(); });
-window.eventListeners.add('keydown', 'circleCommands', function(e) {
-if(e.shiftKey) {
-switch(e.which) {
-case charCodes['r']:
-getInput('enter radius length: ', function(input) {
-circle.radius.fixedLength = parseInt(input);
-circle.radius.setEnd(front.lastPoint);
-front.clear();
-front.showAxes();
-showCircle();
-showInfo();
-});
-break;
+this.added = [];
+return had;
 }
+};
 }
-});
-}
-/////////////
-// Circle: //
-/////////////
-function Circle(radStart, radEnd) {
-Shape.call(this);
-this.center = radStart;
-this.radius = new Line(radStart, radEnd);
-}
-Circle.prototype = new Shape;
-Circle.prototype.constructor = Circle;
-Circle.prototype.draw = function(context) {
-context.beginPath();
-context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
-context.stroke();
+function Canvas(id) {
+var _canvas = document.getElementById(id);
+this.canvas = _canvas;
+this.context = _canvas.getContext('2d');
+this.clear = function() {
+this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+};
+this.eventListeners = new EventListenerCollection(_canvas)
 }
 var front, back;
 window.addEventListener('load', function() {
@@ -295,82 +219,6 @@ front.canvas.addEventListener('mousemove', function() { front.clear(); }, false)
 front.canvas.addEventListener('mousemove', function() { front.showAxes(); }, false);
 front.eventListeners.add('mousemove', 'showPos', front.showPos.bind(front));
 }
-function designEllipse(radStart, radEnd) {
-var ellipse = new Ellipse(radStart, radEnd);
-var startAxis = new AxisPair(radStart);
-var arcAngle = new Arc(radStart, 15, new Angle(0), ellipse.rotation);
-showEllipse();
-showInfo();
-function showEllipse() {
-ellipse.draw(front.context);
-startAxis.sketch(front.context);
-arcAngle.endAngle = ellipse.rotation;
-arcAngle.sketch(front.context);
-}
-function showInfo() {
-var text = 'center x: ' + ellipse.center.x +
-', y: ' + ellipse.center.y +
-', semimajor axis length: ' + ellipse.semiMajor.length.toFixed(2) +
-', semiminor axis length: ' + ellipse.semiMinor.length.toFixed(2);
-showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
-front.context.save();
-front.context.translate(ellipse.center.x, ellipse.center.y);
-front.context.rotate(ellipse.rotation.rad);
-new Line({ x: 0, y: 0 }, { x: ellipse.xAxis.length, y: 0 }).sketch(front.context);
-new Line({ x: 0, y: 0 }, { x: 0, y: -ellipse.yAxis.length }).sketch(front.context);
-front.context.restore();
-var text = ellipse.rotation.deg.toFixed(2) + unescape("%B0");
-showText(text, radStart, new Angle(getAngle(radStart, front.lastPoint).rad + Math.PI), front.context);
-}
-front.eventListeners.add('mousemove', 'showEllipse', showEllipse);
-front.eventListeners.add('mousemove', 'showInfo', showInfo);
-front.eventListeners.add('mousemove', 'setRadiiEnds', function() {
-ellipse.xAxis.end.x = front.lastPoint.x;
-ellipse.yAxis.end.y = front.lastPoint.y
-});
-front.eventListeners.add('click', 'setEllipseRotation', function() {
-front.eventListeners.remove('setEllipseRotation');
-front.eventListeners.remove('setRadiiEnds');
-var origRot = new Line(radStart, front.lastPoint).angle;
-front.eventListeners.add('mousemove', 'rotateEllipse', function() {
-var currAngle = getAngle(radStart, front.lastPoint);
-ellipse.rotation = new Angle(currAngle.rad - origRot.rad);
-});
-front.eventListeners.add('click', 'complete', function() { ellipse.complete() });
-});
-}
-//////////////
-// Ellipse: //
-//////////////
-function Ellipse(radStart, radEnd) {
-Shape.call(this);
-this.center = radStart;
-this.xAxis = new Line(radStart, { x: radEnd.x, y: radStart.y });
-this.yAxis = new Line(radStart, { x: radStart.x, y: radEnd.y });
-this.rotation = new Angle(0);
-}
-Ellipse.prototype = new Shape;
-Ellipse.prototype.constructor = Ellipse;
-Object.defineProperty(Ellipse.prototype, 'semiMajor', {
-get: function() {
-return this.yAxis.length >= this.xAxis.length ? this.yAxis : this.xAxis;
-}
-});
-Object.defineProperty(Ellipse.prototype, 'semiMinor', {
-get: function() {
-return this.yAxis.length >= this.xAxis.length ? this.xAxis : this.yAxis;
-}
-});
-Ellipse.prototype.draw = function(context) {
-context.beginPath();
-context.save();
-context.translate(this.center.x, this.center.y);
-context.rotate(this.rotation.rad);
-context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
-context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
-context.restore();
-context.stroke();
-}
 function Point(x, y) {
 this.x = x;
 this.y = y;
@@ -416,6 +264,110 @@ rad: _rad,
 deg: (_rad / Math.PI * 180),
 quadrant: Math.ceil(_rad / (0.5 * Math.PI)) || 4
 };
+}
+function showText(text, point, angle, context) {
+context.save();
+switch(angle.quadrant) {
+case 1:
+context.fillText(text, point.x + 15, point.y + 20);
+break;
+case 2:
+context.textAlign = "right";
+context.fillText(text, point.x - 15, point.y + 20);
+break;
+case 3:
+context.textAlign = "right";
+context.fillText(text, point.x - 15, point.y - 15);
+break;
+case 4:
+context.fillText(text, point.x + 15, point.y - 15);
+break;
+}
+context.restore();
+}
+function getInput(promptText, propToFill) {
+var mainText = promptText.main || promptText;
+var textToAdd = [{ className: 'center', text: mainText, id: 'inputdiv' }];
+if(promptText.subtext)
+textToAdd.push({ className: 'center', text: promptText.subtext });
+textToAdd.push('', '[esc]: cancel');
+var replacement = replaceInfoText(textToAdd);
+var b = replacement.bs[0];
+var prevCommands = window.eventListeners.clear();
+window.eventListeners.add('keydown', 'getInput', function(e) {
+if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
+b.textContent += (e.which - charCodes.zero);
+} else if(e.which == charCodes.enter) {
+window.eventListeners.remove('getInput');
+prevCommands.forEach(function(el) {
+window.eventListeners.add(el.eventType, el.callbackName, el.callback);
+});
+propToFill(infodiv.textContent.replace(mainText, ''));
+document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
+if(subdiv) document.getElementById('infopanel').removeChild(subdiv);
+} else if(e.which == charCodes['backspace']) {
+b.textContent = infodiv.textContent.slice(0, -1);
+} else if(e.which == charCodes['esc']) {
+window.eventListeners.remove('getInput');
+prevCommands.forEach(function(el) {
+window.eventListeners.add(el.eventType, el.callbackName, el.callback);
+});
+document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
+if(subdiv) document.getElementById('infopanel').removeChild(subdiv);
+}
+});
+}
+function replaceInfoText(infoText) {
+var infodiv = document.getElementById('infodiv');
+var newdiv = document.createElement('div');
+newdiv.id = 'infodiv';
+var bs = infoText.map(function(text) {
+var b = document.createElement('b');
+if(text.id) b.id = text.id;
+if(text.className) b.className = text.className;
+var text = text.text || text || '<br/>';
+b.innerHTML = text;
+newdiv.appendChild(b);
+return b;
+});
+document.getElementById('infopanel').replaceChild(newdiv, infodiv);
+return { olddiv: infodiv, newdiv: newdiv, bs: bs };
+}
+function displayHelpText(shapeName, ownCommand, shiftCommands) {
+var shapeCommands = [
+'drawing ' + shapeName,
+'',
+'[a]: arc',
+'[b]: bezier curve',
+'[c]: circle',
+'[e]: ellipse',
+'[l]: line',
+'[r]: rectangle',
+'[s]: square',
+'[t]: triangle'
+].filter(function(commandLine) {
+return commandLine.slice(0,3) != '[' + ownCommand + ']';
+});
+var allText = shapeCommands.concat([
+'',
+'[esc]: stop drawing',
+'',
+'Shift+'
+]).concat(shiftCommands);
+replaceInfoText(allText);
+}
+function Shape() { }
+Shape.prototype.complete = function() {
+front.refresh(true);
+this.draw(back.context);
+}
+Shape.prototype.sketch = function(context) {
+context.save();
+context.strokeStyle = "blue";
+context.lineWidth = 0.5;
+context.setLineDash([5]);
+this.draw(context);
+context.restore();
 }
 function designLine(startPoint, endPoint) {
 var line = new Line(startPoint, endPoint);
@@ -534,34 +486,6 @@ this.vertical.sketch(context);
 this.horizontal.sketch(context);
 }
 }
-}
-if (!Array.prototype.findIndex) {
-Object.defineProperty(Array.prototype, 'findIndex', {
-enumerable: false,
-configurable: true,
-writable: true,
-value: function(predicate) {
-if (this == null) {
-throw new TypeError('Array.prototype.find called on null or undefined');
-}
-if (typeof predicate !== 'function') {
-throw new TypeError('predicate must be a function');
-}
-var list = Object(this);
-var length = list.length >>> 0;
-var thisArg = arguments[1];
-var value;
-for (var i = 0; i < length; i++) {
-if (i in list) {
-value = list[i];
-if (predicate.call(thisArg, value, i, list)) {
-return i;
-}
-}
-}
-return -1;
-}
-});
 }
 function designRect(diagStart, diagEnd) {
 displayHelpText('rectangle', 'r', [
@@ -685,12 +609,17 @@ context.rotate((this.fixedRotation || this.rotation).rad);
 context.strokeRect(0, 0, width, height);
 context.restore();
 }
-function Shape() { }
-Shape.prototype.complete = function() {
-front.refresh(true);
-this.draw(back.context);
-}
-Shape.prototype.sketch = function(context) {
+function Arc(radiusStart, radiusLength, startAngle, endAngle) {
+return {
+center: radiusStart,
+startAngle: startAngle,
+endAngle: endAngle,
+draw: function(context) {
+context.beginPath();
+context.arc(this.center.x, this.center.y, radiusLength, this.startAngle.rad, this.endAngle.rad, false);
+context.stroke();
+},
+sketch: function(context) {
 context.save();
 context.strokeStyle = "blue";
 context.lineWidth = 0.5;
@@ -698,114 +627,137 @@ context.setLineDash([5]);
 this.draw(context);
 context.restore();
 }
-function showText(text, point, angle, context) {
-context.save();
-switch(angle.quadrant) {
-case 1:
-context.fillText(text, point.x + 15, point.y + 20);
-break;
-case 2:
-context.textAlign = "right";
-context.fillText(text, point.x - 15, point.y + 20);
-break;
-case 3:
-context.textAlign = "right";
-context.fillText(text, point.x - 15, point.y - 15);
-break;
-case 4:
-context.fillText(text, point.x + 15, point.y - 15);
-break;
-}
-context.restore();
-}
-function Text(text, point) {
-return {
-text: text,
-point: point,
-textAlign: front.context.textAlign,
-background: null,
-fontColor: front.context.fillStyle,
-draw: function(context) {
-context.save();
-context.textAlign = this.textAlign;
-if(this.background) {
-context.fillStyle = this.background;
-context.fillRect(this.point.x, this.point.y - 10, context.measureText(text).width, 20);
-}
-context.fillStyle = this.fontColor;
-context.fillText(this.text, this.point.x, this.point.y);
-context.restore();
-}
 };
 }
-function getInput(promptText, propToFill) {
-var mainText = promptText.main || promptText;
-var textToAdd = [{ className: 'center', text: mainText, id: 'inputdiv' }];
-if(promptText.subtext)
-textToAdd.push({ className: 'center', text: promptText.subtext });
-textToAdd.push('', '[esc]: cancel');
-var replacement = replaceInfoText(textToAdd);
-var b = replacement.bs[0];
-var prevCommands = window.eventListeners.clear();
-window.eventListeners.add('keydown', 'getInput', function(e) {
-if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
-b.textContent += (e.which - charCodes.zero);
-} else if(e.which == charCodes.enter) {
-window.eventListeners.remove('getInput');
-prevCommands.forEach(function(el) {
-window.eventListeners.add(el.eventType, el.callbackName, el.callback);
+function designCir(radStart, radEnd) {
+var circle = new Circle(radStart, radEnd);
+var startAxis = new AxisPair(radStart);
+showCircle();
+showInfo();
+displayHelpText('circle', 'c', [
+'[R]: set radius length'
+]);
+function showCircle() {
+circle.draw(front.context);
+startAxis.sketch(front.context);
+}
+function showInfo() {
+new AxisPair(circle.center).sketch(front.context);
+circle.radius.sketch(front.context);
+var text = 'center x: ' + circle.center.x + ', y: ' + circle.center.y + ', radius length: ' + circle.radius.length.toFixed(2);
+showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
+}
+front.eventListeners.add('mousemove', 'setEnd', function() {
+circle.radius.setEnd(front.lastPoint);
 });
-propToFill(infodiv.textContent.replace(mainText, ''));
-document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
-if(subdiv) document.getElementById('infopanel').removeChild(subdiv);
-} else if(e.which == charCodes['backspace']) {
-b.textContent = infodiv.textContent.slice(0, -1);
-} else if(e.which == charCodes['esc']) {
-window.eventListeners.remove('getInput');
-prevCommands.forEach(function(el) {
-window.eventListeners.add(el.eventType, el.callbackName, el.callback);
+front.eventListeners.add('mousemove', 'showCircle', showCircle);
+front.eventListeners.add('mousemove', 'showInfo', showInfo);
+front.eventListeners.add('click', 'saveCir', function() { circle.complete(); });
+window.eventListeners.add('keydown', 'circleCommands', function(e) {
+if(e.shiftKey) {
+switch(e.which) {
+case charCodes['r']:
+getInput('enter radius length: ', function(input) {
+circle.radius.fixedLength = parseInt(input);
+circle.radius.setEnd(front.lastPoint);
+front.clear();
+front.showAxes();
+showCircle();
+showInfo();
 });
-document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
-if(subdiv) document.getElementById('infopanel').removeChild(subdiv);
+break;
+}
 }
 });
 }
-function replaceInfoText(infoText) {
-var infodiv = document.getElementById('infodiv');
-var newdiv = document.createElement('div');
-newdiv.id = 'infodiv';
-var bs = infoText.map(function(text) {
-var b = document.createElement('b');
-if(text.id) b.id = text.id;
-if(text.className) b.className = text.className;
-var text = text.text || text || '<br/>';
-b.innerHTML = text;
-newdiv.appendChild(b);
-return b;
-});
-document.getElementById('infopanel').replaceChild(newdiv, infodiv);
-return { olddiv: infodiv, newdiv: newdiv, bs: bs };
+/////////////
+// Circle: //
+/////////////
+function Circle(radStart, radEnd) {
+Shape.call(this);
+this.center = radStart;
+this.radius = new Line(radStart, radEnd);
 }
-function displayHelpText(shapeName, ownCommand, shiftCommands) {
-var shapeCommands = [
-'drawing ' + shapeName,
-'',
-'[a]: arc',
-'[b]: bezier curve',
-'[c]: circle',
-'[e]: ellipse',
-'[l]: line',
-'[r]: rectangle',
-'[s]: square',
-'[t]: triangle'
-].filter(function(commandLine) {
-return commandLine.slice(0,3) != '[' + ownCommand + ']';
+Circle.prototype = new Shape;
+Circle.prototype.constructor = Circle;
+Circle.prototype.draw = function(context) {
+context.beginPath();
+context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
+context.stroke();
+}
+function designEllipse(radStart, radEnd) {
+var ellipse = new Ellipse(radStart, radEnd);
+var startAxis = new AxisPair(radStart);
+var arcAngle = new Arc(radStart, 15, new Angle(0), ellipse.rotation);
+showEllipse();
+showInfo();
+function showEllipse() {
+ellipse.draw(front.context);
+startAxis.sketch(front.context);
+arcAngle.endAngle = ellipse.rotation;
+arcAngle.sketch(front.context);
+}
+function showInfo() {
+var text = 'center x: ' + ellipse.center.x +
+', y: ' + ellipse.center.y +
+', semimajor axis length: ' + ellipse.semiMajor.length.toFixed(2) +
+', semiminor axis length: ' + ellipse.semiMinor.length.toFixed(2);
+showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
+front.context.save();
+front.context.translate(ellipse.center.x, ellipse.center.y);
+front.context.rotate(ellipse.rotation.rad);
+new Line({ x: 0, y: 0 }, { x: ellipse.xAxis.length, y: 0 }).sketch(front.context);
+new Line({ x: 0, y: 0 }, { x: 0, y: -ellipse.yAxis.length }).sketch(front.context);
+front.context.restore();
+var text = ellipse.rotation.deg.toFixed(2) + unescape("%B0");
+showText(text, radStart, new Angle(getAngle(radStart, front.lastPoint).rad + Math.PI), front.context);
+}
+front.eventListeners.add('mousemove', 'showEllipse', showEllipse);
+front.eventListeners.add('mousemove', 'showInfo', showInfo);
+front.eventListeners.add('mousemove', 'setRadiiEnds', function() {
+ellipse.xAxis.end.x = front.lastPoint.x;
+ellipse.yAxis.end.y = front.lastPoint.y
 });
-var allText = shapeCommands.concat([
-'',
-'[esc]: stop drawing',
-'',
-'Shift+'
-]).concat(shiftCommands);
-replaceInfoText(allText);
+front.eventListeners.add('click', 'setEllipseRotation', function() {
+front.eventListeners.remove('setEllipseRotation');
+front.eventListeners.remove('setRadiiEnds');
+var origRot = new Line(radStart, front.lastPoint).angle;
+front.eventListeners.add('mousemove', 'rotateEllipse', function() {
+var currAngle = getAngle(radStart, front.lastPoint);
+ellipse.rotation = new Angle(currAngle.rad - origRot.rad);
+});
+front.eventListeners.add('click', 'complete', function() { ellipse.complete() });
+});
+}
+//////////////
+// Ellipse: //
+//////////////
+function Ellipse(radStart, radEnd) {
+Shape.call(this);
+this.center = radStart;
+this.xAxis = new Line(radStart, { x: radEnd.x, y: radStart.y });
+this.yAxis = new Line(radStart, { x: radStart.x, y: radEnd.y });
+this.rotation = new Angle(0);
+}
+Ellipse.prototype = new Shape;
+Ellipse.prototype.constructor = Ellipse;
+Object.defineProperty(Ellipse.prototype, 'semiMajor', {
+get: function() {
+return this.yAxis.length >= this.xAxis.length ? this.yAxis : this.xAxis;
+}
+});
+Object.defineProperty(Ellipse.prototype, 'semiMinor', {
+get: function() {
+return this.yAxis.length >= this.xAxis.length ? this.xAxis : this.yAxis;
+}
+});
+Ellipse.prototype.draw = function(context) {
+context.beginPath();
+context.save();
+context.translate(this.center.x, this.center.y);
+context.rotate(this.rotation.rad);
+context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
+context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
+context.restore();
+context.stroke();
 }
