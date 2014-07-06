@@ -37,7 +37,7 @@ function designLine(startPoint, endPoint) {
   });
   front.eventListeners.add('mousemove', 'showLine', showLine);
   front.eventListeners.add('mousemove', 'showInfo', showInfo);
-  front.eventListeners.add('click', 'saveLine', line.complete.bind(line));
+  front.eventListeners.add('click', 'saveLine', function() { line.complete() });
 
   window.eventListeners.add('keydown', 'lineCommands', function(e) {
     if(e.shiftKey) {

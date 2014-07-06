@@ -24,10 +24,7 @@ function designCir(radStart, radEnd) {
 
   front.eventListeners.add('mousemove', 'showInfo', showInfo);
 
-  front.eventListeners.add('click', 'saveCir', function(e) {
-    front.stopDrawing(true);
-    circle.draw(back.context);
-  });
+  front.eventListeners.add('click', 'saveCir', function() { circle.complete() });
 }
 
 /////////////
