@@ -1,0 +1,38 @@
+body {
+  background-color: black;
+}
+
+canvas {
+  position: absolute;
+  right: 18px;
+  top: 20px;
+}
+
+#frontlayer {
+  border: 1px solid black;
+  opacity: 100%;
+}
+
+#backlayer {
+  background-color: white;
+}
+
+#infopanel {
+  position: absolute;
+  left: 18px;
+  top: 20px;
+  border: 1px solid black;
+  background-color: rgb(225,225,225);
+}
+
+#infodiv {
+  font-size: small;
+}
+
+#infodiv b {
+  display: block;
+}
+
+#infodiv b.center {
+  text-align: center;
+}
