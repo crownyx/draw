@@ -36,7 +36,7 @@ function getInput(promptText, propToFill) {
 }
 
 function replaceInfoText(infoText) {
-  var infodiv = document.getElementById('infodiv');
+  var infodiv = front().canvas.infodiv;
   var newdiv = document.createElement('div');
   newdiv.id = 'infodiv';
   var bs = infoText.map(function(text) {
@@ -50,28 +50,4 @@ function replaceInfoText(infoText) {
   });
   document.getElementById('infopanel').replaceChild(newdiv, infodiv);
   return { olddiv: infodiv, newdiv: newdiv, bs: bs };
-}
-
-function displayHelpText(shapeName, ownCommand, shiftCommands) {
-  var shapeCommands = [
-    'drawing ' + shapeName,
-    '',
-    '[a]: arc',
-    '[b]: bezier curve',
-    '[c]: circle',
-    '[e]: ellipse',
-    '[l]: line',
-    '[r]: rectangle',
-    '[s]: square',
-    '[t]: triangle'
-  ].filter(function(commandLine) {
-    return commandLine.slice(0,3) != '[' + ownCommand + ']';
-  });
-  var allText = shapeCommands.concat([
-    '',
-    '[esc]: stop drawing',
-    '',
-    'Shift+'
-  ]).concat(shiftCommands);
-  replaceInfoText(allText);
 }

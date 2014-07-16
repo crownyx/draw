@@ -6,6 +6,12 @@ function designEllipse(radStart, radEnd) {
   showEllipse();
   showInfo();
 
+  displayHelpText('ellipse', 'e', [
+    '[I]: set semim[I]nor axis length',
+    '[A]: set semim[A]jor axis length',
+    '[R]: set rotation'
+  ]);
+
   function showEllipse() {
     ellipse.draw(front.context);
 
@@ -52,6 +58,12 @@ function designEllipse(radStart, radEnd) {
     });
 
     front.eventListeners.add('click', 'complete', function() { ellipse.complete() });
+  });
+
+  window.eventListeners.add('keydown', 'ellipseCommands', function(e) {
+    if(e.shiftKey) {
+
+    }
   });
 }
 

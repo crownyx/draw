@@ -1,53 +1,13 @@
 function designLine(startPoint, endPoint) {
-  var line = new Line(startPoint, endPoint);
-  var startAxis = new AxisPair(line.start);
-  var arcAngle  = new Arc(line.start, 15, new Angle(0), line.angle);
-
-  showLine();
-  showInfo();
-
-  displayHelpText('line', 'l', [
-    '[L]: set length',
-    '[R]: set rotation'
-  ]);
-
-  function showLine() {
-    line.draw(front.context);
-
-    startAxis.sketch(front.context);
-
-    arcAngle.endAngle = line.angle;
-    arcAngle.sketch(front.context);
-  }
-
-  function showInfo() {
-    var text = 'x: '        + line.start.x.toFixed(2) +
-               ', y: '      + line.start.y.toFixed(2) +
-               ' to x: '    + line.end.x.toFixed(2)   +
-               ', y: '      + line.end.y.toFixed(2)   +
-               ', length: ' + line.length.toFixed(2);
-    showText(text, front.lastPoint, getAngle(line.start, front.lastPoint), front.context);
-
-    var text = line.angle.deg.toFixed(2) + unescape("%B0");
-    showText(text, line.start, new Angle(line.angle.rad + Math.PI), front.context);
-  }
-
-  front.eventListeners.add('mousemove', 'setEnd', function() {
-    line.setEnd(front.lastPoint);
-  });
-  front.eventListeners.add('mousemove', 'showLine', showLine);
-  front.eventListeners.add('mousemove', 'showInfo', showInfo);
-  front.eventListeners.add('click', 'saveLine', function() { line.complete() });
-
   window.eventListeners.add('keydown', 'lineCommands', function(e) {
     if(e.shiftKey) {
       switch(e.which) {
         case charCodes['l']:
           getInput('enter length: ', function(input) {
             line.fixedLength = parseInt(input);
-            line.setEnd(front.lastPoint);
-            front.clear();
-            front.showAxes();
+            line.setEnd(front().canvas.lastPoint);
+            front().canvas.clear();
+            front().canvas.showAxes();
             showLine();
             showInfo();
           });
@@ -55,9 +15,9 @@ function designLine(startPoint, endPoint) {
         case charCodes['r']:
           getInput({ main: 'enter rotation: ', subtext: '(in degrees)' }, function(input) {
             line.fixedRotation = new Angle(parseInt(input) / 180 * Math.PI);
-            line.setEnd(front.lastPoint);
-            front.clear();
-            front.showAxes();
+            line.setEnd(front().canvas.lastPoint);
+            front().canvas.clear();
+            front().canvas.showAxes();
             showLine();
             showInfo();
           });
@@ -73,6 +33,27 @@ function designLine(startPoint, endPoint) {
 
 function Line(start, end) {
   Shape.call(this);
+
+  this.name          = 'LINE';
+  this.ownCommand    = 'l';
+
+  this.shiftCommands = {
+    'L': {
+      info:       'set length',
+      promptText: 'enter length: ',
+      setProp:    function(length) {
+        this.fixedLength = length;
+      }
+    },
+    'A': {
+      info:       'set angle/rotation',
+      promptText: { main: 'enter angle: ', subtext: '(in degrees)' },
+      setProp:    function(deg) {
+        this.fixedRotation = new Angle(deg / 180 * Math.PI);
+      }
+    }
+  };
+
   this.start = start;
   this.end   = end;
 }
@@ -103,6 +84,26 @@ Object.defineProperty(Line.prototype, 'angle', {
   get: function() { return getAngle(this.start, this.end); },
 });
 
+Object.defineProperty(Line.prototype, 'arcAngle', {
+  get: function() {
+    var arc = new Arc(this.start, 15, new Angle(0), this.angle);
+    (function(line) {
+      arc.setEnd = function(point) {
+        this.endAngle = getAngle(line.start, point);
+      };
+    })(this);
+    return arc;
+  }
+});
+
+Object.defineProperty(Line.prototype, 'showText', {
+  get: function() {
+    return 'length: ' + this.length.toFixed(2);
+  }
+});
+
+Line.prototype.nextStep = Line.prototype.complete;
+
 Line.prototype.draw = function(context) {
   context.beginPath();
     context.moveTo(this.start.x, this.start.y);
@@ -115,17 +116,17 @@ Line.prototype.draw = function(context) {
 ////////////////////
 
 function VerticalLine(x) {
-  return new Line({ x: x, y: 0 }, { x: x, y: front.canvas.height });
+  return new Line({ x: x, y: 0 }, { x: x, y: front().canvas.height });
 }
 
 function HorizontalLine(y) {
-  return new Line({ x: 0, y: y }, { x: front.canvas.width, y: y });
+  return new Line({ x: 0, y: y }, { x: front().canvas.width, y: y });
 }
 
 function AxisPair(origin) {
   return {
-    vertical: new Line({ x: origin.x, y: 0 }, { x: origin.x, y: front.canvas.height }),
-    horizontal: new Line({ x: 0, y: origin.y }, { x: front.canvas.width, y: origin.y }),
+    vertical: new Line({ x: origin.x, y: 0 }, { x: origin.x, y: front().canvas.height }),
+    horizontal: new Line({ x: 0, y: origin.y }, { x: front().canvas.width, y: origin.y }),
     draw: function(context) {
       this.vertical.draw(context);
       this.horizontal.draw(context);

@@ -1,5 +1,5 @@
 function designRect(diagStart, diagEnd) {
-  displayHelpText('rectangle', 'r', [
+  displayHelpText('RECTANGLE', 'r', [
     '[H]: set height',
     '[L]: set length',
     '[R]: set rotation'
@@ -29,7 +29,7 @@ function designRect(diagStart, diagEnd) {
     showText(text, front.lastPoint, getAngle(rect.diagonal.start, front.lastPoint), front.context);
 
     var text = rect.rotation.deg.toFixed(2) + unescape("%B0")
-    showText(text, rect.diagonal.start, new Angle(rect.rotation.rad + Math.PI), front.context);
+    showText(text, rect.diagonal.start, new Angle(getAngle(diagStart, front.lastPoint).rad + Math.PI), front.context);
   }
 
   front.eventListeners.add('mousemove', 'setEnd', function() {
@@ -39,23 +39,23 @@ function designRect(diagStart, diagEnd) {
   front.eventListeners.add('mousemove', 'showRect', showRect);
   front.eventListeners.add('mousemove', 'showInfo', showInfo);
 
-  front.eventListeners.add('click', 'setRectRot', function(e) {
-    if(rect.fixedRotation) rect.complete();
+  //front.eventListeners.add('click', 'setRectRot', function(e) {
+  //  if(rect.fixedRotation) rect.complete();
 
-    front.eventListeners.remove('setEnd');
-    front.eventListeners.remove('setRectRot');
+  //  front.eventListeners.remove('setEnd');
+  //  front.eventListeners.remove('setRectRot');
 
-    rect.fixedLength = rect.length;
-    rect.fixedHeight = rect.height;
-    rect.inRotation = true;
+  //  rect.fixedLength = rect.length;
+  //  rect.fixedHeight = rect.height;
+  //  rect.inRotation = true;
 
-    front.eventListeners.add('mousemove', 'setRot', function() {
-      var angle = getAngle(rect.diagonal.start, front.lastPoint);
-      rect.rotation = new Angle(angle.rad - rect.diagonal.angle.rad);
-    });
+  //  front.eventListeners.add('mousemove', 'setRot', function() {
+  //    var angle = getAngle(rect.diagonal.start, front.lastPoint);
+  //    rect.rotation = new Angle(angle.rad - rect.diagonal.angle.rad);
+  //  });
 
-    front.eventListeners.add('click', 'saveRect', rect.complete.bind(rect));
-  });
+  front.eventListeners.add('click', 'saveRect', function() { rect.complete(); });
+  //});
 
   window.eventListeners.add('keydown', 'rectCommands', function(e) {
     if(e.shiftKey) {

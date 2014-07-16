@@ -19,7 +19,7 @@ function designCir(radStart, radEnd) {
     new AxisPair(circle.center).sketch(front.context);
     circle.radius.sketch(front.context);
 
-    var text = 'center x: ' + circle.center.x + ', y: ' + circle.center.y + ', radius length: ' + circle.radius.length.toFixed(2);
+    var text = 'radius length: ' + circle.radius.length.toFixed(2);
     showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
   }
 
