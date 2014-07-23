@@ -21,7 +21,6 @@ function getInput(promptText, propToFill) {
       });
       propToFill(infodiv.textContent.replace(mainText, ''));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
-      if(subdiv) document.getElementById('infopanel').removeChild(subdiv);
     } else if(e.which == charCodes['backspace']) {
       b.textContent = infodiv.textContent.slice(0, -1);
     } else if(e.which == charCodes['esc']) {
@@ -30,13 +29,12 @@ function getInput(promptText, propToFill) {
         window.eventListeners.add(el.eventType, el.callbackName, el.callback);
       });
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
-      if(subdiv) document.getElementById('infopanel').removeChild(subdiv);
     }
   });
 }
 
 function replaceInfoText(infoText) {
-  var infodiv = front().canvas.infodiv;
+  var infodiv = document.getElementById('infodiv');
   var newdiv = document.createElement('div');
   newdiv.id = 'infodiv';
   var bs = infoText.map(function(text) {

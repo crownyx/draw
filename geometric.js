@@ -8,8 +8,8 @@ function Point(x, y) {
 
 function getPoint(point) {
   return (new Point (
-    point.pageX - front().canvas.offsetLeft,
-    point.pageY - front().canvas.offsetTop
+    point.pageX - front.canvas.offsetLeft,
+    point.pageY - front.canvas.offsetTop
   ));
 }
 

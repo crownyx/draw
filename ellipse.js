@@ -1,78 +1,6 @@
-function designEllipse(radStart, radEnd) {
-  var ellipse = new Ellipse(radStart, radEnd);
-  var startAxis = new AxisPair(radStart);
-  var arcAngle = new Arc(radStart, 15, new Angle(0), ellipse.rotation);
-
-  showEllipse();
-  showInfo();
-
-  displayHelpText('ellipse', 'e', [
-    '[I]: set semim[I]nor axis length',
-    '[A]: set semim[A]jor axis length',
-    '[R]: set rotation'
-  ]);
-
-  function showEllipse() {
-    ellipse.draw(front.context);
-
-    startAxis.sketch(front.context);
-
-    arcAngle.endAngle = ellipse.rotation;
-    arcAngle.sketch(front.context);
-  }
-
-  function showInfo() {
-    var text = 'center x: ' + ellipse.center.x +
-               ', y: ' + ellipse.center.y +
-               ', semimajor axis length: ' + ellipse.semiMajor.length.toFixed(2) +
-               ', semiminor axis length: ' + ellipse.semiMinor.length.toFixed(2);
-    showText(text, front.lastPoint, getAngle(radStart, front.lastPoint), front.context);
-
-    front.context.save();
-      front.context.translate(ellipse.center.x, ellipse.center.y);
-      front.context.rotate(ellipse.rotation.rad);
-      new Line({ x: 0, y: 0 }, { x: ellipse.xAxis.length, y: 0 }).sketch(front.context);
-      new Line({ x: 0, y: 0 }, { x: 0, y: -ellipse.yAxis.length }).sketch(front.context);
-    front.context.restore();
-
-    var text = ellipse.rotation.deg.toFixed(2) + unescape("%B0");
-    showText(text, radStart, new Angle(getAngle(radStart, front.lastPoint).rad + Math.PI), front.context);
-  }
-
-  front.eventListeners.add('mousemove', 'showEllipse', showEllipse);
-  front.eventListeners.add('mousemove', 'showInfo', showInfo);
-  front.eventListeners.add('mousemove', 'setRadiiEnds', function() {
-    ellipse.xAxis.end.x = front.lastPoint.x;
-    ellipse.yAxis.end.y = front.lastPoint.y
-  });
-
-  front.eventListeners.add('click', 'setEllipseRotation', function() {
-    front.eventListeners.remove('setEllipseRotation');
-    front.eventListeners.remove('setRadiiEnds');
-
-    var origRot = new Line(radStart, front.lastPoint).angle;
-
-    front.eventListeners.add('mousemove', 'rotateEllipse', function() {
-      var currAngle = getAngle(radStart, front.lastPoint);
-      ellipse.rotation = new Angle(currAngle.rad - origRot.rad);
-    });
-
-    front.eventListeners.add('click', 'complete', function() { ellipse.complete() });
-  });
-
-  window.eventListeners.add('keydown', 'ellipseCommands', function(e) {
-    if(e.shiftKey) {
-
-    }
-  });
-}
-
-//////////////
-// Ellipse: //
-//////////////
-
 function Ellipse(radStart, radEnd) {
   Shape.call(this);
+
   this.center = radStart;
   this.xAxis = new Line(radStart, { x: radEnd.x, y: radStart.y });
   this.yAxis = new Line(radStart, { x: radStart.x, y: radEnd.y });
@@ -103,4 +31,11 @@ Ellipse.prototype.draw = function(context) {
       context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
     context.restore();
   context.stroke();
+}
+
+Ellipse.prototype.infoText = function() { return 'length'; }
+
+Ellipse.prototype.setEnd = function(point) {
+  this.yAxis.setEnd(new Point(this.center.x, point.y));
+  this.xAxis.setEnd(new Point(point.x, this.center.y));
 }
