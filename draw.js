@@ -19,7 +19,10 @@ window.onload = function() {
   front.canvas.addEventListener('mousemove', function()  { front.showAxes();              }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showPos();               }, false);
 
-  front.eventListeners.add('click', 'design', function(e) { front.startDrawing(e); });
+  front.eventListeners.add('click', 'design', function(e) {
+    front.startPoint = getPoint(e);
+    designLine();
+  });
 }
 
 function drawCommands(e) {
@@ -30,24 +33,20 @@ function drawCommands(e) {
         front.refresh(true);
       break;
       case charCodes['c']:
-        front.refresh();
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
         design(Circle);
+        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['e']:
-        front.refresh();
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
         design(Ellipse);
+        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['l']:
-        front.refresh();
+        designLine();
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-        design(Line);
       break;
       case charCodes['r']:
-        front.refresh();
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
         design(Rectangle);
+        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
     }
   }

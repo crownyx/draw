@@ -25,9 +25,11 @@ Canvas.prototype.refresh = function(restart) {
   window.eventListeners.clear();
 
   if(restart) {
-    (function(cvs) {
-      cvs.eventListeners.add('click', 'startDrawing', function(e) { cvs.startDrawing(e); });
-    })(this);
+    var cvs = this;
+    this.eventListeners.add('click', 'startDrawing', function(e) {
+      cvs.startPoint = getPoint(e);
+      designLine();
+    });
 
     this.infopanel.replaceChild(this.infopanel.infodiv, document.getElementById('infodiv'));
   }
@@ -48,14 +50,23 @@ Canvas.prototype.showPos = function() {
   );
 };
 
-Canvas.prototype.startDrawing = function(e) {
-  this.startPoint = getPoint(e);
-  design(Line);
-  (function(cvs) {
-    cvs.eventListeners.add('mousemove', 'showXAxis', function() {
-      new HorizontalLine(cvs.startPoint.y).sketch(cvs.context);
-    });
-  })(this);
+function designLine() {
+  var line = design(Line);
+  front.eventListeners.add('mousemove', 'showXAxis', function() {
+    new HorizontalLine(front.startPoint.y).sketch(front.context);
+  });
+  front.eventListeners.add('mousemove', 'showAngle', function() {
+    new Arc(line.start, 15, new Angle(0), line.angle).sketch(front.context);
+    front.context.textAlign = 'right';
+    front.context.fillText(
+      line.angle.deg.toFixed(2) + unescape("\xB0"),
+      front.lastPoint.x - 10,
+      front.lastPoint.y + 15
+    );
+    front.context.textAlign = 'start';
+  });
+  new Arc(line.start, 15, new Angle(0), line.angle).sketch(front.context);
+  new HorizontalLine(front.startPoint.y).sketch(front.context);
 }
 
 function design(shapeConstructor) {
@@ -76,32 +87,36 @@ function design(shapeConstructor) {
   shape.draw(front.context);
   front.context.fillText(shape.infoText(), 10, 15);
 
-  front.infopanel.replaceChild(
-    (function() {
-      var newdiv = document.createElement('div');
-      ['[a]: arc',
-       '[b]: bezier curve',
-       '[c]: circle',
-       '[e]: ellipse',
-       '[l]: line',
-       '[r]: rectangle',
-       '[s]: square',
-       '[t]: triangle',
-       '',
-       '[esc]: stop drawing'
-      ].map(function(line) {
-        var span = document.createElement('span');
-        span.textContent = line;
-        return span;
-      }).forEach(function(span) {
-        newdiv.appendChild(span);
-        newdiv.appendChild(document.createElement('br'));
-      });
-      newdiv.id = 'infodiv';
-      return newdiv;
-    })(),
-    front.infopanel.infodiv
-  );
+  if(front.infopanel.contains(front.infopanel.infodiv)) {
+    front.infopanel.replaceChild(
+      (function() {
+        var newdiv = document.createElement('div');
+        ['[a]: arc',
+         '[b]: bezier curve',
+         '[c]: circle',
+         '[e]: ellipse',
+         '[l]: line',
+         '[r]: rectangle',
+         '[s]: square',
+         '[t]: triangle',
+         '',
+         '[esc]: stop drawing'
+        ].map(function(line) {
+          var span = document.createElement('span');
+          span.textContent = line;
+          return span;
+        }).forEach(function(span) {
+          newdiv.appendChild(span);
+          newdiv.appendChild(document.createElement('br'));
+        });
+        newdiv.id = 'infodiv';
+        return newdiv;
+      })(),
+      front.infopanel.infodiv
+    );
+  }
+
+  return shape;
 }
 
 var front = new Canvas('frontlayer');
