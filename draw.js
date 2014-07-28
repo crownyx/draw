@@ -19,9 +19,17 @@ window.onload = function() {
   front.canvas.addEventListener('mousemove', function()  { front.showAxes();              }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showPos();               }, false);
 
+  commandMode();
+}
+
+function commandMode() {
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = getPoint(e);
     designLine();
+  });
+
+  window.eventListeners.add('keydown', 'selectMode', function(e) {
+    if(e.which == charCodes['s']) selectMode();
   });
 }
 

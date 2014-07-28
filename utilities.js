@@ -42,7 +42,7 @@ function replaceInfoText(infoText) {
     if(text.id) b.id = text.id;
     if(text.className) b.className = text.className;
     var text = text.text || text || '<br/>';
-    b.innerHTML = text;
+    b.textContent = text;
     newdiv.appendChild(b);
     return b;
   });

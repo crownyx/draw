@@ -2,6 +2,7 @@ function Shape() { }
 
 Shape.prototype.complete = function() {
   front.refresh(true);
+  back.shapes.push(this);
   this.draw(back.context);
 }
 
@@ -12,6 +13,13 @@ Shape.prototype.sketch = function(context) {
     context.setLineDash([5]);
     this.draw(context);
   context.restore();
+}
+
+Shape.prototype.showPoints = function() {
+  this.points.forEach(function(point) {
+    var circle = new Circle(point, new Point(point.x + 2, point.y));
+    circle.fill(front.context);
+  });
 }
 
 /*\ Shape public interface:

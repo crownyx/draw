@@ -25,12 +25,7 @@ Canvas.prototype.refresh = function(restart) {
   window.eventListeners.clear();
 
   if(restart) {
-    var cvs = this;
-    this.eventListeners.add('click', 'startDrawing', function(e) {
-      cvs.startPoint = getPoint(e);
-      designLine();
-    });
-
+    commandMode();
     this.infopanel.replaceChild(this.infopanel.infodiv, document.getElementById('infodiv'));
   }
 }
@@ -77,8 +72,8 @@ function design(shapeConstructor) {
   var shape = new shapeConstructor(front.startPoint, front.lastPoint);
 
   front.eventListeners.add('mousemove', 'setEnd',    function(e) { shape.setEnd(getPoint(e)); });
-  front.eventListeners.add('mousemove', 'showShape', function(e) { shape.draw(front.context); });
-  front.eventListeners.add('click', 'nextStep',      function(e) { shape.complete();          });
+  front.eventListeners.add('mousemove', 'drawShape', function()  { shape.draw(front.context); });
+  front.eventListeners.add('click', 'completeShape', function()  { shape.complete();          });
 
   front.eventListeners.add('mousemove', 'showText', function() {
     front.context.fillText(shape.infoText(), 10, 15);
@@ -101,13 +96,16 @@ function design(shapeConstructor) {
          '[t]: triangle',
          '',
          '[esc]: stop drawing'
-        ].map(function(line) {
-          var span = document.createElement('span');
-          span.textContent = line;
-          return span;
-        }).forEach(function(span) {
-          newdiv.appendChild(span);
-          newdiv.appendChild(document.createElement('br'));
+        ].forEach(function(line) {
+          newdiv.appendChild((function() {
+            if(line) {
+              var b = document.createElement('b');
+              b.textContent = line;
+              return b;
+            } else {
+              return document.createElement('br');
+            }
+          })());
         });
         newdiv.id = 'infodiv';
         return newdiv;

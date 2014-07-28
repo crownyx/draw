@@ -25,6 +25,21 @@ Line.prototype.setEnd = function(point) {
   }
 }
 
+Object.defineProperty(Line.prototype, 'mid', {
+  get: function() {
+    return new Point(
+      (this.end.x + this.start.x) / 2,
+      (this.end.y + this.start.y) / 2
+    );
+  }
+});
+
+Object.defineProperty(Line.prototype, "points", {
+  get: function() {
+    return [this.start, this.mid, this.end];
+  }
+});
+
 Object.defineProperty(Line.prototype, 'length', {
   get: function() {
     return Math.sqrt(Math.pow(this.end.x - this.start.x, 2) + Math.pow(this.end.y - this.start.y, 2));

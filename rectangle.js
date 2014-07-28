@@ -24,6 +24,18 @@ Rectangle.prototype.infoText = function() {
   return 'length: ' + this.length.toFixed(2) + ', height: ' + this.height.toFixed(2);
 }
 
+Object.defineProperty(Rectangle.prototype, 'points', {
+  get: function() {
+    var start = this.diagonal.start, end = this.diagonal.end;
+    return [
+      start,
+      new Point(end.x, start.y),
+      end,
+      new Point(start.x, end.y)
+    ];
+  }
+});
+
 Rectangle.prototype.setEnd = function(point) {
   var quad = (this.inRotation ? this.diagonal.angle : getAngle(this.diagonal.start, point)).quadrant;
 

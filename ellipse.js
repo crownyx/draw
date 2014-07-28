@@ -22,6 +22,18 @@ Object.defineProperty(Ellipse.prototype, 'semiMinor', {
   }
 });
 
+Object.defineProperty(Ellipse.prototype, 'points', {
+  get: function() {
+    return [
+      this.center,
+      new Point(this.center.x, this.center.y - this.yAxis.length),
+      new Point(this.center.x + this.xAxis.length, this.center.y),
+      new Point(this.center.x, this.center.y + this.yAxis.length),
+      new Point(this.center.x - this.xAxis.length, this.center.y)
+    ];
+  }
+});
+
 Ellipse.prototype.draw = function(context) {
   context.beginPath();
     context.save();
