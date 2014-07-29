@@ -4,6 +4,11 @@ function Point(x, y) {
   this.toString = function() {
     return "(x: " + this.x + ", y: " + this.y + ")";
   }
+  this.fill = function(context, params = {}) {
+    context.beginPath();
+      context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
+    context.fill();
+  }
 }
 
 function getPoint(point) {

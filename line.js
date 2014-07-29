@@ -50,7 +50,7 @@ Object.defineProperty(Line.prototype, 'angle', {
   get: function() { return getAngle(this.start, this.end); },
 });
 
-Line.prototype.draw = function(context) {
+Line.prototype._ownDraw = function(context) {
   context.beginPath();
     context.moveTo(this.start.x, this.start.y);
     context.lineTo(this.end.x, this.end.y);

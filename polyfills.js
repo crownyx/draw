@@ -27,3 +27,8 @@ if (!Array.prototype.findIndex) {
     }
   });
 }
+
+Array.prototype.remove = function(obj) {
+  var index = this.indexOf(obj);
+  this.splice(index, 1);
+}

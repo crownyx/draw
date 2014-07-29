@@ -11,15 +11,24 @@ Shape.prototype.sketch = function(context) {
     context.strokeStyle = "blue";
     context.lineWidth = 0.5;
     context.setLineDash([5]);
-    this.draw(context);
+    this._ownDraw(context);
   context.restore();
 }
 
-Shape.prototype.showPoints = function() {
+Shape.prototype.showPoints = function(context) {
   this.points.forEach(function(point) {
     var circle = new Circle(point, new Point(point.x + 2, point.y));
-    circle.fill(front.context);
+    circle.fill(context);
   });
+}
+
+Shape.prototype.draw = function(context) {
+  context.save();
+    context.strokeStyle = this.strokeStyle || context.strokeStyle;
+    context.lineWidth   = this.lineWidth   || context.lineWidth;
+    context.setLineDash(this.lineDash || []);
+    this._ownDraw(context);
+  context.restore();
 }
 
 /*\ Shape public interface:

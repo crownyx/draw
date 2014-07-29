@@ -34,7 +34,7 @@ Object.defineProperty(Ellipse.prototype, 'points', {
   }
 });
 
-Ellipse.prototype.draw = function(context) {
+Ellipse.prototype._ownDraw = function(context) {
   context.beginPath();
     context.save();
       context.translate(this.center.x, this.center.y);

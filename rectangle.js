@@ -49,7 +49,7 @@ Rectangle.prototype.setEnd = function(point) {
  this.diagonal.setEnd(new Point(x, y));
 }
 
-Rectangle.prototype.draw = function(context) {
+Rectangle.prototype._ownDraw = function(context) {
   var width  = this.diagonal.end.x - this.diagonal.start.x,
       height = this.diagonal.end.y - this.diagonal.start.y;
   context.save();

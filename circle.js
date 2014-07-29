@@ -21,7 +21,7 @@ Object.defineProperty(Circle.prototype, 'points', {
   }
 });
 
-Circle.prototype.draw = function(context) {
+Circle.prototype._ownDraw = function(context) {
   context.beginPath();
     context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
   context.stroke();

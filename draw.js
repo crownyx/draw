@@ -41,11 +41,11 @@ function drawCommands(e) {
         front.refresh(true);
       break;
       case charCodes['c']:
-        design(Circle);
+        design(new Circle(front.startPoint, front.lastPoint));
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['e']:
-        design(Ellipse);
+        design(new Ellipse(front.startPoint, front.lastPoint));
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['l']:
@@ -53,7 +53,7 @@ function drawCommands(e) {
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['r']:
-        design(Rectangle);
+        design(new Rectangle(front.startPoint, front.lastPoint));
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
     }
