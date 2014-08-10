@@ -11,7 +11,9 @@ Shape.prototype.sketch = function(context) {
     context.strokeStyle = "blue";
     context.lineWidth = 0.5;
     context.setLineDash([5]);
-    this._ownDraw(context);
+    context.beginPath();
+      this.drawPath(context);
+    context.stroke();
   context.restore();
 }
 
@@ -27,22 +29,11 @@ Shape.prototype.draw = function(context) {
     context.strokeStyle = this.strokeStyle || context.strokeStyle;
     context.lineWidth   = this.lineWidth   || context.lineWidth;
     context.setLineDash(this.lineDash || []);
-    this._ownDraw(context);
+    context.beginPath();
+      this.drawPath(context);
+    context.stroke();
   context.restore();
 }
 
 /*\ Shape public interface:
-|*| name          : eg 'LINE'
-|*| ownCommand    : eg 'l'
-|*| setEnd(point) :
-|*| arcAngle      : optional. use Object.defineProperty, have it return an arc
-|*| showText      : text at endpoint. use Object.defineProperty
-|*| nextStep      : must eventually resolve to Shape.prototype.complete()
-|*| draw(context)
-|*|
-|*| shiftCommands : eg { 'L': { ... see below ... }, 'A': { ... see below ... } }
-|*|    name       : used for window.eventListeners.add('keydown', name ...
-|*|    info       : used in shapes help text
-|*|    promptText : used in getInput mode
-|*|    setProp    : function
 \*/

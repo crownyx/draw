@@ -50,11 +50,16 @@ Object.defineProperty(Line.prototype, 'angle', {
   get: function() { return getAngle(this.start, this.end); },
 });
 
-Line.prototype._ownDraw = function(context) {
-  context.beginPath();
-    context.moveTo(this.start.x, this.start.y);
-    context.lineTo(this.end.x, this.end.y);
-  context.stroke();
+Line.prototype.drawPath = function(context) {
+  context.moveTo(this.start.x, this.start.y);
+  context.lineTo(this.end.x, this.end.y);
+}
+
+Line.prototype.translate = function(point) {
+  var xDiff = this.mid.x - point.x;
+  var yDiff = this.mid.y - point.y;
+  this.start = new Point(this.start.x - xDiff, this.start.y - yDiff);
+  this.end = new Point(this.end.x - xDiff, this.end.y - yDiff);
 }
 
 ////////////////////
@@ -66,7 +71,7 @@ function VerticalLine(x) {
 }
 
 function HorizontalLine(y) {
-  return new Line({ x: 0, y: y }, { x: front.canvas.width, y: y });
+  return new Line(new Point(0, y), new Point(front.canvas.width, y));
 }
 
 function AxisPair(origin) {

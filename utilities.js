@@ -41,8 +41,8 @@ function replaceInfoText(infoText) {
     var b = document.createElement('b');
     if(text.id) b.id = text.id;
     if(text.className) b.className = text.className;
-    var text = text.text || text || '<br/>';
-    b.textContent = text;
+    var text = text.text || text;
+    if(text) { b.textContent = text; } else { b = document.createElement('br'); }
     newdiv.appendChild(b);
     return b;
   });

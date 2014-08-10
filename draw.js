@@ -28,8 +28,11 @@ function commandMode() {
     designLine();
   });
 
-  window.eventListeners.add('keydown', 'selectMode', function(e) {
-    if(e.which == charCodes['s']) selectMode();
+  window.eventListeners.add('keydown', 'switchMode', function(e) {
+    switch(e.which) {
+      case charCodes['s']: selectMode(); break;
+      case charCodes['e']: editMode(); break;
+    }
   });
 }
 
@@ -73,6 +76,11 @@ function EventListenerCollection(receiver) {
       receiver.removeEventListener(cb.eventType, cb.callback, false);
       this.added.splice(index, 1);
       return cb;
+    },
+    find: function(callbackName) {
+      return(this.added.find(function(cb) {
+        return cb.callbackName == callbackName;
+      }));
     },
     clear: function() {
       var had = this.added;

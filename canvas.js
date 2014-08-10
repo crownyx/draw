@@ -17,9 +17,11 @@ Canvas.prototype.clear = function() {
 
 Canvas.prototype.refresh = function(restart) {
   this.clear();
-  this.eventListeners.clear();
-  this.showPos();
-  this.showAxes();
+  this.shapes.forEach(function(shape) { shape.draw(this.context); }, this);
+
+  if(this.lastPoint) this.showPos();
+  if(this.lastPoint) this.showAxes();
+  if(this.eventListeners) this.eventListeners.clear();
 
   window.eventListeners.clear();
 

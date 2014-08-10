@@ -4,10 +4,24 @@ function Point(x, y) {
   this.toString = function() {
     return "(x: " + this.x + ", y: " + this.y + ")";
   }
-  this.fill = function(context, params = {}) {
-    context.beginPath();
-      context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
-    context.fill();
+  this.fill = function(context, params = { radius: 2 }) {
+    context.save();
+      context.fillStyle = this.fillStyle || context.fillStyle;
+      context.beginPath();
+        context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
+      context.fill();
+    context.restore();
+  }
+  this.draw = function(context, params = { radius: 2 }) {
+    context.save();
+      context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
+      context.beginPath();
+        context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
+      context.stroke();
+    context.restore();
+  }
+  this.same = function(point) {
+    return point.x == this.x && point.y == this.y;
   }
 }
 

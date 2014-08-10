@@ -3,6 +3,8 @@ function Rectangle(diagStart, diagEnd) {
 
   this.diagonal = new Line(diagStart, diagEnd);
   this.rotation = new Angle(0);
+
+  this.controlLine = this.diagonal;
 }
 
 Rectangle.prototype = new Shape;
@@ -49,12 +51,19 @@ Rectangle.prototype.setEnd = function(point) {
  this.diagonal.setEnd(new Point(x, y));
 }
 
-Rectangle.prototype._ownDraw = function(context) {
-  var width  = this.diagonal.end.x - this.diagonal.start.x,
-      height = this.diagonal.end.y - this.diagonal.start.y;
-  context.save();
-    context.translate(this.diagonal.start.x, this.diagonal.start.y);
-    context.rotate((this.fixedRotation || this.rotation).rad);
-    context.strokeRect(0, 0, width, height);
-  context.restore();
+Rectangle.prototype.drawPath = function(context) {
+  context.moveTo(this.diagonal.start.x, this.diagonal.start.y);
+  context.lineTo(this.diagonal.start.x, this.diagonal.end.y);
+  context.lineTo(this.diagonal.end.x, this.diagonal.end.y);
+  context.lineTo(this.diagonal.end.x, this.diagonal.start.y);
+  context.lineTo(this.diagonal.start.x, this.diagonal.start.y);
+}
+
+Rectangle.prototype.fill = function(context) {
+  context.fillRect(
+    this.diagonal.start.x,
+    this.diagonal.start.y,
+    this.diagonal.end.x - this.diagonal.start.x,
+    this.diagonal.end.y - this.diagonal.start.y
+  );
 }
