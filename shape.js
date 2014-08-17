@@ -24,10 +24,10 @@ Shape.prototype.showPoints = function(context) {
   });
 }
 
-Shape.prototype.draw = function(context) {
+Shape.prototype.draw = function(context, params = {}) {
   context.save();
-    context.strokeStyle = this.strokeStyle || context.strokeStyle;
-    context.lineWidth   = this.lineWidth   || context.lineWidth;
+    context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
+    context.lineWidth   = this.lineWidth   || params.lineWidth   || context.lineWidth;
     context.setLineDash(this.lineDash || []);
     context.beginPath();
       this.drawPath(context);

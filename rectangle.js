@@ -3,8 +3,6 @@ function Rectangle(diagStart, diagEnd) {
 
   this.diagonal = new Line(diagStart, diagEnd);
   this.rotation = new Angle(0);
-
-  this.controlLine = this.diagonal;
 }
 
 Rectangle.prototype = new Shape;
@@ -26,6 +24,10 @@ Rectangle.prototype.infoText = function() {
   return 'length: ' + this.length.toFixed(2) + ', height: ' + this.height.toFixed(2);
 }
 
+Object.defineProperty(Rectangle.prototype, 'center', {
+  get: function() { return this.diagonal.mid; }
+});
+
 Object.defineProperty(Rectangle.prototype, 'points', {
   get: function() {
     var start = this.diagonal.start, end = this.diagonal.end;
@@ -33,10 +35,15 @@ Object.defineProperty(Rectangle.prototype, 'points', {
       start,
       new Point(end.x, start.y),
       end,
-      new Point(start.x, end.y)
+      new Point(start.x, end.y),
+      this.center
     ];
   }
 });
+
+Rectangle.prototype.translate = function(point) {
+  this.diagonal.translate(point);
+}
 
 Rectangle.prototype.setEnd = function(point) {
   var quad = (this.inRotation ? this.diagonal.angle : getAngle(this.diagonal.start, point)).quadrant;

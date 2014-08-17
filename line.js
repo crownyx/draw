@@ -34,6 +34,10 @@ Object.defineProperty(Line.prototype, 'mid', {
   }
 });
 
+Object.defineProperty(Line.prototype, 'center', {
+  get: function() { return this.mid; }
+});
+
 Object.defineProperty(Line.prototype, "points", {
   get: function() {
     return [this.start, this.mid, this.end];

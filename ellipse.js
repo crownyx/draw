@@ -49,3 +49,11 @@ Ellipse.prototype.setEnd = function(point) {
   if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.center.x, point.y));
   if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.center.y));
 }
+
+Ellipse.prototype.translate = function(point) {
+  var xDiff = point.x - this.center.x;
+  var yDiff = point.y - this.center.y;
+  this.center = point;
+  this.xAxis = new Line(point, new Point(this.xAxis.end.x + xDiff, this.xAxis.end.y + yDiff));
+  this.yAxis = new Line(point, new Point(this.yAxis.end.x + xDiff, this.yAxis.end.y + yDiff));
+}

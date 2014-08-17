@@ -36,3 +36,10 @@ Circle.prototype.fill = function(context) {
 Circle.prototype.infoText = function() {
   return "radius: " + this.radius.length.toFixed(2);
 }
+
+Circle.prototype.translate = function(point) {
+  var xDiff = point.x - this.center.x;
+  var yDiff = point.y - this.center.y;
+  this.center = point;
+  this.radius = new Line(point, new Point(this.radius.end.x + xDiff, this.radius.end.y + yDiff));
+}
