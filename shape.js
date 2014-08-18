@@ -1,8 +1,8 @@
 function Shape() { }
 
 Shape.prototype.complete = function() {
-  front.refresh(true);
   back.shapes.push(this);
+  front.refresh(true);
   this.draw(back.context);
 }
 

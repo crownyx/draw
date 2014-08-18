@@ -14,19 +14,35 @@ function design(shape) {
   shape.draw(front.context);
   front.context.fillText(shape.infoText(), 10, 15);
 
-  if(front.infopanel.contains(front.infopanel.infodiv)) {
-    replaceInfoText(['[a]: arc',
-     '[b]: bezier curve',
-     '[c]: circle',
-     '[e]: ellipse',
-     '[l]: line',
-     '[r]: rectangle',
-     '[s]: square',
-     '[t]: triangle',
-     '',
-     '[esc]: stop drawing'
-    ]);
-  }
+  front.infopanel.replaceChild(
+    (function(div) {
+      div.id = "infodiv";
+      var commands = [
+       '[a]: arc',
+       '[b]: bezier curve',
+       '[c]: circle',
+       '[e]: ellipse',
+       '[l]: line',
+       '[r]: rectangle',
+       '[s]: square',
+       '[t]: triangle',
+       '',
+       '[esc]: stop drawing'
+      ];
+      commands.forEach(function(command) {
+        if(command) {
+          div.appendChild((function(b) {
+            b.textContent = command;
+            return b;
+          })(document.createElement('b')));
+        } else {
+          div.appendChild(document.createElement('br'));
+        }
+      });
+      return div;
+    })(document.createElement('div')),
+    document.getElementById('infodiv')
+  );
 
   return shape;
 }

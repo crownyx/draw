@@ -23,6 +23,31 @@ window.onload = function() {
 }
 
 function commandMode() {
+  front.infopanel.replaceChild(
+    (function(div) {
+      div.appendChild((function(b) {
+        b.className = "center";
+        b.textContent = "click to begin drawing";
+        return b;
+      })(document.createElement('b'))),
+      div.id = "infodiv";
+      return div;
+    })(document.createElement('div')),
+    document.getElementById('infodiv')
+  );
+
+  if(back.shapes.length) {
+    document.getElementById('infodiv').appendChild(document.createElement('br'));
+    document.getElementById('infodiv').appendChild((function(b) {
+      b.textContent = "[s]: select shape(s)";
+      return b;
+    })(document.createElement('b')));
+    document.getElementById('infodiv').appendChild((function(b) {
+      b.textContent = "[e]: edit shape(s)";
+      return b;
+    })(document.createElement('b')));
+  }
+
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = getPoint(e);
     designLine();
