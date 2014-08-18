@@ -66,6 +66,13 @@ Line.prototype.translate = function(point) {
   this.end = new Point(this.end.x - xDiff, this.end.y - yDiff);
 }
 
+Line.prototype.copy = function() {
+  return new Line(
+    new Point(this.start.x, this.start.y),
+    new Point(this.end.x, this.end.y)
+  );
+}
+
 ////////////////////
 // Special Lines: //
 ////////////////////

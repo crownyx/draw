@@ -43,3 +43,10 @@ Circle.prototype.translate = function(point) {
   this.center = point;
   this.radius = new Line(point, new Point(this.radius.end.x + xDiff, this.radius.end.y + yDiff));
 }
+
+Circle.prototype.copy = function() {
+  return new Circle(
+    new Point(this.radius.start.x, this.radius.start.y),
+    new Point(this.radius.end.x, this.radius.end.y)
+  );
+}

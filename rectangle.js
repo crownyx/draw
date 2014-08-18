@@ -74,3 +74,10 @@ Rectangle.prototype.fill = function(context) {
     this.diagonal.end.y - this.diagonal.start.y
   );
 }
+
+Rectangle.prototype.copy = function() {
+  return new Rectangle(
+    new Point(this.diagonal.start.x, this.diagonal.start.y),
+    new Point(this.diagonal.end.x, this.diagonal.end.y)
+  );
+}

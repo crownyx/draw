@@ -57,3 +57,16 @@ Ellipse.prototype.translate = function(point) {
   this.xAxis = new Line(point, new Point(this.xAxis.end.x + xDiff, this.xAxis.end.y + yDiff));
   this.yAxis = new Line(point, new Point(this.yAxis.end.x + xDiff, this.yAxis.end.y + yDiff));
 }
+
+Ellipse.prototype.copy = function() {
+  var ellipse = new Ellipse(this.center, this.center);
+  ellipse.xRadius = new Line(
+    new Point(this.center.x, this.center.y),
+    new Point(this.xRadius.end.x, this.xRadius.end.y)
+  );
+  ellipse.yRadius = new Line(
+    new Point(this.center.x, this.center.y),
+    new Point(this.yRadius.end.x, this.yRadius.end.y)
+  );
+  return ellipse;
+}

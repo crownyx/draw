@@ -16,9 +16,13 @@ function editMode() {
 
   var lastHighlighted;
 
+  window.eventListeners.add('keydown', 'exitEditMode', function(e) {
+    if(e.which == charCodes['esc']) { front.refresh(true); back.refresh(); }
+  });
+
   front.eventListeners.add('mousemove', 'findPoint', function(e) {
-    if(front.eventListeners.find('selectPoint'))
-      front.eventListeners.remove('selectPoint');
+    if(front.eventListeners.find('selectPoint')) front.eventListeners.remove('selectPoint');
+
     var currPoint = getPoint(e);
     var nearPoint = allPoints.filter(function(point) {
       return new Line(point, currPoint).length < 5;
@@ -38,11 +42,13 @@ function editMode() {
       allPoints.forEach(function(point) { point.fill(back.context); });
 
       front.eventListeners.add('click', 'selectPoint', function() {
-        front.refresh();
-        back.shapes.remove(nearPoint.shape);
-        back.refresh();
         var shape = nearPoint.shape;
+        var origShape = shape.copy();
+        back.shapes.remove(shape);
+        back.refresh();
         if(nearPoint.same(shape.center)) {
+          front.refresh();
+          shape.draw(front.context);
           translate(shape);
         } else {
           switch(shape.constructor) {
@@ -79,6 +85,13 @@ function editMode() {
             break;
           }
         }
+        window.eventListeners.add('keydown', 'exitEditMode', function(e) {
+          if(e.which == charCodes['esc']) {
+            back.shapes.push(origShape);
+            back.refresh();
+            front.refresh(true);
+          }
+        });
       });
     } else if(lastHighlighted) {
       back.clear();
