@@ -1,10 +1,5 @@
 function editMode() {
-  front.refresh();
-
-  replaceInfoText([{
-    text: 'select point',
-    className: 'center'
-  }]);
+  replaceInfoText([{ text: 'select point', className: 'center' }]);
 
   var allPoints = back.shapes.map(function(shape) {
     var points = shape.points;
@@ -17,7 +12,10 @@ function editMode() {
   var lastHighlighted;
 
   window.eventListeners.add('keydown', 'exitEditMode', function(e) {
-    if(e.which == charCodes['esc']) { front.refresh(true); back.refresh(); }
+    if(e.which == charCodes['esc']) {
+      back.refresh();
+      changeMode(commandMode);
+    }
   });
 
   front.eventListeners.add('mousemove', 'findPoint', function(e) {
@@ -42,12 +40,15 @@ function editMode() {
       allPoints.forEach(function(point) { point.fill(back.context); });
 
       front.eventListeners.add('click', 'selectPoint', function() {
+        window.refresh(); front.refresh();
+
         var shape = nearPoint.shape;
         var origShape = shape.copy();
+
         back.shapes.remove(shape);
         back.refresh();
+
         if(nearPoint.same(shape.center)) {
-          front.refresh();
           shape.draw(front.context);
           translate(shape);
         } else {
@@ -84,12 +85,13 @@ function editMode() {
               design(shape);
             break;
           }
+          window.eventListeners.remove('exitDesignMode');
         }
         window.eventListeners.add('keydown', 'exitEditMode', function(e) {
           if(e.which == charCodes['esc']) {
             back.shapes.push(origShape);
             back.refresh();
-            front.refresh(true);
+            changeMode(commandMode);
           }
         });
       });

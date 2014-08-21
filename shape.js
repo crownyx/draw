@@ -2,7 +2,6 @@ function Shape() { }
 
 Shape.prototype.complete = function() {
   back.shapes.push(this);
-  front.refresh(true);
   this.draw(back.context);
 }
 

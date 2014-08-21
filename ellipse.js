@@ -60,13 +60,13 @@ Ellipse.prototype.translate = function(point) {
 
 Ellipse.prototype.copy = function() {
   var ellipse = new Ellipse(this.center, this.center);
-  ellipse.xRadius = new Line(
+  ellipse.xAxis = new Line(
     new Point(this.center.x, this.center.y),
-    new Point(this.xRadius.end.x, this.xRadius.end.y)
+    new Point(this.xAxis.end.x, this.xAxis.end.y)
   );
-  ellipse.yRadius = new Line(
+  ellipse.yAxis = new Line(
     new Point(this.center.x, this.center.y),
-    new Point(this.yRadius.end.x, this.yRadius.end.y)
+    new Point(this.yAxis.end.x, this.yAxis.end.y)
   );
   return ellipse;
 }

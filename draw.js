@@ -19,7 +19,15 @@ window.onload = function() {
   front.canvas.addEventListener('mousemove', function()  { front.showAxes();              }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showPos();               }, false);
 
-  commandMode();
+  this.refresh = function() { this.eventListeners.clear(); }
+
+  changeMode(commandMode);
+}
+
+function changeMode(mode) {
+  window.refresh();
+  front.refresh();
+  if(mode) mode();
 }
 
 function commandMode() {
@@ -50,13 +58,13 @@ function commandMode() {
 
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = getPoint(e);
-    designLine();
+    changeMode(designLine);
   });
 
   window.eventListeners.add('keydown', 'switchMode', function(e) {
     switch(e.which) {
-      case charCodes['s']: selectMode(); break;
-      case charCodes['e']: editMode(); break;
+      case charCodes['s']: changeMode(selectMode); break;
+      case charCodes['e']: changeMode(editMode); break;
     }
   });
 }
@@ -64,23 +72,23 @@ function commandMode() {
 function drawCommands(e) {
   if(!e.shiftKey) {
     switch(e.which){
-      case charCodes['esc']:
-        this.eventListeners.clear();
-        front.refresh(true);
-      break;
       case charCodes['c']:
+        changeMode();
         design(new Circle(front.startPoint, front.lastPoint));
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['e']:
+        changeMode();
         design(new Ellipse(front.startPoint, front.lastPoint));
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['l']:
+        changeMode();
         designLine();
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;
       case charCodes['r']:
+        changeMode();
         design(new Rectangle(front.startPoint, front.lastPoint));
         window.eventListeners.add('keydown', 'drawCommands', drawCommands);
       break;

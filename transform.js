@@ -4,8 +4,8 @@ function translate(shape) {
     shape.draw(front.context);
   });
   front.eventListeners.add('click', 'saveShape', function(e) {
-    front.refresh();
     shape.translate(getPoint(e));
     shape.complete();
+    changeMode(commandMode);
   });
 }

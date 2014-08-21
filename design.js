@@ -1,11 +1,17 @@
 function design(shape) {
-  front.refresh();
-
   window.eventListeners.add('keydown', 'drawCommands', drawCommands);
+
+  window.eventListeners.add('keydown', 'exitDesignMode', function(e) {
+    if(e.which == charCodes['esc']) changeMode(commandMode);
+  });
 
   front.eventListeners.add('mousemove', 'setEnd',    function(e) { shape.setEnd(getPoint(e)); });
   front.eventListeners.add('mousemove', 'drawShape', function()  { shape.draw(front.context); });
-  front.eventListeners.add('click', 'completeShape', function()  { shape.complete();          });
+
+  front.eventListeners.add('click', 'completeShape', function()  {
+    shape.complete();
+    changeMode(commandMode);
+  });
 
   front.eventListeners.add('mousemove', 'showText', function() {
     front.context.fillText(shape.infoText(), 10, 15);

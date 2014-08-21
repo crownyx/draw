@@ -15,22 +15,6 @@ Canvas.prototype.clear = function() {
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
-Canvas.prototype.refresh = function(restart) {
-  this.clear();
-  this.shapes.forEach(function(shape) { shape.draw(this.context); }, this);
-
-  if(this.lastPoint)      this.showPos();
-  if(this.lastPoint)      this.showAxes();
-  if(this.eventListeners) this.eventListeners.clear();
-
-  window.eventListeners.clear();
-
-  if(restart) {
-    this.shapes = [];
-    commandMode();
-  }
-}
-
 Canvas.prototype.showAxes = function() {
   this.context.lineWidth = 0.5;
     new AxisPair(this.lastPoint).draw(this.context);
@@ -67,3 +51,21 @@ function designLine() {
 
 var front = new Canvas('frontlayer');
 var back  = new Canvas('backlayer');
+
+front.refresh = function(restart) {
+  this.clear();
+
+  this.showPos();
+  this.showAxes();
+  this.eventListeners.clear();
+
+  if(restart) {
+    this.shapes = [];
+    commandMode();
+  }
+}
+
+back.refresh = function() {
+  this.clear();
+  this.shapes.forEach(function(shape) { shape.draw(this.context); }, this);
+}
