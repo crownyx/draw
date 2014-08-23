@@ -1,11 +1,7 @@
 function selectMode() {
-  front.refresh();
   var selected = [];
 
-  replaceInfoText([{
-    text: 'select shape(s) by point(s)',
-    className: 'center'
-  }]);
+  replaceInfoText([{ text: 'select shape(s) by point(s)', className: 'center' }]);
 
   var allPoints = back.shapes.map(function(shape) {
     var points = shape.points;
@@ -19,6 +15,7 @@ function selectMode() {
     front.eventListeners.clear();
 
     var selectRect = new Rectangle(getPoint(e), getPoint(e));
+
     front.eventListeners.add('mousemove', 'showSelectRect', function(e) {
       selectRect.setEnd(getPoint(e));
       front.context.strokeStyle = "blue";
@@ -46,14 +43,21 @@ function selectMode() {
           if(!(selected.indexOf(point.shape) + 1)) {
             selected.push(point.shape);
             back.shapes.remove(point.shape);
-            point.shape.strokeStyle = "blue";
-            point.shape.draw(back.context);
           }
         }
       });
+
       back.shapes.forEach(function(shape) { shape.draw(back.context); });
-      
-      if(selected.length) deleteOrTransform(selected);
+
+      if(selected.length) {
+        var group = new Group(selected);
+        group.strokeStyle = "blue";
+        group.draw(front.context);
+        front.eventListeners.add('mousemove', 'drawGroup', function() {
+          group.draw(front.context);
+        });
+        deleteOrTransform(group);
+      }
     });
   });
 
@@ -64,14 +68,13 @@ function selectMode() {
           shape.strokeStyle = "black";
           back.shapes.push(shape);
         });
-        back.refresh();
-        front.refresh(true);
+        changeMode(commandMode);
       break;
     }
   });
 }
 
-function deleteOrTransform(selected) {
+function deleteOrTransform(group) {
   replaceInfoText([
     '[d]: delete',
     '[r]: rotate',
@@ -84,15 +87,15 @@ function deleteOrTransform(selected) {
     switch(e.which) {
       case charCodes['d']:
         back.refresh();
-        front.refresh(true);
+        changeMode(commandMode);
       break;
       case charCodes['r']:
         back.refresh();
-        rotateGroup(new Group(selected));
+        rotateGroup(group);
       break;
       case charCodes['t']:
         back.refresh();
-        translateGroup(new Group(selected));
+        translateGroup(group);
       break;
     }
   });
@@ -100,11 +103,11 @@ function deleteOrTransform(selected) {
 
 function Group(shapes) {
   this.shapes = shapes;
-  this.translate = new Point(0, 0);
+  this.topleft = new Point(0, 0);
 
   this.draw = function(context) {
     context.save();
-      context.translate(this.translate.x, this.translate.y);
+      context.translate(this.topleft.x, this.topleft.y);
       context.strokeStyle = this.strokeStyle;
       this.shapes.forEach(function(shape) {
         context.beginPath();
@@ -114,27 +117,39 @@ function Group(shapes) {
     context.restore();
   }
 
-  this.setTranslate = function(point) {
-    this.translate = point;
+  this.translate = function(point) {
     this.shapes.forEach(function(shape) {
-      if (shape instanceof Ellipse) {
-        var end = shape.controlLine.end;
-        delete shape.controlLine;
-        shape.controlLine = new Line(shape.center, end);
-      }
-      (function(start, end) {
-        start.x = start.x - point.x;
-        start.y = start.y - point.y;
-        end.x = end.x - point.x;
-        end.y = end.y - point.y;
-      })(shape.controlLine.start, shape.controlLine.end);
+      shape.translate(new Point(shape.center.x + point.x, shape.center.y + point.y));
     });
   }
 }
 
-function rotateGroup(group) {
-  group.strokeStyle = "blue";
+function translateGroup(group) {
+  front.eventListeners.add('click', 'chooseRefpoint', function(e) {
+    front.eventListeners.remove('drawGroup');
+    front.eventListeners.remove('chooseRefpoint');
+    var refPoint = getPoint(e);
+    var movePoint = refPoint;
 
+    front.eventListeners.add('mousemove', 'moveGroup', function(e) {
+      movePoint = getPoint(e);
+      group.translate(new Point(movePoint.x - refPoint.x, movePoint.y - refPoint.y));
+      group.draw(front.context);
+      refPoint = movePoint;
+    });
+
+    front.eventListeners.add('click', 'saveGroup', function(e) {
+      movePoint = getPoint(e);
+      group.translate(new Point(movePoint.x - refPoint.x, movePoint.y - refPoint.y));
+      group.shapes.forEach(function(shape) {
+        shape.complete();
+        changeMode(commandMode);
+      });
+    });
+  });
+}
+
+function rotateGroup(group) {
   front.eventListeners.add('mousemove', 'drawGroup', function() {
     group.draw(front.context);
   });

@@ -34,6 +34,15 @@ Object.defineProperty(Ellipse.prototype, 'points', {
   }
 });
 
+Object.defineProperty(Ellipse.prototype, 'controlLine', {
+  get: function() {
+    return new Line(
+      this.center,
+      new Point(this.yAxis.end.x, this.xAxis.end.y)
+    );
+  }
+});
+
 Ellipse.prototype.drawPath = function(context) {
   context.save();
     context.translate(this.center.x, this.center.y);

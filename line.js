@@ -3,6 +3,8 @@ function Line(start, end) {
 
   this.start = start;
   this.end   = end;
+
+  this.controlLine = this;
 }
 
 Line.prototype = new Shape;

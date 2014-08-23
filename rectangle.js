@@ -3,6 +3,8 @@ function Rectangle(diagStart, diagEnd) {
 
   this.diagonal = new Line(diagStart, diagEnd);
   this.rotation = new Angle(0);
+
+  this.controlLine = this.diagonal;
 }
 
 Rectangle.prototype = new Shape;
