@@ -46,7 +46,6 @@ Object.defineProperty(Ellipse.prototype, 'controlLine', {
 Ellipse.prototype.drawPath = function(context) {
   context.save();
     context.translate(this.center.x, this.center.y);
-    context.rotate(this.rotation.rad);
     context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
     context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
   context.restore();

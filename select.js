@@ -60,13 +60,11 @@ function selectMode() {
     });
   });
 
-  window.eventListeners.add('keydown', 'selectCommands', function(e) {
-    switch(e.which) {
-      case charCodes['esc']:
-        selectedCopies.forEach(function(shape) { back.shapes.push(shape); });
-        back.refresh();
-        changeMode(commandMode);
-      break;
+  window.eventListeners.add('keydown', 'escape', function(e) {
+    if(e.which == charCodes['esc']) {
+      selectedCopies.forEach(function(shape) { back.shapes.push(shape); });
+      back.refresh();
+      changeMode(commandMode);
     }
   });
 }
@@ -105,9 +103,7 @@ function Group(shapes) {
     context.save();
       context.strokeStyle = this.strokeStyle;
       this.shapes.forEach(function(shape) {
-        context.beginPath();
-          shape.drawPath(context);
-        context.stroke();
+        shape.draw(context);
       });
     context.restore();
   }
@@ -120,8 +116,8 @@ function Group(shapes) {
 }
 
 function translateGroup(group) {
-  replaceInfoText([
-    { text: 'choose reference point for translation',
+  replaceInfoText([{
+      text: 'choose reference point for translation',
       className: 'center'
     },
     '',
@@ -184,18 +180,60 @@ function translateGroup(group) {
 }
 
 function rotateGroup(group) {
-  front.eventListeners.add('mousemove', 'drawGroup', function() {
-    group.draw(front.context);
-  });
-
   replaceInfoText([{
-    text: 'click center of rotation',
-    className: 'center'
-  }]);
+      text: 'choose center point for rotation',
+      className: 'center'
+    },
+    '',
+    '[esc]: cancel'
+  ]);
 
-  front.eventListeners.add('click', 'chooseCenter', function(e) {
-    front.eventListeners.remove('chooseCenter');
-    group.setTranslate(getPoint(e));
+  var allPoints = group.shapes.map(function(shape) {
+    shape.points.forEach(function(point) { point.shape = shape; });
+    return shape.points;
+  }).flatten();
 
+  front.eventListeners.add('mousemove', 'drawGroup', function(e) {
+    group.draw(front.context);
+    allPoints.forEach(function(point) { point.fill(front.context); });
+
+    var currPoint = getPoint(e);
+    var nearPoint = allPoints.filter(function(point) {
+      return new Line(point, currPoint).length < 5;
+    }).sort(function(point) {
+      return new Line(point, currPoint).length;
+    })[0];
+
+    if(nearPoint) {
+      nearPoint.draw(front.context, { radius: 5, strokeStyle: "blue" });
+      front.eventListeners.add('click', 'chooseRefPoint', function() { beginRotating(nearPoint); });
+    } else {
+      front.eventListeners.add('click', 'chooseRefPoint', function(e) { beginRotating(getPoint(e)); });
+    }
   });
+
+  function beginRotating(refPoint) {
+    group.shapes.forEach(function(shape) {
+      shape.origin = refPoint;
+      shape.translate(new Point(shape.center.x - refPoint.x, shape.center.y - refPoint.y));
+    });
+
+    front.eventListeners.add('mousemove', 'drawGroup', function(e) { group.draw(front.context); });
+
+    front.eventListeners.add('mousemove', 'setRotation', function(e) {
+      var currPoint = getPoint(e);
+      var angle = getAngle(refPoint, currPoint);
+      new HorizontalLine(refPoint.y).sketch(front.context);
+      new Line(refPoint, currPoint).sketch(front.context);
+      new Arc(refPoint, 15, new Angle(0), angle).sketch(front.context);
+      front.context.textAlign = 'right';
+      front.context.fillText(
+        angle.deg.toFixed(2) + unescape("\xB0"),
+        front.lastPoint.x - 10,
+        front.lastPoint.y + 15
+      );
+      front.context.textAlign = 'start';
+      group.shapes.forEach(function(shape) { shape.rotation = angle; });
+    });
+  }
 }

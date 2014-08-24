@@ -28,6 +28,8 @@ Shape.prototype.draw = function(context, params = {}) {
     context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
     context.lineWidth   = this.lineWidth   || params.lineWidth   || context.lineWidth;
     context.setLineDash(this.lineDash || []);
+    context.translate((this.origin || { x: 0 }).x, (this.origin || { y: 0 }).y);
+    context.rotate((this.rotation || { rad: 0 }).rad);
     context.beginPath();
       this.drawPath(context);
     context.stroke();
