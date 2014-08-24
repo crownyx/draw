@@ -5,6 +5,22 @@ function Line(start, end) {
   this.end   = end;
 
   this.controlLine = this;
+
+  var line = this;
+
+  this.shiftCommands = [
+    {
+      key: 'a',
+      forWhat: 'angle',
+      subtext: '(in degrees)',
+      callback: function(deg) { line.fixedRotation = new Angle(deg / 180 * Math.PI); }
+    },
+    {
+      key: 'l',
+      forWhat: 'length',
+      callback: function(length) { line.fixedLength = length; }
+    }
+  ];
 }
 
 Line.prototype = new Shape;

@@ -11,18 +11,22 @@ function getInput(promptText, propToFill) {
 
   var prevCommands = window.eventListeners.clear();
 
+  var input = [];
+
   window.eventListeners.add('keydown', 'getInput', function(e) {
     if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
       b.textContent += (e.which - charCodes.zero);
+      input.push(e.which - charCodes.zero);
     } else if(e.which == charCodes.enter) {
       window.eventListeners.remove('getInput');
       prevCommands.forEach(function(el) {
         window.eventListeners.add(el.eventType, el.callbackName, el.callback);
       });
-      propToFill(infodiv.textContent.replace(mainText, ''));
+      propToFill(parseInt(input.join('')));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
     } else if(e.which == charCodes['backspace']) {
       b.textContent = infodiv.textContent.slice(0, -1);
+      input.pop();
     } else if(e.which == charCodes['esc']) {
       window.eventListeners.remove('getInput');
       prevCommands.forEach(function(el) {

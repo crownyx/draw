@@ -1,3 +1,7 @@
+///////////
+// Array //
+///////////
+
 if (!Array.prototype.find) {
   Object.defineProperty(Array.prototype, 'find', {
     enumerable: false,
@@ -67,4 +71,12 @@ Array.prototype.flatten = function() {
   return(this.reduce(function(prev, curr) {
     return prev.concat(curr);
   }, []));
+}
+
+////////////
+// String //
+////////////
+
+String.prototype.capitalize = function() {
+  return this[0].toUpperCase() + this.substring(1);
 }
