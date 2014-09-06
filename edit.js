@@ -1,11 +1,7 @@
 function editMode() {
   replaceInfoText([{ text: 'select point', className: 'center' }]);
 
-  var allPoints = back.shapes.map(function(shape) {
-    var points = shape.points;
-    points.forEach(function(point) { point.shape = shape; });
-    return points;
-  }).flatten();
+  var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
 
   allPoints.forEach(function(point) { point.fill(back.context); });
 
@@ -22,21 +18,26 @@ function editMode() {
     if(front.eventListeners.find('selectPoint')) front.eventListeners.remove('selectPoint');
 
     var currPoint = getPoint(e);
+
     var nearPoint = allPoints.filter(function(point) {
-      return new Line(point, currPoint).length < 5;
+      return new Line(currPoint, point).length < 5;
     }).sort(function(point) {
-      return new Line(point, currPoint).length;
+      return new Line(currPoint, point).length;
     })[0];
 
     if(nearPoint) {
       nearPoint.draw(front.context, { radius: 5, strokeStyle: "blue" });
+
       lastHighlighted = nearPoint.shape;
+
       back.clear();
+
       back.shapes.forEach(function(shape) {
         shape === nearPoint.shape ?
         shape.draw(back.context, { strokeStyle: "blue" }) :
         shape.draw(back.context);
       });
+
       allPoints.forEach(function(point) { point.fill(back.context); });
 
       front.eventListeners.add('click', 'selectPoint', function() {
@@ -50,7 +51,8 @@ function editMode() {
 
         if(nearPoint.same(shape.center)) {
           shape.draw(front.context);
-          translate(shape);
+          var origDiff = { x: shape.origin.x - nearPoint.x, y: shape.origin.y - nearPoint.y };
+          translate(shape, origDiff);
         } else {
           switch(shape.constructor) {
             case Line:
@@ -69,12 +71,11 @@ function editMode() {
               design(shape);
             break;
             case Ellipse:
-              if(nearPoint.x === shape.yAxis.end.x) {
+              if(nearPoint.same(shape.points.yTop, 5) || nearPoint.same(shape.points.yBottom, 5)) {
                 shape.yAxis.fixed = false;
                 shape.xAxis.fixed = true;
                 shape.yAxis.end = nearPoint;
-              }
-              if(nearPoint.y === shape.xAxis.end.y) {
+              } else if(nearPoint.same(shape.points.xLeft, 5) || nearPoint.same(shape.points.xRight, 5)) {
                 shape.xAxis.fixed = false;
                 shape.yAxis.fixed = true;
                 shape.xAxis.end = nearPoint;

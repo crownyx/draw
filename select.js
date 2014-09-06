@@ -1,13 +1,10 @@
 function selectMode() {
-  var selected = []; var selectedCopies = [];
+  var selected = [];
+  var selectedCopies = [];
 
   replaceInfoText([{ text: 'select shape(s) by point(s)', className: 'center' }]);
 
-  var allPoints = back.shapes.map(function(shape) {
-    var points = shape.points;
-    points.forEach(function(point) { point.shape = shape; });
-    return points;
-  }).flatten();
+  var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
 
   allPoints.forEach(function(point) { point.fill(back.context); });
 
@@ -18,12 +15,8 @@ function selectMode() {
 
     front.eventListeners.add('mousemove', 'showSelectRect', function(e) {
       selectRect.setEnd(getPoint(e));
-      front.context.strokeStyle = "blue";
-      front.context.fillStyle = "rgba(173,216,230,0.25)";
-        selectRect.draw(front.context);
-        selectRect.fill(front.context);
-      front.context.strokeStyle = "black";
-      front.context.fillStyle = "black";
+      selectRect.draw(front.context, { strokeStyle: "blue" });
+      selectRect.fill(front.context, { fillStyle: "rgba(173,216,230,0.25)" });
     });
 
     front.eventListeners.add('click', 'completeSelection', function(e) {
@@ -33,8 +26,6 @@ function selectMode() {
       var rightMost = Math.max(selectRect.diagonal.end.x, selectRect.diagonal.start.x);
       var upperMost = Math.min(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
       var lowerMost = Math.max(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
-
-      back.clear(); front.refresh();
 
       allPoints.forEach(function(point) {
         if(point.x > leftMost && point.x < rightMost && point.y > upperMost && point.y < lowerMost) {
@@ -46,15 +37,14 @@ function selectMode() {
         }
       });
 
-      back.shapes.forEach(function(shape) { shape.draw(back.context); });
+      back.refresh();
+      front.refresh();
 
       if(selected.length) {
         var group = new Group(selected);
         group.strokeStyle = "blue";
         group.draw(front.context);
-        front.eventListeners.add('mousemove', 'drawGroup', function() {
-          group.draw(front.context);
-        });
+        front.eventListeners.add('mousemove', 'drawGroup', function() { group.draw(front.context); });
         deleteOrTransform(group);
       }
     });
@@ -102,16 +92,8 @@ function Group(shapes) {
   this.draw = function(context) {
     context.save();
       context.strokeStyle = this.strokeStyle;
-      this.shapes.forEach(function(shape) {
-        shape.draw(context);
-      });
+      this.shapes.forEach(function(shape) { shape.draw(context); });
     context.restore();
-  }
-
-  this.translate = function(point) {
-    this.shapes.forEach(function(shape) {
-      shape.translate(new Point(shape.center.x + point.x, shape.center.y + point.y));
-    });
   }
 }
 
@@ -124,16 +106,16 @@ function translateGroup(group) {
     '[esc]: cancel'
   ]);
 
-  var allPoints = group.shapes.map(function(shape) {
-    shape.points.forEach(function(point) { point.shape = shape; });
-    return shape.points;
-  }).flatten();
+  var allPoints = group.shapes.map(function(shape) { return shape.points.values; }).flatten();
+
+  allPoints.forEach(function(point) { point.fill(front.context); });
 
   front.eventListeners.add('mousemove', 'drawGroup', function(e) {
     group.draw(front.context);
     allPoints.forEach(function(point) { point.fill(front.context); });
 
     var currPoint = getPoint(e);
+
     var nearPoint = allPoints.filter(function(point) {
       return new Line(point, currPoint).length < 5;
     }).sort(function(point) {
@@ -159,45 +141,50 @@ function translateGroup(group) {
 
     front.eventListeners.remove('drawGroup');
     front.eventListeners.remove('chooseRefPoint');
-    var movePoint = refPoint;
+
+    group.shapes.forEach(function(shape) {
+      shape.xDiff = shape.origin.x - refPoint.x;
+      shape.yDiff = shape.origin.y - refPoint.y;
+    });
 
     front.eventListeners.add('mousemove', 'moveGroup', function(e) {
-      movePoint = getPoint(e);
-      group.translate(new Point(movePoint.x - refPoint.x, movePoint.y - refPoint.y));
+      var newPoint = getPoint(e);
+      group.shapes.forEach(function(shape) {
+        shape.translate(new Point(newPoint.x + shape.xDiff, newPoint.y + shape.yDiff));
+      });
       group.draw(front.context);
-      refPoint = movePoint;
     });
 
     front.eventListeners.add('click', 'saveGroup', function(e) {
-      movePoint = getPoint(e);
-      group.translate(new Point(movePoint.x - refPoint.x, movePoint.y - refPoint.y));
+      var newPoint = getPoint(e);
       group.shapes.forEach(function(shape) {
+        shape.translate(new Point(newPoint.x + shape.xDiff, newPoint.y + shape.yDiff));
         shape.complete();
-        changeMode(commandMode);
       });
+      changeMode(commandMode);
     });
   }
 }
 
 function rotateGroup(group) {
   replaceInfoText([{
-      text: 'choose center point for rotation',
+      text: 'click to choose center of rotation',
       className: 'center'
     },
     '',
     '[esc]: cancel'
   ]);
 
-  var allPoints = group.shapes.map(function(shape) {
-    shape.points.forEach(function(point) { point.shape = shape; });
-    return shape.points;
-  }).flatten();
+  var allPoints = group.shapes.map(function(shape) { return shape.points.values; }).flatten();
+
+  allPoints.forEach(function(point) { point.fill(front.context); });
 
   front.eventListeners.add('mousemove', 'drawGroup', function(e) {
     group.draw(front.context);
     allPoints.forEach(function(point) { point.fill(front.context); });
 
     var currPoint = getPoint(e);
+
     var nearPoint = allPoints.filter(function(point) {
       return new Line(point, currPoint).length < 5;
     }).sort(function(point) {
@@ -213,12 +200,18 @@ function rotateGroup(group) {
   });
 
   function beginRotating(refPoint) {
-    group.shapes.forEach(function(shape) {
-      shape.origin = refPoint;
-      shape.translate(new Point(shape.center.x - refPoint.x, shape.center.y - refPoint.y));
-    });
+    front.eventListeners.remove('chooseRefPoint');
 
-    front.eventListeners.add('mousemove', 'drawGroup', function(e) { group.draw(front.context); });
+    replaceInfoText([{
+      text: 'choose angle of rotation, then click.',
+      className: 'center'
+    }]);
+
+    group.shapes.forEach(function(shape) {
+      shape.refLine = new Line(refPoint, shape.origin.copy());
+      shape.origAngle = shape.refLine.angle;
+      shape.origRot = shape.rotation.rad;
+    });
 
     front.eventListeners.add('mousemove', 'setRotation', function(e) {
       var currPoint = getPoint(e);
@@ -233,7 +226,27 @@ function rotateGroup(group) {
         front.lastPoint.y + 15
       );
       front.context.textAlign = 'start';
-      group.shapes.forEach(function(shape) { shape.rotation = angle; });
+      group.shapes.forEach(function(shape) {
+        shape.translate(new Point(
+          refPoint.x + Math.cos(shape.origAngle.rad + angle.rad) * shape.refLine.length,
+          refPoint.y + Math.sin(shape.origAngle.rad + angle.rad) * shape.refLine.length
+        ));
+        shape.rotate(new Angle(shape.origRot + angle.rad));
+      });
+    });
+
+    front.eventListeners.add('mousemove', 'drawGroup', function(e) { group.draw(front.context); });
+
+    front.eventListeners.add('click', 'saveGroup', function(e) {
+      var currPoint = getPoint(e);
+      var angle = getAngle(refPoint, currPoint);
+      group.shapes.forEach(function(shape) {
+        shape.origin = new Point(refPoint.x + Math.cos(shape.origAngle.rad + angle.rad) * shape.refLine.length,
+                                 refPoint.y + Math.sin(shape.origAngle.rad + angle.rad) * shape.refLine.length);
+        shape.rotate(new Angle(shape.origRot + angle.rad));
+        shape.complete();
+      });
+      changeMode(commandMode);
     });
   }
 }

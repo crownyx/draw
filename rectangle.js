@@ -2,7 +2,7 @@ function Rectangle(diagStart, diagEnd) {
   Shape.call(this);
 
   this.diagonal = new Line(diagStart, diagEnd);
-  this.rotation = new Angle(0);
+  this.origin = diagStart;
 
   this.controlLine = this.diagonal;
 }
@@ -27,25 +27,39 @@ Rectangle.prototype.infoText = function() {
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {
-  get: function() { return this.diagonal.mid; }
+  get: function() { return this.points[this.points.length - 1]; }
 });
 
 Object.defineProperty(Rectangle.prototype, 'points', {
   get: function() {
-    var start = this.diagonal.start, end = this.diagonal.end;
+    var corner1 = this.origin;
+    var corner2 = new Point(this.diagonal.start.x, this.diagonal.end.y);
+    var corner3 = this.diagonal.end;
+    var corner4 = new Point(this.diagonal.end.x, this.diagonal.start.y);
+    var center  = new Line(corner1, corner3).mid;
     return [
-      start,
-      new Point(end.x, start.y),
-      end,
-      new Point(start.x, end.y),
-      this.center
-    ];
+      corner1,
+      corner2,
+      corner3,
+      corner4,
+      center
+    ].map(function(point) {
+      var point = point.translate(this.origin, this.rotation.rad);
+      point.shape = this;
+      return point;
+    }, this);
   }
 });
 
 Rectangle.prototype.translate = function(point) {
-  this.diagonal.translate(point);
+  this.origin = point;
+  this.diagonal.translate(new Point(
+    point.x + Math.cos(this.diagonal.angle.rad) * (this.diagonal.length / 2),
+    point.y + Math.sin(this.diagonal.angle.rad) * (this.diagonal.length / 2)
+  ));
 }
+
+Rectangle.prototype.rotate = function(rotation) { this.rotation = rotation; }
 
 Rectangle.prototype.setEnd = function(point) {
   var quad = (this.inRotation ? this.diagonal.angle : getAngle(this.diagonal.start, point)).quadrant;
@@ -61,25 +75,28 @@ Rectangle.prototype.setEnd = function(point) {
 }
 
 Rectangle.prototype.drawPath = function(context) {
-  context.moveTo(this.diagonal.start.x, this.diagonal.start.y);
-  context.lineTo(this.diagonal.start.x, this.diagonal.end.y);
-  context.lineTo(this.diagonal.end.x, this.diagonal.end.y);
-  context.lineTo(this.diagonal.end.x, this.diagonal.start.y);
-  context.lineTo(this.diagonal.start.x, this.diagonal.start.y);
+  context.moveTo(0, 0);
+  context.lineTo(this.diagonal.end.x - this.diagonal.start.x, 0);
+  context.lineTo(this.diagonal.end.x - this.diagonal.start.x, this.diagonal.end.y - this.diagonal.start.y);
+  context.lineTo(0, this.diagonal.end.y - this.diagonal.start.y);
+  context.lineTo(0, 0);
 }
 
-Rectangle.prototype.fill = function(context) {
-  context.fillRect(
-    this.diagonal.start.x,
-    this.diagonal.start.y,
-    this.diagonal.end.x - this.diagonal.start.x,
-    this.diagonal.end.y - this.diagonal.start.y
-  );
+Rectangle.prototype.fill = function(context, params) {
+  context.save();
+    context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
+    context.fillRect(
+      this.diagonal.start.x,
+      this.diagonal.start.y,
+      this.diagonal.end.x - this.diagonal.start.x,
+      this.diagonal.end.y - this.diagonal.start.y
+    );
+  context.restore();
 }
 
 Rectangle.prototype.copy = function() {
-  return new Rectangle(
-    new Point(this.diagonal.start.x, this.diagonal.start.y),
-    new Point(this.diagonal.end.x, this.diagonal.end.y)
-  );
+  var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
+  newRect.origin = this.origin;
+  newRect.rotation = this.rotation;
+  return newRect;
 }

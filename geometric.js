@@ -1,30 +1,3 @@
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
-  this.toString = function() {
-    return "(x: " + this.x + ", y: " + this.y + ")";
-  }
-  this.fill = function(context, params = { radius: 2 }) {
-    context.save();
-      context.fillStyle = this.fillStyle || context.fillStyle;
-      context.beginPath();
-        context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
-      context.fill();
-    context.restore();
-  }
-  this.draw = function(context, params = { radius: 2 }) {
-    context.save();
-      context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
-      context.beginPath();
-        context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
-      context.stroke();
-    context.restore();
-  }
-  this.same = function(point) {
-    return point.x == this.x && point.y == this.y;
-  }
-}
-
 function getPoint(point) {
   return (new Point (
     point.pageX - front.canvas.offsetLeft,
@@ -61,9 +34,18 @@ function getQuadrant(lineStart, lineEnd) {
 
 function Angle(rad) {
   var _rad = ((rad || 0) + 2 * Math.PI) % (2 * Math.PI);
+  var _quad = Math.ceil(_rad / (0.5 * Math.PI)) || 4;
   return {
     rad: _rad,
     deg: (_rad / Math.PI * 180),
-    quadrant: Math.ceil(_rad / (0.5 * Math.PI)) || 4
+    quadrant: _quad,
+    refAngle: (function() {
+      switch(_quad) {
+        case 1: return _rad; break;
+        case 2: return Math.PI - _rad; break;
+        case 3: return _rad - Math.PI; break;
+        case 4: return 2 * Math.PI - _rad; break;
+      }
+    })()
   };
 }

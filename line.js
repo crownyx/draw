@@ -45,10 +45,12 @@ Line.prototype.setEnd = function(point) {
 
 Object.defineProperty(Line.prototype, 'mid', {
   get: function() {
-    return new Point(
+    var mid = new Point(
       (this.end.x + this.start.x) / 2,
       (this.end.y + this.start.y) / 2
     );
+    mid.translated = function() { return this; }
+    return mid;
   }
 });
 
@@ -58,7 +60,10 @@ Object.defineProperty(Line.prototype, 'center', {
 
 Object.defineProperty(Line.prototype, "points", {
   get: function() {
-    return [this.start, this.mid, this.end];
+    return [this.start, this.mid, this.end].map(function(point) {
+      point.shape = this;
+      return point;
+    }, this);
   }
 });
 

@@ -80,3 +80,39 @@ Array.prototype.flatten = function() {
 String.prototype.capitalize = function() {
   return this[0].toUpperCase() + this.substring(1);
 }
+
+////////////
+// Object //
+////////////
+
+Object.defineProperty(Object.prototype, 'values', {
+  enumerable: false,
+  configurable: true,
+  get: function() {
+    var obj = this;
+    var keys = Object.keys(this);
+    return keys.map(function(key) { return obj[key]; });
+  }
+});
+
+Object.defineProperty(Object.prototype, 'map', {
+  enumerable: false,
+  configurable: true,
+  writable: true,
+  value: function(callback) {
+    if (this == null) {
+      throw new TypeError('Object.prototype.map called on null or undefined');
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function');
+    }
+    var keys = Object.keys(this);
+    var thisArg = arguments[1];
+
+    keys.forEach(function(key) {
+      this[key] = callback.call(thisArg, key, this[key]);
+    }, this);
+
+    return this;
+  }
+});

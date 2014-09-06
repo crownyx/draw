@@ -8,12 +8,21 @@ Object.defineProperty(Canvas.prototype, 'canvas', {
 });
 
 Object.defineProperty(Canvas.prototype, 'context', {
-  get: function() { return this.canvas.getContext('2d'); }
+  get: function() {
+    var ctx = this.canvas.getContext('2d');
+    ctx.layer = this;
+    return ctx;
+  }
 });
 
 Canvas.prototype.clear = function() {
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
+
+Canvas.prototype.translate = function(point) {
+  this.origin = point;
+  this.context.translate(point.x, point.y);
+}
 
 Canvas.prototype.showAxes = function() {
   this.context.lineWidth = 0.5;

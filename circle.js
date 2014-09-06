@@ -19,7 +19,11 @@ Object.defineProperty(Circle.prototype, 'points', {
       new Point(this.center.x + this.radius.length, this.center.y),
       new Point(this.center.x, this.center.y + this.radius.length),
       new Point(this.center.x - this.radius.length, this.center.y)
-    ];
+    ].map(function(point) {
+      var point = point.translate(this.origin, this.rotation.rad);
+      point.shape = this;
+      return point;
+    }, this);
   }
 });
 
@@ -45,8 +49,5 @@ Circle.prototype.translate = function(point) {
 }
 
 Circle.prototype.copy = function() {
-  return new Circle(
-    new Point(this.radius.start.x, this.radius.start.y),
-    new Point(this.radius.end.x, this.radius.end.y)
-  );
+  return new Circle(this.radius.start.copy(), this.radius.end.copy());
 }
