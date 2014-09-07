@@ -1,6 +1,7 @@
 function Circle(radStart, radEnd) {
   Shape.call(this);
-  this.center = radStart;
+
+  this.origin = radStart;
   this.radius = new Line(radStart, radEnd);
 
   this.controlLine = this.radius;
@@ -10,6 +11,10 @@ Circle.prototype = new Shape;
 Circle.prototype.constructor = Circle;
 
 Circle.prototype.setEnd = function(point) { this.radius.end = point; }
+
+Object.defineProperty(Circle.prototype, 'center', {
+  get: function() { return this.origin; }
+});
 
 Object.defineProperty(Circle.prototype, 'points', {
   get: function() {
@@ -28,7 +33,7 @@ Object.defineProperty(Circle.prototype, 'points', {
 });
 
 Circle.prototype.drawPath = function(context) {
-  context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
+  context.arc(0, 0, this.radius.length, 0, 2 * Math.PI);
 }
 
 Circle.prototype.fill = function(context) {
@@ -44,7 +49,7 @@ Circle.prototype.infoText = function() {
 Circle.prototype.translate = function(point) {
   var xDiff = point.x - this.center.x;
   var yDiff = point.y - this.center.y;
-  this.center = point;
+  this.origin = point;
   this.radius = new Line(point, new Point(this.radius.end.x + xDiff, this.radius.end.y + yDiff));
 }
 

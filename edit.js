@@ -67,15 +67,16 @@ function editMode() {
             case Rectangle:
               var x = nearPoint.x === shape.diagonal.end.x ? shape.diagonal.start.x : shape.diagonal.end.x;
               var y = nearPoint.y === shape.diagonal.end.y ? shape.diagonal.start.y : shape.diagonal.end.y;
-              shape.diagonal = new Line(new Point(x, y), nearPoint);
-              design(shape);
+              var rect = new Rectangle(new Point(x, y), nearPoint);
+              rect.rotation = shape.rotation;
+              design(rect);
             break;
             case Ellipse:
-              if(nearPoint.same(shape.points.yTop, 5) || nearPoint.same(shape.points.yBottom, 5)) {
+              if(nearPoint.same(shape.points.yTop) || nearPoint.same(shape.points.yBottom)) {
                 shape.yAxis.fixed = false;
                 shape.xAxis.fixed = true;
                 shape.yAxis.end = nearPoint;
-              } else if(nearPoint.same(shape.points.xLeft, 5) || nearPoint.same(shape.points.xRight, 5)) {
+              } else if(nearPoint.same(shape.points.xLeft) || nearPoint.same(shape.points.xRight)) {
                 shape.xAxis.fixed = false;
                 shape.yAxis.fixed = true;
                 shape.xAxis.end = nearPoint;

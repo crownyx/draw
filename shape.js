@@ -32,3 +32,5 @@ Shape.prototype.draw = function(context, params = {}) {
     context.stroke();
   context.restore();
 }
+
+Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }

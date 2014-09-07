@@ -5,6 +5,21 @@ function Rectangle(diagStart, diagEnd) {
   this.origin = diagStart;
 
   this.controlLine = this.diagonal;
+
+  var rect = this;
+
+  this.shiftCommands = [
+    {
+      key: 'l',
+      forWhat: 'length',
+      callback: function(length) { rect.fixedLength = length; }
+    },
+    {
+      key: 'h',
+      forWhat: 'height',
+      callback: function(height) { rect.fixedHeight = height; }
+    }
+  ];
 }
 
 Rectangle.prototype = new Shape;
