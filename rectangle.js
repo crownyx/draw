@@ -42,7 +42,7 @@ Rectangle.prototype.infoText = function() {
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {
-  get: function() { return this.points[this.points.length - 1]; }
+  get: function() { return this.points.center; }
 });
 
 Object.defineProperty(Rectangle.prototype, 'points', {
@@ -52,13 +52,13 @@ Object.defineProperty(Rectangle.prototype, 'points', {
     var corner3 = this.diagonal.end;
     var corner4 = new Point(this.diagonal.end.x, this.diagonal.start.y);
     var center  = new Line(corner1, corner3).mid;
-    return [
-      corner1,
-      corner2,
-      corner3,
-      corner4,
-      center
-    ].map(function(point) {
+    return {
+      corner1: corner1,
+      corner2: corner2,
+      corner3: corner3,
+      corner4: corner4,
+      center: center
+    }.map(function(name, point) {
       var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
@@ -77,7 +77,9 @@ Rectangle.prototype.translate = function(point) {
 Rectangle.prototype.rotate = function(rotation) { this.rotation = rotation; }
 
 Rectangle.prototype.setEnd = function(point) {
-  var quad = (this.inRotation ? this.diagonal.angle : getAngle(this.diagonal.start, point)).quadrant;
+  var point = point.untranslate(this.origin, this.rotation);
+
+  var quad = getAngle(this.diagonal.start, point).quadrant;
 
   var x = this.fixedLength ?
           this.diagonal.start.x + (quad == 2 || quad == 3 ? -1 : 1) * this.length :
@@ -86,7 +88,7 @@ Rectangle.prototype.setEnd = function(point) {
           this.diagonal.start.y + (quad == 3 || quad == 4 ? -1 : 1) * this.height :
           point.y;
 
- this.diagonal.setEnd(new Point(x, y));
+  this.diagonal.setEnd(new Point(x, y));
 }
 
 Rectangle.prototype.drawPath = function(context) {

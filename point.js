@@ -1,6 +1,6 @@
 function Point(x, y) {
-  this.x = x;
-  this.y = y;
+  this.x = Math.round(x);
+  this.y = Math.round(y);
 
   this.toString = function() { return "(x: " + this.x + ", y: " + this.y + ")"; }
 
@@ -30,8 +30,11 @@ function Point(x, y) {
     return newPoint;
   }
 
-  this.untranslate = function(refPoint) {
-    var newPoint = new Point(this.x - refPoint.x, this.y - refPoint.y);
+  this.untranslate = function(refPoint, rotation) {
+    var refLine = new Line(refPoint, this);
+    var origAngle = new Angle(refLine.angle.rad - rotation.rad).rad;
+    var newPoint = new Point(refPoint.x + Math.cos(origAngle) * refLine.length,
+                             refPoint.y + Math.sin(origAngle) * refLine.length);
     return newPoint;
   }
 

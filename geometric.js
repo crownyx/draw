@@ -1,7 +1,7 @@
 function getPoint(point) {
   return (new Point (
-    Math.round(point.pageX - front.canvas.offsetLeft),
-    Math.round(point.pageY - front.canvas.offsetTop)
+    point.pageX - front.canvas.offsetLeft,
+    point.pageY - front.canvas.offsetTop
   ));
 }
 

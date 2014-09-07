@@ -65,10 +65,13 @@ function editMode() {
               }
             break;
             case Rectangle:
-              var x = nearPoint.x === shape.diagonal.end.x ? shape.diagonal.start.x : shape.diagonal.end.x;
-              var y = nearPoint.y === shape.diagonal.end.y ? shape.diagonal.start.y : shape.diagonal.end.y;
-              var rect = new Rectangle(new Point(x, y), nearPoint);
+              var opposite = nearPoint.same(shape.points.corner1) ? shape.points.corner3 :
+                             nearPoint.same(shape.points.corner2) ? shape.points.corner4 :
+                             nearPoint.same(shape.points.corner3) ? shape.points.corner1 :
+                             shape.points.corner2;
+              var rect = new Rectangle(opposite, nearPoint);
               rect.rotation = shape.rotation;
+              rect.setEnd(nearPoint);
               design(rect);
             break;
             case Ellipse:
