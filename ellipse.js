@@ -66,18 +66,15 @@ Ellipse.prototype.drawPath = function(context) {
 Ellipse.prototype.infoText = function() { return 'length'; }
 
 Ellipse.prototype.setEnd = function(point) {
-  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.center.x, point.y));
-  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.center.y));
+  var point = point.untranslate(this.origin, this.rotation);
+  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y));
+  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y));
 }
 
 Ellipse.prototype.translate = function(point) {
   this.origin = point;
-  this.xAxis.translate(new Point(
-    this.origin.x, this.origin.y + this.xAxis.length / 2
-  ));
-  this.yAxis.translate(new Point(
-    this.origin.x + this.yAxis.length / 2, this.origin.y
-  ));
+  this.xAxis = new Line(this.origin, new Point(this.origin.x + this.xAxis.length, this.origin.y));
+  this.yAxis = new Line(this.origin, new Point(this.origin.x, this.origin.y + this.yAxis.length));
 }
 
 Ellipse.prototype.rotate = function(rotation) { this.rotation = rotation; }

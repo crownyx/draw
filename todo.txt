@@ -1,3 +1,0 @@
-9/6
-
-edit ellipse: point does not line up

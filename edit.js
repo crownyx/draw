@@ -78,11 +78,11 @@ function editMode() {
               if(nearPoint.same(shape.points.yTop) || nearPoint.same(shape.points.yBottom)) {
                 shape.yAxis.fixed = false;
                 shape.xAxis.fixed = true;
-                shape.yAxis.end = nearPoint;
+                shape.setEnd(nearPoint);
               } else if(nearPoint.same(shape.points.xLeft) || nearPoint.same(shape.points.xRight)) {
                 shape.xAxis.fixed = false;
                 shape.yAxis.fixed = true;
-                shape.xAxis.end = nearPoint;
+                shape.setEnd(nearPoint);
               }
               design(shape);
             break;
