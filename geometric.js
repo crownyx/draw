@@ -33,7 +33,7 @@ function getQuadrant(lineStart, lineEnd) {
 }
 
 function Angle(rad) {
-  var _rad = ((rad || 0) + 2 * Math.PI) % (2 * Math.PI);
+  var _rad = (rad && !(rad % (2 * Math.PI)) ? rad : ((rad || 0) + 2 * Math.PI) % (2 * Math.PI));
   var _quad = Math.ceil(_rad / (0.5 * Math.PI)) || 4;
   return {
     rad: _rad,

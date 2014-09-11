@@ -9,6 +9,11 @@ Shape.prototype.complete = function() {
   this.draw(back.context);
 }
 
+Shape.prototype.nextStep = function() {
+  this.complete();
+  changeMode(commandMode);
+}
+
 Shape.prototype.sketch = function(context) {
   context.save();
     context.strokeStyle = "blue";

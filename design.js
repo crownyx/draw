@@ -9,8 +9,7 @@ function design(shape) {
   front.eventListeners.add('mousemove', 'drawShape', function()  { shape.draw(front.context); });
 
   front.eventListeners.add('click', 'completeShape', function()  {
-    shape.complete();
-    changeMode(commandMode);
+    shape.nextStep();
   });
 
   front.eventListeners.add('mousemove', 'showText', function() {

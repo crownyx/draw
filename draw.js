@@ -72,6 +72,11 @@ function commandMode() {
 function drawCommands(e) {
   if(!e.shiftKey) {
     switch(e.which){
+      case charCodes['a']:
+        changeMode();
+        design(new Arc(front.startPoint, new Line(front.startPoint, front.lastPoint).length));
+        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
+      break;
       case charCodes['c']:
         changeMode();
         design(new Circle(front.startPoint, front.lastPoint));
