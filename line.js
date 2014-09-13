@@ -13,12 +13,35 @@ function Line(start, end) {
       key: 'a',
       forWhat: 'angle',
       subtext: '(in degrees)',
-      callback: function(deg) { line.fixedRotation = new Angle(deg / 180 * Math.PI); }
+      callback: function(deg) {
+        line.fixedRotation = new Angle(parseInt(deg) / 180 * Math.PI);
+      }
+    },
+    {
+      key: 'e',
+      forWhat: 'endpoint',
+      subtext: '(x & y coordinates separated by comma)',
+      callback: function(xy) {
+        var x = parseInt(xy.split(',')[0]), y = parseInt(xy.split(',')[1]);
+        var refLine = new Line(line.start, new Point(x, y));
+        line.fixedRotation = refLine.angle;
+        line.fixedLength = refLine.length;
+      }
     },
     {
       key: 'l',
       forWhat: 'length',
-      callback: function(length) { line.fixedLength = length; }
+      callback: function(length) { line.fixedLength = parseInt(length); }
+    },
+    {
+      key: 's',
+      forWhat: 'startpoint',
+      subtext: '(x & y coordinates separated by comma)',
+      callback: function(xy) {
+        var x = parseInt(xy.split(',')[0]), y = parseInt(xy.split(',')[1]);
+        line.start = new Point(x, y);
+        line.origin = new Point(x, y);
+      }
     }
   ];
 }
@@ -27,7 +50,7 @@ Line.prototype = new Shape;
 Line.prototype.constructor = Line;
 
 Line.prototype.infoText = function() {
-  return "length: " + this.length.toFixed(2);
+  return "length: " + Math.round(this.length);
 }
 
 Line.prototype.setEnd = function(point) {
@@ -85,11 +108,12 @@ Line.prototype.preview = function(sketch) {
   new HorizontalLine(this.start.y).sketch(front.context);
   new VerticalLine(this.start.x).sketch(front.context);
   new Arc(this.start, 10, new Angle(0), this.angle).draw(front.context, { strokeStyle: 'blue', lineWidth: 0.5 });
-  var textAlignment = front.textAlignments[(this.angle.quadrant + 1) % 4];
+  var angle = getAngle(front.startPoint, front.lastPoint);
+  var textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
   front.context.save();
     front.context.textAlign = textAlignment.textAlign;
     front.context.fillText(
-      this.angle.deg.toFixed(2) + unescape("\xB0"),
+      Math.round(this.angle.deg) + unescape("\xB0"),
       this.start.x + textAlignment.xPlus,
       this.start.y + textAlignment.yPlus
     );

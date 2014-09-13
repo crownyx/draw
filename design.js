@@ -44,7 +44,7 @@ function design(shape) {
       if(e.shiftKey && e.which == charCodes[command.key]) {
         var helpText = 'enter ' + command.forWhat + ': ';
         if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
-        getInput(helpText, command.callback);
+        getInput(helpText, command.callback, shape);
       }
     });
   });

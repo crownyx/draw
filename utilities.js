@@ -1,4 +1,4 @@
-function getInput(promptText, propToFill) {
+function getInput(promptText, propToFill, shape) {
   var mainText = promptText.main || promptText;
 
   var textToAdd = [{ className: 'center', text: mainText, id: 'inputdiv' }];
@@ -17,13 +17,22 @@ function getInput(promptText, propToFill) {
     if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
       b.textContent += (e.which - charCodes.zero);
       input.push(e.which - charCodes.zero);
+    } else if(e.which == charCodes['comma']) {
+      b.textContent += ',';
+      input.push(',');
     } else if(e.which == charCodes.enter) {
       window.eventListeners.remove('getInput');
       prevCommands.forEach(function(el) {
         window.eventListeners.add(el.eventType, el.callbackName, el.callback);
       });
-      propToFill(parseInt(input.join('')));
+      propToFill(input.join(''));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
+      front.clear();
+      shape.setEnd(front.lastPoint);
+      shape.preview();
+//////////////////
+// need to fix: //
+//////////////////
     } else if(e.which == charCodes['backspace']) {
       b.textContent = infodiv.textContent.slice(0, -1);
       input.pop();

@@ -1,6 +1,6 @@
 function Point(x, y) {
-  this.x = Math.round(x);
-  this.y = Math.round(y);
+  this.x = x;
+  this.y = y;
 
   this.toString = function() { return "(x: " + this.x + ", y: " + this.y + ")"; }
 
@@ -38,12 +38,11 @@ function Point(x, y) {
     return newPoint;
   }
 
-  this.same = function(point, prec) {
-    var pointX = prec ? point.x.toFixed(prec) : point.x;
-    var thisX = prec ? this.x.toFixed(prec) : this.x;
-    var pointY = prec ? point.y.toFixed(prec) : point.y;
-    var thisY = prec ? this.y.toFixed(prec) : this.y;
-    return pointX == thisX && pointY == thisY;
+  this.same = function(point) {
+    return(
+      Math.round(point.x) == Math.round(this.x) &&
+      Math.round(point.y) == Math.round(this.y)
+    );
   }
 
   this.copy = function() {

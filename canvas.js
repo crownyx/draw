@@ -24,13 +24,10 @@ Canvas.prototype.translate = function(point) {
   this.context.translate(point.x, point.y);
 }
 
-Canvas.prototype.showAxes = function() {
-  this.context.lineWidth = 0.5;
-    new AxisPair(this.lastPoint).draw(this.context);
-  this.context.lineWidth = 1;
-}
+var front = new Canvas('frontlayer');
+var back  = new Canvas('backlayer');
 
-Canvas.prototype.showPos = function() {
+front.showPos = function() {
   var angle = getAngle(front.startPoint, front.lastPoint);
   var textAlignment = front.textAlignments[angle.quadrant - 1];
   this.context.save();
@@ -44,8 +41,11 @@ Canvas.prototype.showPos = function() {
   this.context.restore();
 };
 
-var front = new Canvas('frontlayer');
-var back  = new Canvas('backlayer');
+front.showAxes = function() {
+  this.context.lineWidth = 0.5;
+    new AxisPair(this.lastPoint).draw(this.context);
+  this.context.lineWidth = 1;
+}
 
 front.refresh = function() {
   this.clear();
