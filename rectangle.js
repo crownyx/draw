@@ -4,7 +4,7 @@ function Rectangle(diagStart, diagEnd) {
   this.diagonal = new Line(diagStart, diagEnd);
   this.origin = diagStart;
 
-  this.controlLine = this.diagonal;
+  this.lines = [this.diagonal];
 
   var rect = this;
 
@@ -66,13 +66,6 @@ Object.defineProperty(Rectangle.prototype, 'points', {
   }
 });
 
-Rectangle.prototype.translate = function(point) {
-  this.origin = point;
-  this.diagonal.translate(point);
-}
-
-Rectangle.prototype.rotate = function(rotation) { this.rotation = rotation; }
-
 Rectangle.prototype.setEnd = function(point) {
   var point = point.untranslate(this.origin, this.rotation);
 
@@ -94,6 +87,11 @@ Rectangle.prototype.drawPath = function(context) {
   context.lineTo(this.diagonal.end.x - this.diagonal.start.x, this.diagonal.end.y - this.diagonal.start.y);
   context.lineTo(0, this.diagonal.end.y - this.diagonal.start.y);
   context.lineTo(0, 0);
+}
+
+Rectangle.prototype.preview = function() {
+  this.diagonal.preview(true);
+  this.draw(front.context);
 }
 
 Rectangle.prototype.fill = function(context, params) {

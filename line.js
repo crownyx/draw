@@ -4,7 +4,6 @@ function Line(start, end) {
   this.start = start;
   this.end   = end;
 
-  this.controlLine = this;
   this.origin = start;
 
   var line = this;
@@ -60,6 +59,7 @@ Object.defineProperty(Line.prototype, 'center', {
 Object.defineProperty(Line.prototype, "points", {
   get: function() {
     return [this.start, this.mid, this.end].map(function(point) {
+      var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
     }, this);
@@ -79,6 +79,22 @@ Object.defineProperty(Line.prototype, 'angle', {
 Line.prototype.drawPath = function(context) {
   context.moveTo(0, 0);
   context.lineTo(this.end.x - this.start.x, this.end.y - this.start.y);
+}
+
+Line.prototype.preview = function(sketch) {
+  new HorizontalLine(this.start.y).sketch(front.context);
+  new VerticalLine(this.start.x).sketch(front.context);
+  new Arc(this.start, 10, new Angle(0), this.angle).draw(front.context, { strokeStyle: 'blue', lineWidth: 0.5 });
+  var textAlignment = front.textAlignments[(this.angle.quadrant + 1) % 4];
+  front.context.save();
+    front.context.textAlign = textAlignment.textAlign;
+    front.context.fillText(
+      this.angle.deg.toFixed(2) + unescape("\xB0"),
+      this.start.x + textAlignment.xPlus,
+      this.start.y + textAlignment.yPlus
+    );
+  front.context.restore();
+  sketch ? this.sketch(front.context) : this.draw(front.context);
 }
 
 Line.prototype.translate = function(point) {

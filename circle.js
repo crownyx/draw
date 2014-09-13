@@ -4,7 +4,7 @@ function Circle(radStart, radEnd) {
   this.origin = radStart;
   this.radius = new Line(radStart, radEnd);
 
-  this.controlLine = this.radius;
+  this.lines = [this.radius];
 }
 
 Circle.prototype = new Shape;
@@ -36,6 +36,11 @@ Circle.prototype.drawPath = function(context) {
   context.arc(0, 0, this.radius.length, 0, 2 * Math.PI);
 }
 
+Circle.prototype.preview = function() {
+  this.radius.preview(true);
+  this.draw(front.context);
+}
+
 Circle.prototype.fill = function(context) {
   context.beginPath();
     context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
@@ -44,13 +49,6 @@ Circle.prototype.fill = function(context) {
 
 Circle.prototype.infoText = function() {
   return "radius: " + this.radius.length.toFixed(2);
-}
-
-Circle.prototype.translate = function(point) {
-  var xDiff = point.x - this.center.x;
-  var yDiff = point.y - this.center.y;
-  this.origin = point;
-  this.radius.translate(point);
 }
 
 Circle.prototype.copy = function() {

@@ -56,13 +56,9 @@ function editMode() {
         } else {
           switch(shape.constructor) {
             case Line:
-              if(nearPoint === shape.start) {
-                shape.start = shape.end;
-                shape.end = nearPoint;
-                design(shape);
-              } else if(nearPoint === shape.end) {
-                design(shape);
-              }
+              (function(backwards) {
+                design(new Line(backwards ? shape.end : shape.start, backwards ? shape.start : shape.end));
+              })(nearPoint.same(shape.start));
             break;
             case Rectangle:
               var opposite = nearPoint.same(shape.points.corner1) ? shape.points.corner3 :

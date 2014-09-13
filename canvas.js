@@ -31,48 +31,36 @@ Canvas.prototype.showAxes = function() {
 }
 
 Canvas.prototype.showPos = function() {
-  this.context.fillText(
-    "x: "   + this.lastPoint.x +
-    ", y: " + this.lastPoint.y,
-    this.lastPoint.x + 10,
-    this.lastPoint.y - 10
-  );
-};
-
-function designLine() {
-  var line = design(new Line(front.startPoint, front.lastPoint));
-  front.eventListeners.add('mousemove', 'showXAxis', function() {
-    new HorizontalLine(front.startPoint.y).sketch(front.context);
-  });
-  front.eventListeners.add('mousemove', 'showAngle', function() {
-    new Arc(line.start, 15, new Angle(0), line.angle).sketch(front.context);
-    front.context.textAlign = 'right';
-    front.context.fillText(
-      line.angle.deg.toFixed(2) + unescape("\xB0"),
-      front.lastPoint.x - 10,
-      front.lastPoint.y + 15
+  var angle = getAngle(front.startPoint, front.lastPoint);
+  var textAlignment = front.textAlignments[angle.quadrant - 1];
+  this.context.save();
+    this.context.textAlign = textAlignment.textAlign;
+    this.context.fillText(
+      "x: "   + this.lastPoint.x +
+      ", y: " + this.lastPoint.y,
+      this.lastPoint.x + textAlignment.xPlus,
+      this.lastPoint.y + textAlignment.yPlus
     );
-    front.context.textAlign = 'start';
-  });
-  new Arc(line.start, 15, new Angle(0), line.angle).sketch(front.context);
-  new HorizontalLine(front.startPoint.y).sketch(front.context);
-}
+  this.context.restore();
+};
 
 var front = new Canvas('frontlayer');
 var back  = new Canvas('backlayer');
 
-front.refresh = function(restart) {
+front.refresh = function() {
   this.clear();
 
   this.showPos();
   this.showAxes();
   this.eventListeners.clear();
-
-  if(restart) {
-    this.shapes = [];
-    commandMode();
-  }
 }
+
+front.textAlignments = [
+  { xPlus: 15,  yPlus: 20,  textAlign: 'left' },
+  { xPlus: -15, yPlus: 20,  textAlign: 'right'},
+  { xPlus: -15, yPlus: -15, textAlign: 'right'},
+  { xPlus: 15,  yPlus: -15, textAlign: 'left' }
+]
 
 back.refresh = function() {
   this.clear();

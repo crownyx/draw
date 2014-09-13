@@ -7,6 +7,8 @@ function Ellipse(radStart, radEnd) {
   this.yAxis = new Line(radStart, { x: radStart.x, y: radEnd.y });
   this.rotation = new Angle(0);
 
+  this.lines = [this.yAxis, this.xAxis];
+
   this.shiftCommands = [];
 }
 
@@ -63,6 +65,11 @@ Ellipse.prototype.drawPath = function(context) {
   context.restore();
 }
 
+Ellipse.prototype.preview = function() {
+  this.yAxis.preview(true);
+  this.draw(front.context);
+}
+
 Ellipse.prototype.infoText = function() { return 'length'; }
 
 Ellipse.prototype.setEnd = function(point) {
@@ -70,14 +77,6 @@ Ellipse.prototype.setEnd = function(point) {
   if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y));
   if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y));
 }
-
-Ellipse.prototype.translate = function(point) {
-  this.origin = point;
-  this.xAxis.translate(point);
-  this.yAxis.translate(point);
-}
-
-Ellipse.prototype.rotate = function(rotation) { this.rotation = rotation; }
 
 Ellipse.prototype.copy = function() {
   var ellipse = new Ellipse(this.center, this.center);

@@ -10,9 +10,11 @@ window.onload = function() {
   document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 42 + 'px';
   document.getElementById('infopanel').style.height = window.innerHeight - 40 + 'px';
 
-  front.lastPoint = new Point(0, 0);
   front.infopanel = document.getElementById('infopanel');
   front.infopanel.infodiv = document.getElementById('infodiv');
+
+  front.startPoint = new Point(0, front.canvas.height);
+  front.lastPoint  = new Point(front.canvas.width, 0);
 
   front.canvas.addEventListener('mousemove', function()  { front.clear();                 }, false);
   front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = getPoint(e); }, false);
@@ -27,10 +29,14 @@ window.onload = function() {
 function changeMode(mode) {
   window.refresh();
   front.refresh();
+
   if(mode) mode();
 }
 
 function commandMode() {
+  front.startPoint = new Point(0, front.canvas.height);
+  front.lastPoint  = new Point(front.canvas.width, 0);
+
   front.infopanel.replaceChild(
     (function(div) {
       div.appendChild((function(b) {
@@ -58,7 +64,9 @@ function commandMode() {
 
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = getPoint(e);
-    changeMode(designLine);
+    changeMode();
+    design(new Line(front.startPoint, front.lastPoint));
+    window.eventListeners.add('keydown', 'drawCommands', drawCommands);
   });
 
   window.eventListeners.add('keydown', 'switchMode', function(e) {
