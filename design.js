@@ -6,7 +6,7 @@ function design(shape) {
   });
 
   front.eventListeners.add('mousemove', 'setEnd',    function(e) { shape.setEnd(getPoint(e)); });
-  front.eventListeners.add('mousemove', 'drawShape', function()  { shape.draw(front.context); });
+  front.eventListeners.add('mousemove', 'drawShape', function()  { shape.preview(); });
 
   front.eventListeners.add('click', 'completeShape', function()  {
     shape.nextStep();

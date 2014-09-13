@@ -5,6 +5,7 @@ function Line(start, end) {
   this.end   = end;
 
   this.controlLine = this;
+  this.origin = start;
 
   var line = this;
 
@@ -76,15 +77,15 @@ Object.defineProperty(Line.prototype, 'angle', {
 });
 
 Line.prototype.drawPath = function(context) {
-  context.moveTo(this.start.x, this.start.y);
-  context.lineTo(this.end.x, this.end.y);
+  context.moveTo(0, 0);
+  context.lineTo(this.end.x - this.start.x, this.end.y - this.start.y);
 }
 
 Line.prototype.translate = function(point) {
-  var xDiff = this.mid.x - point.x;
-  var yDiff = this.mid.y - point.y;
-  this.start = new Point(this.start.x - xDiff, this.start.y - yDiff);
-  this.end = new Point(this.end.x - xDiff, this.end.y - yDiff);
+  var origDiff = { x: this.end.x - this.start.x, y: this.end.y - this.start.y };
+  this.origin = point;
+  this.start = point;
+  this.end = new Point(this.start.x + origDiff.x, this.start.y + origDiff.y);
 }
 
 Line.prototype.copy = function() {

@@ -68,10 +68,7 @@ Object.defineProperty(Rectangle.prototype, 'points', {
 
 Rectangle.prototype.translate = function(point) {
   this.origin = point;
-  this.diagonal.translate(new Point(
-    point.x + Math.cos(this.diagonal.angle.rad) * (this.diagonal.length / 2),
-    point.y + Math.sin(this.diagonal.angle.rad) * (this.diagonal.length / 2)
-  ));
+  this.diagonal.translate(point);
 }
 
 Rectangle.prototype.rotate = function(rotation) { this.rotation = rotation; }

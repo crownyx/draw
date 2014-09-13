@@ -50,7 +50,7 @@ Circle.prototype.translate = function(point) {
   var xDiff = point.x - this.center.x;
   var yDiff = point.y - this.center.y;
   this.origin = point;
-  this.radius = new Line(point, new Point(this.radius.end.x + xDiff, this.radius.end.y + yDiff));
+  this.radius.translate(point);
 }
 
 Circle.prototype.copy = function() {

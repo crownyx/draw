@@ -19,6 +19,8 @@ Shape.prototype.sketch = function(context) {
     context.strokeStyle = "blue";
     context.lineWidth = 0.5;
     context.setLineDash([5]);
+    context.layer.translate(this.origin);
+    context.rotate(this.rotation.rad);
     context.beginPath();
       this.drawPath(context);
     context.stroke();
@@ -37,5 +39,7 @@ Shape.prototype.draw = function(context, params = {}) {
     context.stroke();
   context.restore();
 }
+
+Shape.prototype.preview = function() { this.draw(front.context); }
 
 Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }

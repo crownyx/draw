@@ -73,8 +73,8 @@ Ellipse.prototype.setEnd = function(point) {
 
 Ellipse.prototype.translate = function(point) {
   this.origin = point;
-  this.xAxis = new Line(this.origin, new Point(this.origin.x + this.xAxis.length, this.origin.y));
-  this.yAxis = new Line(this.origin, new Point(this.origin.x, this.origin.y + this.yAxis.length));
+  this.xAxis.translate(point);
+  this.yAxis.translate(point);
 }
 
 Ellipse.prototype.rotate = function(rotation) { this.rotation = rotation; }

@@ -1,3 +1,5 @@
-9/10
+9/11
 
 Fix translate line
+finish arc
+implement .preview() for all shapes
