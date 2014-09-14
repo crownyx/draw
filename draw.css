@@ -8,8 +8,6 @@ canvas {
   top: 20px;
 }
 
-#frontlayer { opacity: 100%; }
-
 #backlayer { background-color: white; }
 
 #infopanel {

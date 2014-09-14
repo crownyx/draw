@@ -19,13 +19,17 @@ Canvas.prototype.clear = function() {
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
+Canvas.prototype.save = function() { this.context.save(); }
+Canvas.prototype.restore = function() { this.context.restore(); }
+
 Canvas.prototype.translate = function(point) {
   this.origin = point;
   this.context.translate(point.x, point.y);
 }
 
-var front = new Canvas('frontlayer');
-var back  = new Canvas('backlayer');
+var front  = new Canvas('frontlayer');
+var middle = new Canvas('drawlayer');
+var back   = new Canvas('backlayer');
 
 front.showPos = function() {
   var angle = getAngle(front.startPoint, front.lastPoint);

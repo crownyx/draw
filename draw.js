@@ -2,10 +2,12 @@ window.onload = function() {
   this.eventListeners  = new EventListenerCollection(this);
   front.eventListeners = new EventListenerCollection(front.canvas);
 
-  front.canvas.width  = window.innerWidth  - 202;   
-  front.canvas.height = window.innerHeight - 40;
-  back.canvas.width   = window.innerWidth  - 202;   
-  back.canvas.height  = window.innerHeight - 40;
+  front.canvas.width   = window.innerWidth  - 202;
+  front.canvas.height  = window.innerHeight - 40;
+  middle.canvas.width  = window.innerWidth  - 202;
+  middle.canvas.height = window.innerHeight - 40;
+  back.canvas.width    = window.innerWidth  - 202;
+  back.canvas.height   = window.innerHeight - 40;
 
   document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 42 + 'px';
   document.getElementById('infopanel').style.height = window.innerHeight - 40 + 'px';
@@ -16,7 +18,7 @@ window.onload = function() {
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
 
-  front.canvas.addEventListener('mousemove', function()  { front.clear();                 }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.clear(); middle.clear(); }, false);
   front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = getPoint(e); }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showAxes();              }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showPos();               }, false);
@@ -29,6 +31,7 @@ window.onload = function() {
 function changeMode(mode) {
   window.refresh();
   front.refresh();
+  middle.clear();
 
   if(mode) mode();
 }
@@ -79,32 +82,24 @@ function commandMode() {
 
 function drawCommands(e) {
   if(!e.shiftKey) {
-    switch(e.which){
-      case charCodes['a']:
-        changeMode();
-        design(new Arc(front.startPoint, new Line(front.startPoint, front.lastPoint).length));
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-      break;
-      case charCodes['c']:
-        changeMode();
-        design(new Circle(front.startPoint, front.lastPoint));
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-      break;
-      case charCodes['e']:
-        changeMode();
-        design(new Ellipse(front.startPoint, front.lastPoint));
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-      break;
-      case charCodes['l']:
-        changeMode();
-        designLine();
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-      break;
-      case charCodes['r']:
-        changeMode();
-        design(new Rectangle(front.startPoint, front.lastPoint));
-        window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-      break;
+    var shape = (function() {
+      switch(e.which) {
+        case charCodes['a']:
+          return new Arc(front.startPoint, new Line(front.startPoint, front.lastPoint).length);
+        case charCodes['c']:
+          return new Circle(front.startPoint, front.lastPoint);
+        case charCodes['e']:
+          return new Ellipse(front.startPoint, front.lastPoint);
+        case charCodes['l']:
+          return new Line(front.startPoint, front.lastPoint);
+        case charCodes['r']:
+          return new Rectangle(front.startPoint, front.lastPoint);
+      }
+    })();
+    if(shape) {
+      changeMode();
+      design(shape);
+      window.eventListeners.add('keydown', 'drawCommands', drawCommands);
     }
   }
 }

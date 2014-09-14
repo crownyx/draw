@@ -105,20 +105,20 @@ Line.prototype.drawPath = function(context) {
 }
 
 Line.prototype.preview = function(sketch) {
-  new HorizontalLine(this.start.y).sketch(front.context);
-  new VerticalLine(this.start.x).sketch(front.context);
-  new Arc(this.start, 10, new Angle(0), this.angle).draw(front.context, { strokeStyle: 'blue', lineWidth: 0.5 });
+  new HorizontalLine(this.start.y).sketch(middle.context);
+  new VerticalLine(this.start.x).sketch(middle.context);
+  new Arc(this.start, 10, new Angle(0), this.angle).draw(middle.context, { strokeStyle: 'blue', lineWidth: 0.5 });
   var angle = getAngle(front.startPoint, front.lastPoint);
   var textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
-  front.context.save();
-    front.context.textAlign = textAlignment.textAlign;
-    front.context.fillText(
+  middle.save();
+    middle.context.textAlign = textAlignment.textAlign;
+    middle.context.fillText(
       Math.round(this.angle.deg) + unescape("\xB0"),
       this.start.x + textAlignment.xPlus,
       this.start.y + textAlignment.yPlus
     );
-  front.context.restore();
-  sketch ? this.sketch(front.context) : this.draw(front.context);
+  middle.restore();
+  sketch ? this.sketch(middle.context) : this.draw(middle.context);
 }
 
 Line.prototype.translate = function(point) {

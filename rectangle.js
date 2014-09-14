@@ -91,7 +91,7 @@ Rectangle.prototype.drawPath = function(context) {
 
 Rectangle.prototype.preview = function() {
   this.diagonal.preview(true);
-  this.draw(front.context);
+  this.draw(middle.context);
 }
 
 Rectangle.prototype.fill = function(context, params) {

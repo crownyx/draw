@@ -67,7 +67,7 @@ Ellipse.prototype.drawPath = function(context) {
 
 Ellipse.prototype.preview = function() {
   this.yAxis.preview(true);
-  this.draw(front.context);
+  this.draw(middle.context);
 }
 
 Ellipse.prototype.infoText = function() { return 'length'; }

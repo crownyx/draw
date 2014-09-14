@@ -40,8 +40,14 @@ function Point(x, y) {
 
   this.same = function(point) {
     return(
-      Math.round(point.x) == Math.round(this.x) &&
-      Math.round(point.y) == Math.round(this.y)
+      (
+        Math.floor(point.x) == Math.round(this.x) ||
+        Math.ceil(point.x)  == Math.round(this.x)
+      ) &&
+      (
+        Math.floor(point.y) == Math.round(this.y) ||
+        Math.ceil(point.y)  == Math.round(this.y)
+      )
     );
   }
 

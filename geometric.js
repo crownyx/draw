@@ -1,5 +1,5 @@
 function getPoint(point) {
-  return (new Point (
+  return (new Point(
     point.pageX - front.canvas.offsetLeft,
     point.pageY - front.canvas.offsetTop
   ));

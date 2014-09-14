@@ -16,7 +16,7 @@ function design(shape) {
     front.context.fillText(shape.infoText(), 10, 15);
   });
 
-  shape.draw(front.context);
+  shape.preview();
   front.context.fillText(shape.infoText(), 10, 15);
 
   replaceInfoText([

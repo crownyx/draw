@@ -27,7 +27,7 @@ function getInput(promptText, propToFill, shape) {
       });
       propToFill(input.join(''));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
-      front.clear();
+      middle.clear();
       shape.setEnd(front.lastPoint);
       shape.preview();
 //////////////////

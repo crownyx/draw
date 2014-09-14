@@ -1,5 +1,8 @@
 9/11
 
-Fix translate line
 finish arc
 implement .preview() for all shapes
+
+select mode: when type 'r' or 't', next stage should be ready
+getInput: delete doesn't work
+
