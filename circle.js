@@ -38,7 +38,7 @@ Circle.prototype.drawPath = function(context) {
 
 Circle.prototype.preview = function() {
   this.radius.preview(true);
-  this.draw(front.context);
+  this.draw(middle.context);
 }
 
 Circle.prototype.fill = function(context) {

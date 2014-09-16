@@ -51,6 +51,10 @@ function Point(x, y) {
     );
   }
 
+  this.distance = function(otherPoint) {
+    return Math.sqrt(Math.pow(this.x - otherPoint.x, 2) + Math.pow(this.y - otherPoint.y, 2));
+  }
+
   this.copy = function() {
     return new Point(this.x, this.y);
   }

@@ -6,11 +6,9 @@ function design(shape) {
   });
 
   front.eventListeners.add('mousemove', 'setEnd',    function(e) { shape.setEnd(getPoint(e)); });
-  front.eventListeners.add('mousemove', 'drawShape', function()  { shape.preview(); });
+  front.eventListeners.add('mousemove', 'drawShape', function()  { middle.clear(); shape.preview(); });
 
-  front.eventListeners.add('click', 'completeShape', function()  {
-    shape.nextStep();
-  });
+  front.eventListeners.add('click', 'completeShape', function()  { shape.nextStep(); });
 
   front.eventListeners.add('mousemove', 'showText', function() {
     front.context.fillText(shape.infoText(), 10, 15);

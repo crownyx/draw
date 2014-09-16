@@ -73,6 +73,11 @@ Array.prototype.flatten = function() {
   }, []));
 }
 
+Array.prototype.flatMap = function(callback) {
+  var mapped = this.map(callback);
+  return mapped.flatten();
+}
+
 ////////////
 // String //
 ////////////

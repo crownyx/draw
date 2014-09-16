@@ -38,16 +38,16 @@ Arc.prototype.nextStep = function() {
 }
 
 Arc.prototype.preview = function() {
-  new HorizontalLine(this.center.y).sketch(front.context);
-  new Line(this.center, this.radiusEnd).sketch(front.context);
-  new Arc(this.center, 15, 0, this._workingAngle()).sketch(front.context);
+  new HorizontalLine(this.center.y).sketch(middle.context);
+  new Line(this.center, this.radiusEnd).sketch(middle.context);
+  new Arc(this.center, 15, 0, this._workingAngle()).sketch(middle.context);
   front.context.save();
-    front.context.textAlign = 'right';
-    front.context.fillText(
+    middle.context.textAlign = 'right';
+    middle.context.fillText(
       this._workingAngle().deg.toFixed(2) + unescape("\xB0"),
       front.lastPoint.x - 10,
       front.lastPoint.y + 15
     );
-  front.context.restore();
-  this.draw(front.context);
+  middle.context.restore();
+  this.draw(middle.context);
 }

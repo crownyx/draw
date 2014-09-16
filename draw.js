@@ -18,7 +18,7 @@ window.onload = function() {
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
 
-  front.canvas.addEventListener('mousemove', function()  { front.clear(); middle.clear(); }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.clear();                 }, false);
   front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = getPoint(e); }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showAxes();              }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showPos();               }, false);

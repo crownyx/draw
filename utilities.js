@@ -30,11 +30,8 @@ function getInput(promptText, propToFill, shape) {
       middle.clear();
       shape.setEnd(front.lastPoint);
       shape.preview();
-//////////////////
-// need to fix: //
-//////////////////
     } else if(e.which == charCodes['backspace']) {
-      b.textContent = infodiv.textContent.slice(0, -1);
+      b.textContent = b.textContent.slice(0, -1);
       input.pop();
     } else if(e.which == charCodes['esc']) {
       window.eventListeners.remove('getInput');

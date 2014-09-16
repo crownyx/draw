@@ -94,18 +94,6 @@ Rectangle.prototype.preview = function() {
   this.draw(middle.context);
 }
 
-Rectangle.prototype.fill = function(context, params) {
-  context.save();
-    context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
-    context.fillRect(
-      this.diagonal.start.x,
-      this.diagonal.start.y,
-      this.diagonal.end.x - this.diagonal.start.x,
-      this.diagonal.end.y - this.diagonal.start.y
-    );
-  context.restore();
-}
-
 Rectangle.prototype.copy = function() {
   var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
   newRect.origin = this.origin;

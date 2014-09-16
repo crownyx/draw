@@ -40,6 +40,17 @@ Shape.prototype.draw = function(context, params = {}) {
   context.restore();
 }
 
+Shape.prototype.fill = function(context, params = {}) {
+  context.save();
+    context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
+    context.layer.translate(this.origin);
+    context.rotate(this.rotation.rad);
+    context.beginPath();
+      this.drawPath(context);
+    context.fill();
+  context.restore();
+}
+
 Shape.prototype.preview = function() { this.draw(front.context); }
 
 Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }
