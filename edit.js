@@ -57,7 +57,10 @@ function editMode() {
           switch(shape.constructor) {
             case Line:
               (function(backwards) {
-                design(new Line(backwards ? shape.end : shape.start, backwards ? shape.start : shape.end));
+                var start = backwards ? shape.end : shape.start;
+                var end   = backwards ? shape.start : shape.end;
+                front.startPoint = start;
+                design(new Line(start, end));
               })(nearPoint.same(shape.start));
             break;
             case Rectangle:
@@ -66,6 +69,7 @@ function editMode() {
                              nearPoint.same(shape.points.corner3) ? shape.points.corner1 :
                              shape.points.corner2;
               var rect = new Rectangle(opposite, nearPoint);
+              front.startPoint = rect.diagonal.start;
               rect.rotation = shape.rotation;
               rect.setEnd(nearPoint);
               design(rect);
@@ -80,9 +84,12 @@ function editMode() {
                 shape.yAxis.fixed = true;
                 shape.setEnd(nearPoint);
               }
+              front.startPoint = ellipse.center;
               design(shape);
             break;
-            default:
+            case Circle:
+              shape.setEnd(nearPoint);
+              front.startPoint = shape.center;
               design(shape);
             break;
           }

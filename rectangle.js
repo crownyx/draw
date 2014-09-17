@@ -38,7 +38,7 @@ Object.defineProperty(Rectangle.prototype, 'height', {
 });
 
 Rectangle.prototype.infoText = function() {
-  return 'length: ' + this.length.toFixed(2) + ', height: ' + this.height.toFixed(2);
+  return 'length: ' + Math.round(this.length) + ', height: ' + Math.round(this.height);
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {

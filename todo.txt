@@ -3,4 +3,7 @@
 finish arc
 implement .preview() for all shapes
 
-select mode: when type 'r' or 't', next stage should be ready
+9/16
+
+set angle in rotation
+go to point in translation
