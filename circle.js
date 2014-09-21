@@ -5,12 +5,36 @@ function Circle(radStart, radEnd) {
   this.radius = new Line(radStart, radEnd);
 
   this.lines = [this.radius];
+
+  var circle = this;
+
+  this.shiftCommands = [
+    {
+      key: 'a',
+      forWhat: 'area',
+      callback: function(area) {
+        circle.radius.fixedLength = Math.sqrt(parseInt(area) / Math.PI);
+      }
+    },
+    {
+      key: 'c',
+      forWhat: 'circumference',
+      callback: function(circ) {
+        circle.radius.fixedLength = parseInt(circ) / (2 * Math.PI);
+      }
+    },
+    {
+      key: 'r',
+      forWhat: 'radius length',
+      callback: function(length) { circle.radius.fixedLength = parseInt(length); }
+    }
+  ];
 }
 
 Circle.prototype = new Shape;
 Circle.prototype.constructor = Circle;
 
-Circle.prototype.setEnd = function(point) { this.radius.end = point; }
+Circle.prototype.setEnd = function(point) { this.radius.setEnd(point); }
 
 Object.defineProperty(Circle.prototype, 'center', {
   get: function() { return this.origin; }
@@ -32,6 +56,18 @@ Object.defineProperty(Circle.prototype, 'points', {
   }
 });
 
+Object.defineProperty(Circle.prototype, 'circumference', {
+  get: function() {
+    return this.radius.length * 2 * Math.PI;
+  }
+});
+
+Object.defineProperty(Circle.prototype, 'area', {
+  get: function() {
+    return Math.pow(this.radius.length, 2) * Math.PI;
+  }
+});
+
 Circle.prototype.drawPath = function(context) {
   context.arc(0, 0, this.radius.length, 0, 2 * Math.PI);
 }
@@ -48,9 +84,11 @@ Circle.prototype.fill = function(context) {
 }
 
 Circle.prototype.infoText = function() {
-  return "radius: " + this.radius.length.toFixed(2);
+  return(
+    'radius length: '    + commaSep(Math.round(this.radius.length)) +
+    ' | circumference: ' + commaSep(Math.round(this.circumference)) +
+    ' | area: '          + commaSep(Math.round(this.area)         )
+  );
 }
 
-Circle.prototype.copy = function() {
-  return new Circle(this.radius.start.copy(), this.radius.end.copy());
-}
+Circle.prototype.copy = function() { return new Circle(this.radius.start.copy(), this.radius.end.copy()); }

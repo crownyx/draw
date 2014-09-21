@@ -7,3 +7,18 @@ implement .preview() for all shapes
 
 set angle in rotation
 go to point in translation
+
+9/17
+
+goTo point before drawing
+after shiftCommand callback, update infoText
+select rotation: create axes and move degree text
+finish shiftCOmmands for all shapes
+rectangle: area/perimeter
+ellipse: xAxis, yAxis, area, perimeter
+refine infoText for all shapes
+
+9/20
+
+double check ellipse circumference formula
+fix rectangle preview after rotation

@@ -50,7 +50,8 @@ function editMode() {
         back.refresh();
 
         if(nearPoint.same(shape.center)) {
-          shape.draw(front.context);
+          front.startPoint = shape.center;
+          shape.draw(middle.context);
           var origDiff = { x: shape.origin.x - nearPoint.x, y: shape.origin.y - nearPoint.y };
           translate(shape, origDiff);
         } else {
@@ -68,10 +69,12 @@ function editMode() {
                              nearPoint.same(shape.points.corner2) ? shape.points.corner4 :
                              nearPoint.same(shape.points.corner3) ? shape.points.corner1 :
                              shape.points.corner2;
-              var rect = new Rectangle(opposite, nearPoint);
-              front.startPoint = rect.diagonal.start;
-              rect.rotation = shape.rotation;
+              var rect = shape;
+              rect.diagonal.start = opposite;
+              rect.origin = opposite;
               rect.setEnd(nearPoint);
+              rect.diag = rect.diag;
+              front.startPoint = opposite;
               design(rect);
             break;
             case Ellipse:
@@ -84,7 +87,7 @@ function editMode() {
                 shape.yAxis.fixed = true;
                 shape.setEnd(nearPoint);
               }
-              front.startPoint = ellipse.center;
+              front.startPoint = shape.center;
               design(shape);
             break;
             case Circle:

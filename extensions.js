@@ -78,12 +78,32 @@ Array.prototype.flatMap = function(callback) {
   return mapped.flatten();
 }
 
+Array.prototype.minBy = function(method) {
+  return this.sort(function(a, b) {
+    if(a[method] > b[method]) return 1;
+    if(b[method] > a[method]) return -1;
+    return 0;
+  })[0];
+}
+
+Array.prototype.maxBy = function(method) {
+  return this.sort(function(a, b) {
+    if(a[method] > b[method]) return 1;
+    if(b[method] > a[method]) return -1;
+    return 0;
+  })[this.length - 1];
+}
+
 ////////////
 // String //
 ////////////
 
 String.prototype.capitalize = function() {
   return this[0].toUpperCase() + this.substring(1);
+}
+
+String.prototype.right = function(chars) {
+  return this.substring(this.length - chars);
 }
 
 ////////////
@@ -121,3 +141,40 @@ Object.defineProperty(Object.prototype, 'map', {
     return this;
   }
 });
+
+////////////////////
+// Math functions //
+////////////////////
+
+function fact(n) {
+  var fact = 1;
+  for(var i = 1; i <= n; i++) {
+    fact *= i;
+  }
+  return fact;
+}
+
+function doubfact(n) {
+  var start = i % 2 ? 1 : 2;
+  var fact = 1;
+  for(var i = 2, curr = start; curr <= n; curr += 2) {
+    fact *= curr;
+  }
+  return fact;
+}
+
+function commaSep(n) {
+  if(n == 0) return '0';
+  if(n < 0)  return '-' + commaSep(Math.abs(n));
+  var string = '';
+  for(var thous = 0; Math.pow(1000, thous) <= n; thous++) {
+    soFar = n % Math.pow(1000, thous + 1);
+    thisGroup = Math.floor(soFar / Math.pow(1000, thous));
+    if(soFar == n) {
+      string = String(thisGroup) + string;
+    } else {
+      string = ',' + ('00' + String(thisGroup)).right(3) + string;
+    }
+  }
+  return string;
+}

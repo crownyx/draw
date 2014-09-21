@@ -9,28 +9,39 @@ function Ellipse(radStart, radEnd) {
 
   this.lines = [this.yAxis, this.xAxis];
 
-  this.shiftCommands = [];
+  this.shiftCommands = [
+    {
+      key: 'x',
+      forWhat: 'x-axis length',
+      callback: function(length) {
+        this.xAxis.fixedLength = parseInt(length);
+        this.xAxis.fixed = true;
+      }
+    },
+    {
+      key: 'y',
+      forWhat: 'y-axis length',
+      callback: function(length) {
+        this.yAxis.fixedLength = parseInt(length);
+        this.yAxis.fixed = true;
+      }
+    }
+  ];
 }
 
 Ellipse.prototype = new Shape;
 Ellipse.prototype.constructor = Ellipse;
 
 Object.defineProperty(Ellipse.prototype, 'center', {
-  get: function() {
-    return this.origin;
-  }
+  get: function() { return this.origin; }
 });
 
 Object.defineProperty(Ellipse.prototype, 'semiMajor', {
-  get: function() {
-    return this.yAxis.length >= this.xAxis.length ? this.yAxis : this.xAxis;
-  }
+  get: function() { return [this.yAxis, this.xAxis].maxBy('length'); }
 });
 
 Object.defineProperty(Ellipse.prototype, 'semiMinor', {
-  get: function() {
-    return this.yAxis.length >= this.xAxis.length ? this.xAxis : this.yAxis;
-  }
+  get: function() { return [this.yAxis, this.xAxis].minBy('length'); }
 });
 
 Object.defineProperty(Ellipse.prototype, 'points', {
@@ -49,15 +60,6 @@ Object.defineProperty(Ellipse.prototype, 'points', {
   }
 });
 
-Object.defineProperty(Ellipse.prototype, 'controlLine', {
-  get: function() {
-    return new Line(
-      this.center,
-      new Point(this.yAxis.end.x, this.xAxis.end.y)
-    );
-  }
-});
-
 Ellipse.prototype.drawPath = function(context) {
   context.save();
     context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
@@ -66,11 +68,38 @@ Ellipse.prototype.drawPath = function(context) {
 }
 
 Ellipse.prototype.preview = function() {
-  this.yAxis.preview(true);
+  new Line(this.origin, front.lastPoint).preview(true);
   this.draw(middle.context);
 }
 
-Ellipse.prototype.infoText = function() { return 'length'; }
+Object.defineProperty(Ellipse.prototype, 'circumference', {
+  get: function() {
+    var a = this.semiMajor.length, b = this.semiMinor.length;
+    return(
+      Math.PI * (a + b) * (1 + [4,64,256,16384].reduce(function(prev, curr, i) {
+        var n = i + 1;
+        var h = Math.pow(a - b, 2) / Math.pow(a + b, 2);
+        var curr = (1 / curr) * Math.pow(h, n);
+        return prev + curr;
+      }))
+    );
+  }
+});
+
+Object.defineProperty(Ellipse.prototype, 'area', {
+  get: function() {
+    return Math.PI * this.xAxis.length * this.yAxis.length;
+  }
+});
+
+Ellipse.prototype.infoText = function() {
+  return(
+    'x-axis length: '    + commaSep(Math.round(this.xAxis.length )) +
+    ' | y-axis length: ' + commaSep(Math.round(this.yAxis.length )) +
+    ' | circumference: ' + commaSep(Math.round(this.circumference)) +
+    ' | area: '          + commaSep(Math.round(this.area         ))
+  );
+}
 
 Ellipse.prototype.setEnd = function(point) {
   var point = point.untranslate(this.origin, this.rotation);

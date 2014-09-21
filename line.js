@@ -33,16 +33,6 @@ function Line(start, end) {
       forWhat: 'length',
       callback: function(length) { line.fixedLength = parseInt(length); }
     },
-    {
-      key: 's',
-      forWhat: 'startpoint',
-      subtext: '(x & y coordinates separated by comma)',
-      callback: function(xy) {
-        var x = parseInt(xy.split(',')[0]), y = parseInt(xy.split(',')[1]);
-        line.start = new Point(x, y);
-        line.origin = new Point(x, y);
-      }
-    }
   ];
 }
 
@@ -50,7 +40,7 @@ Line.prototype = new Shape;
 Line.prototype.constructor = Line;
 
 Line.prototype.infoText = function() {
-  return "length: " + Math.round(this.length);
+  return "length: " + commaSep(Math.round(this.length));
 }
 
 Line.prototype.setEnd = function(point) {
@@ -109,11 +99,21 @@ Line.prototype.preview = function(sketch) {
   new VerticalLine(this.start.x).sketch(middle.context);
   new Arc(this.start, 10, new Angle(0), this.angle).draw(middle.context, { strokeStyle: 'blue', lineWidth: 0.5 });
   var angle = getAngle(front.startPoint, front.lastPoint);
-  var textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
+  var textAlignment = front.textAlignments[angle.quadrant % 4];
   middle.save();
     middle.context.textAlign = textAlignment.textAlign;
     middle.context.fillText(
       Math.round(this.angle.deg) + unescape("\xB0"),
+      this.start.x + textAlignment.xPlus,
+      this.start.y + textAlignment.yPlus
+    );
+  middle.restore();
+  textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
+  middle.save();
+    middle.context.textAlign = textAlignment.textAlign;
+    middle.context.fillText(
+      'x: '   + Math.round(front.startPoint.x) +
+      ', y: ' + Math.round(front.startPoint.y),
       this.start.x + textAlignment.xPlus,
       this.start.y + textAlignment.yPlus
     );

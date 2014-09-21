@@ -3,7 +3,7 @@ function getInput(promptText, propToFill, shape) {
 
   var textToAdd = [{ className: 'center', text: mainText, id: 'inputdiv' }];
   if(promptText.subtext)
-    textToAdd.push({ className: 'center', text: promptText.subtext });
+    textToAdd.push('', { className: 'center', text: promptText.subtext });
   textToAdd.push('', '[esc]: cancel');
   var replacement = replaceInfoText(textToAdd);
 
@@ -25,7 +25,7 @@ function getInput(promptText, propToFill, shape) {
       prevCommands.forEach(function(el) {
         window.eventListeners.add(el.eventType, el.callbackName, el.callback);
       });
-      propToFill(input.join(''));
+      propToFill.call(shape, input.join(''));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
       middle.clear();
       shape.setEnd(front.lastPoint);

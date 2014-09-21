@@ -1,9 +1,10 @@
 function translate(shape, origDiff) {
   var origin = shape.center;
   front.eventListeners.add('mousemove', 'moveShape', function(e) {
+    middle.clear();
     var currPoint = getPoint(e);
     shape.translate(new Point(currPoint.x + origDiff.x, currPoint.y + origDiff.y));
-    shape.draw(front.context);
+    shape.draw(middle.context);
     var translationPath = new Line(origin, shape.center);
     translationPath.preview(true);
     front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);

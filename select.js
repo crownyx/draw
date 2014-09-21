@@ -248,7 +248,7 @@ function rotateGroup(group) {
 // change where //
 //////////////////
       middle.context.fillText(
-        angle.deg.toFixed(2) + unescape("\xB0"),
+        Math.round(angle.deg) + unescape("\xB0"),
         front.lastPoint.x - 10,
         front.lastPoint.y + 15
       );

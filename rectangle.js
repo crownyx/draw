@@ -2,23 +2,33 @@ function Rectangle(diagStart, diagEnd) {
   Shape.call(this);
 
   this.diagonal = new Line(diagStart, diagEnd);
+  this.diag = this.diagonal;
   this.origin = diagStart;
 
   this.lines = [this.diagonal];
 
-  var rect = this;
-
   this.shiftCommands = [
     {
-      key: 'l',
-      forWhat: 'length',
-      callback: function(length) { rect.fixedLength = length; }
+      key: 'e',
+      forWhat: 'endpoint of diagonal',
+      subtext: '(x & y coordinates separated by comma)',
+      callback: function(xy) {
+        var x = parseInt(xy.split(',')[0]), y = parseInt(xy.split(',')[1]);
+        var refLine = new Line(this.diagonal.start, new Point(x, y));
+        this.diagonal.fixedRotation = refLine.angle;
+        this.diagonal.fixedLength = refLine.length;
+      }
     },
     {
       key: 'h',
       forWhat: 'height',
-      callback: function(height) { rect.fixedHeight = height; }
-    }
+      callback: function(height) { this.fixedHeight = parseInt(height); }
+    },
+    {
+      key: 'l',
+      forWhat: 'length',
+      callback: function(length) { this.fixedLength = parseInt(length); }
+    },
   ];
 }
 
@@ -38,7 +48,10 @@ Object.defineProperty(Rectangle.prototype, 'height', {
 });
 
 Rectangle.prototype.infoText = function() {
-  return 'length: ' + Math.round(this.length) + ', height: ' + Math.round(this.height);
+  return(
+    'length: '    + commaSep(Math.round(this.length)) +
+    ' | height: ' + commaSep(Math.round(this.height))
+  );
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {
@@ -79,6 +92,11 @@ Rectangle.prototype.setEnd = function(point) {
           point.y;
 
   this.diagonal.setEnd(new Point(x, y));
+  this.diag = this.diagonal.copy();
+  this.diag.setEnd(new Point(
+    this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + this.rotation.rad),
+    this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + this.rotation.rad)
+  ));
 }
 
 Rectangle.prototype.drawPath = function(context) {
@@ -89,8 +107,17 @@ Rectangle.prototype.drawPath = function(context) {
   context.lineTo(0, 0);
 }
 
+Rectangle.prototype.rotate = function(rotation) {
+  this.diag = this.diagonal.copy();
+  this.diag.setEnd(new Point(
+    this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + rotation.rad),
+    this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + rotation.rad)
+  ));
+  this.rotation = rotation;
+}
+
 Rectangle.prototype.preview = function() {
-  this.diagonal.preview(true);
+  this.diag.preview(true);
   this.draw(middle.context);
 }
 
