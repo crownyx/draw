@@ -9,7 +9,7 @@ function getInput(promptText, propToFill, shape) {
 
   var b = replacement.bs[0];
 
-  var prevCommands = window.eventListeners.clear();
+  window.eventListeners.suspendAll();
 
   var input = [];
 
@@ -22,9 +22,7 @@ function getInput(promptText, propToFill, shape) {
       input.push(',');
     } else if(e.which == charCodes.enter) {
       window.eventListeners.remove('getInput');
-      prevCommands.forEach(function(el) {
-        window.eventListeners.add(el.eventType, el.callbackName, el.callback);
-      });
+      window.eventListeners.resumeAll();
       propToFill.call(shape, input.join(''));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
       middle.clear();
@@ -35,9 +33,7 @@ function getInput(promptText, propToFill, shape) {
       input.pop();
     } else if(e.which == charCodes['esc']) {
       window.eventListeners.remove('getInput');
-      prevCommands.forEach(function(el) {
-        window.eventListeners.add(el.eventType, el.callbackName, el.callback);
-      });
+      window.eventListeners.resumeAll();
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
     }
   });

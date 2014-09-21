@@ -15,6 +15,7 @@ function Ellipse(radStart, radEnd) {
       forWhat: 'x-axis length',
       callback: function(length) {
         this.xAxis.fixedLength = parseInt(length);
+        this.xAxis.setEnd(front.lastPoint);
         this.xAxis.fixed = true;
       }
     },
@@ -23,6 +24,7 @@ function Ellipse(radStart, radEnd) {
       forWhat: 'y-axis length',
       callback: function(length) {
         this.yAxis.fixedLength = parseInt(length);
+        this.yAxis.setEnd(front.lastPoint);
         this.yAxis.fixed = true;
       }
     }

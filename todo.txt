@@ -21,3 +21,12 @@ refine infoText for all shapes
 9/20
 
 double check ellipse circumference formula
+turn help/commands into buttons
+
+9/21
+
+set endpoint after rotation
+
+long term:
+
+mobile compatibility: buttons on sidebar; click once to set startPoint, then press and drag to choose endpoint

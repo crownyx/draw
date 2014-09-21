@@ -125,11 +125,21 @@ function EventListenerCollection(receiver) {
       delete this.active[callbackName];
       this.suspended[callbackName] = cb;
     },
+    suspendAll: function() {
+      this.active.forEach(function(callbackName, eventListener) {
+        this.suspend(callbackName);
+      }, this);
+    },
     resume: function(callbackName) {
       var cb = this.suspended[callbackName];
       receiver.addEventListener(cb.eventType, cb.callback, false);
       delete this.suspended[callbackName];
       this.active[callbackName] = cb;
+    },
+    resumeAll: function() {
+      this.suspended.forEach(function(callbackName, eventListener) {
+        this.resume(callbackName);
+      }, this);
     },
     find: function(callbackName) {
       return(this.active[callbackName]);
