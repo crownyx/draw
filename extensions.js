@@ -120,6 +120,26 @@ Object.defineProperty(Object.prototype, 'values', {
   }
 });
 
+Object.defineProperty(Object.prototype, 'forEach', {
+  enumerable: false,
+  configurable: true,
+  writable: true,
+  value: function(callback) {
+    if(this == null) {
+      throw new TypeError('Object.prototype.map called on null or undefined');
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function');
+    }
+    var keys = Object.keys(this);
+    var thisArg = arguments[1];
+
+    keys.forEach(function(key) {
+      callback.call(thisArg, key, this[key]);
+    }, this);
+  }
+});
+
 Object.defineProperty(Object.prototype, 'map', {
   enumerable: false,
   configurable: true,

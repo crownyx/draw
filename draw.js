@@ -106,30 +106,41 @@ function drawCommands(e) {
 
 function EventListenerCollection(receiver) {
   return {
-    added: [],
+    active: {},
+    suspended: {},
     add: function(eventType, callbackName, callback) {
       if(this.find(callbackName)) this.remove(callbackName);
       receiver.addEventListener(eventType, callback, false);
-      this.added.push({ eventType: eventType, callbackName: callbackName, callback: callback });
+      this.active[callbackName] = { eventType: eventType, callback: callback };
     },
     remove: function(callbackName) {
-      var index = this.added.findIndex(function(cb) { return cb.callbackName == callbackName; });
-      var cb = this.added[index];
+      var cb = this.active[callbackName];
       receiver.removeEventListener(cb.eventType, cb.callback, false);
-      this.added.splice(index, 1);
+      delete this.active[callbackName];
       return cb;
     },
+    suspend: function(callbackName) {
+      var cb = this.find(callbackName);
+      receiver.removeEventListener(cb.eventType, cb.callback, false);
+      delete this.active[callbackName];
+      this.suspended[callbackName] = cb;
+    },
+    resume: function(callbackName) {
+      var cb = this.suspended[callbackName];
+      receiver.addEventListener(cb.eventType, cb.callback, false);
+      delete this.suspended[callbackName];
+      this.active[callbackName] = cb;
+    },
     find: function(callbackName) {
-      return(this.added.find(function(cb) {
-        return cb.callbackName == callbackName;
-      }));
+      return(this.active[callbackName]);
     },
     clear: function() {
-      var had = this.added;
-      this.added.forEach(function(eventListener) {
+      var had = this.active;
+      this.active.forEach(function(callbackName, eventListener) {
         receiver.removeEventListener(eventListener.eventType, eventListener.callback, false);
       });
-      this.added = [];
+      this.suspended = {};
+      this.active = {};
       return had;
     }
   };

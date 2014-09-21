@@ -21,4 +21,3 @@ refine infoText for all shapes
 9/20
 
 double check ellipse circumference formula
-fix rectangle preview after rotation

@@ -6,12 +6,15 @@ function design(shape) {
   });
 
   front.eventListeners.add('mousemove', 'setEnd',    function(e) { shape.setEnd(getPoint(e)); });
-  front.eventListeners.add('mousemove', 'drawShape', function()  { middle.clear(); shape.preview(); });
+
+  front.eventListeners.add('mousemove', 'drawShape', refreshMiddle = function()  {
+    middle.clear(); shape.preview();
+  });
 
   front.eventListeners.add('click', 'completeShape', function()  { shape.nextStep(); });
 
   front.eventListeners.add('mousemove', 'showText', function() {
-    front.context.fillText(shape.infoText(), 10, 15);
+    middle.context.fillText(shape.infoText(), 10, 15);
   });
 
   shape.preview();
@@ -27,6 +30,8 @@ function design(shape) {
     '[s]: square',
     '[t]: triangle',
     '',
+    '[i]: show/hide info',
+    '',
     '[SHIFT] +'
   ].concat(
     shape.shiftCommands.map(function(command) {
@@ -37,6 +42,18 @@ function design(shape) {
     '[esc]: stop drawing'
   ]));
 
+  window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
+    if(e.which == charCodes['i']) {
+      front.eventListeners.suspend('showText');
+      refreshMiddle();
+      window.eventListeners.add('keydown', 'showHideInfo', showInfo = function(e) {
+        front.eventListeners.resume('showText');
+        front.eventListeners.find('showText').callback();
+        window.eventListeners.add('keydown', 'showHideInfo', hideInfo);
+      });
+    }
+  });
+
   shape.shiftCommands.forEach(function(command) {
     window.eventListeners.add('keydown', 'set' + command.forWhat.capitalize(), function(e) {
       if(e.shiftKey && e.which == charCodes[command.key]) {
@@ -46,6 +63,4 @@ function design(shape) {
       }
     });
   });
-
-  return shape;
 }
