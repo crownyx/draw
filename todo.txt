@@ -27,6 +27,10 @@ turn help/commands into buttons
 
 set endpoint after rotation
 
+9/25
+
+turn off settings (eg fixedLength)
+
 long term:
 
 mobile compatibility: buttons on sidebar; click once to set startPoint, then press and drag to choose endpoint

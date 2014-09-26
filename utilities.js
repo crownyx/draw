@@ -28,6 +28,7 @@ function getInput(promptText, propToFill, shape) {
       middle.clear();
       shape.setEnd(front.lastPoint);
       shape.preview();
+      front.eventListeners.find('showText').callback();
     } else if(e.which == charCodes['backspace']) {
       b.textContent = b.textContent.slice(0, -1);
       input.pop();

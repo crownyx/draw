@@ -2,11 +2,22 @@ function Arc(radiusStart, radiusLength, startAngle, endAngle) {
   Shape.call(this);
 
   this.center = radiusStart;
+  this.radiusEnd = front.lastPoint;
   this.startAngle = startAngle || new Angle(0);
   this.endAngle = endAngle || new Angle(2 * Math.PI);
   this.radiusLength = radiusLength || 0;
+  this.clockwise = true;
 
   this._workingAngle = function() { return this.startAngle; }
+
+  this.shiftCommands = [
+    {
+      key: 'c',
+      forWhat: 'clockwise',
+      toggle: true,
+      callback: function() { this.clockwise = !this.clockwise; }
+    }
+  ];
 }
 
 Arc.prototype = new Shape;
@@ -14,8 +25,8 @@ Arc.prototype.constructor = Arc;
 
 Arc.prototype.infoText = function() { return ''; }
 
-Arc.prototype.drawPath = function(context, params = { counterClock: false }) {
-  context.arc(this.center.x, this.center.y, this.radiusLength, this.startAngle.rad, this.endAngle.rad, params.counterClock);
+Arc.prototype.drawPath = function(context, params = { clockwise: false }) {
+  context.arc(this.center.x, this.center.y, this.radiusLength, this.startAngle.rad, this.endAngle.rad, this.clockwise);
 }
 
 Arc.prototype.setEnd = function(point) {

@@ -35,7 +35,7 @@ function design(shape) {
     '[SHIFT] +'
   ].concat(
     shape.shiftCommands.map(function(command) {
-      return '[' + command.key.toUpperCase() + ']: set ' + command.forWhat;
+      return '[' + command.key.toUpperCase() + ']: ' + (command.toggle ? 'toggle ' : 'set ') + command.forWhat;
     })
   ).concat([
     '',
@@ -55,12 +55,20 @@ function design(shape) {
   });
 
   shape.shiftCommands.forEach(function(command) {
-    window.eventListeners.add('keydown', 'set' + command.forWhat.capitalize(), function(e) {
-      if(e.shiftKey && e.which == charCodes[command.key]) {
-        var helpText = 'enter ' + command.forWhat + ': ';
-        if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
-        getInput(helpText, command.callback, shape);
-      }
-    });
+    if(command.toggle) {
+      window.eventListeners.add('keydown', 'toggle' + command.forWhat.capitalize(), function(e) {
+        if(e.shiftKey && e.which == charCodes[command.key]) {
+          command.callback.call(shape);
+        }
+      });
+    } else {
+      window.eventListeners.add('keydown', 'set' + command.forWhat.capitalize(), function(e) {
+        if(e.shiftKey && e.which == charCodes[command.key]) {
+          var helpText = 'enter ' + command.forWhat + ': ';
+          if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
+          getInput(helpText, command.callback, shape);
+        }
+      });
+    }
   });
 }

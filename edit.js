@@ -61,7 +61,9 @@ function editMode() {
                 var start = backwards ? shape.end : shape.start;
                 var end   = backwards ? shape.start : shape.end;
                 front.startPoint = start;
-                design(new Line(start, end));
+                shape.start = start;
+                shape.end = end;
+                design(shape);
               })(nearPoint.same(shape.start));
             break;
             case Rectangle:
@@ -72,9 +74,8 @@ function editMode() {
               var rect = shape;
               rect.diagonal.start = opposite;
               rect.origin = opposite;
-              rect.setEnd(nearPoint);
-              rect.diag = rect.diag;
               front.startPoint = opposite;
+              rect.setEnd(nearPoint);
               design(rect);
             break;
             case Ellipse:

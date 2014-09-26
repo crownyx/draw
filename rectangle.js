@@ -210,5 +210,6 @@ Rectangle.prototype.copy = function() {
   var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
   newRect.origin = this.origin;
   newRect.rotation = this.rotation;
+  newRect.setEnd = this.setEnd;
   return newRect;
 }

@@ -39,14 +39,19 @@ function Point(x, y) {
   }
 
   this.same = function(point) {
+console.log(point.x + ' ' + this.x + ' ' + point.y + ' ' + this.y);
     return(
       (
-        Math.floor(point.x) == Math.round(this.x) ||
-        Math.ceil(point.x)  == Math.round(this.x)
+        Math.floor(point.x) == Math.floor(this.x) ||
+        Math.ceil(point.x)  == Math.ceil(this.x)  ||
+        Math.floor(point.x) == Math.ceil(this.x)  ||
+        Math.ceil(point.x)  == Math.floor(this.x)
       ) &&
       (
-        Math.floor(point.y) == Math.round(this.y) ||
-        Math.ceil(point.y)  == Math.round(this.y)
+        Math.floor(point.y) == Math.floor(this.y) ||
+        Math.ceil(point.y)  == Math.ceil(this.y)  ||
+        Math.floor(point.y) == Math.ceil(this.y)  ||
+        Math.ceil(point.y)  == Math.floor(this.y)
       )
     );
   }
