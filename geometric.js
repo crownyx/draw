@@ -39,6 +39,9 @@ function Angle(rad) {
     rad: _rad,
     deg: (_rad / Math.PI * 180),
     quadrant: _quad,
+    get perp() {
+      return new Angle(this.rad + Math.PI);
+    },
     refAngle: (function() {
       switch(_quad) {
         case 1: return _rad; break;

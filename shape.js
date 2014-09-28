@@ -19,7 +19,7 @@ Shape.prototype.sketch = function(context) {
     context.strokeStyle = "blue";
     context.lineWidth = 0.5;
     context.setLineDash([5]);
-    context.layer.translate(this.origin);
+    if(!(this.constructor === Line)) context.layer.translate(this.origin);
     context.rotate(this.rotation.rad);
     context.beginPath();
       this.drawPath(context);
@@ -32,8 +32,8 @@ Shape.prototype.draw = function(context, params = {}) {
     context.strokeStyle = params.strokeStyle || this.strokeStyle || context.strokeStyle;
     context.lineWidth   = params.lineWidth   || this.lineWidth   || context.lineWidth;
     context.setLineDash(this.lineDash || []);
-    context.layer.translate(this.origin);
-    if(!(this.constructor === Arc)) context.rotate(this.rotation.rad);
+    if(!(this.constructor === Rectangle) && !(this.constructor === Line)) context.layer.translate(this.origin);
+    if(!(this.constructor === Arc) && !(this.constructor === Rectangle)) context.rotate(this.rotation.rad);
     context.beginPath();
       this.drawPath(context);
     context.stroke();

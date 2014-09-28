@@ -62,7 +62,6 @@ Object.defineProperty(Arc.prototype, 'points', {
       end2: this.endRadius.end,
       center: this.origin
     }.map(function(name, point) {
-      //var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
     }, this);
@@ -93,7 +92,6 @@ Arc.prototype.drawPath = function(context) {
 }
 
 Arc.prototype.setEnd = function(point) {
-  //var point = point.untranslate(this.origin, this.rotation);
   this._workingRadius().setEnd(point);
   this._otherRadius().setEnd(point, { fixedRotation: this._otherRadius().angle });
 }

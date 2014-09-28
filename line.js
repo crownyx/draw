@@ -90,8 +90,8 @@ Object.defineProperty(Line.prototype, 'angle', {
 });
 
 Line.prototype.drawPath = function(context) {
-  context.moveTo(0, 0);
-  context.lineTo(this.end.x - this.start.x, this.end.y - this.start.y);
+  context.moveTo(this.start.x, this.start.y);
+  context.lineTo(this.end.x, this.end.y);
 }
 
 Line.prototype.preview = function(sketch) {
@@ -164,7 +164,7 @@ Line.prototype.copy = function() {
 ////////////////////
 
 function VerticalLine(x) {
-  return new Line({ x: x, y: 0 }, { x: x, y: front.canvas.height });
+  return new Line(new Point(x, 0), new Point(x, front.canvas.height));
 }
 
 function HorizontalLine(y) {

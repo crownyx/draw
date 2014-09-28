@@ -92,13 +92,23 @@ Rectangle.prototype.constructor = Rectangle;
 
 Object.defineProperty(Rectangle.prototype, 'length', {
   get: function() {
-    return this.fixedLength || Math.abs(this.diagonal.end.x - this.diagonal.start.x);
+    if(this.fixedLength) {
+      return this.fixedLength;
+    } else {
+      var diagAngle = this.diagonal.angle.rad - this.rotation.rad;
+      return Math.cos(diagAngle) * this.diagonal.length;
+    }
   }
 });
 
 Object.defineProperty(Rectangle.prototype, 'height', {
   get: function() {
-    return this.fixedHeight || Math.abs(this.diagonal.end.y - this.diagonal.start.y);
+    if(this.fixedHeight) {
+      return this.fixedHeight;
+    } else {
+      var diagAngle = this.diagonal.angle.rad - this.rotation.rad;
+      return Math.sin(diagAngle) * this.diagonal.length;
+    }
   }
 });
 
@@ -129,10 +139,16 @@ Object.defineProperty(Rectangle.prototype, 'center', {
 
 Object.defineProperty(Rectangle.prototype, 'points', {
   get: function() {
-    var corner1 = this.origin;
-    var corner2 = new Point(this.diagonal.start.x, this.diagonal.end.y);
+    var corner1 = this.diagonal.start;
+    var corner2 = new Point(
+      corner1.x + Math.cos(this.rotation.rad) * this.length,
+      corner1.y + Math.sin(this.rotation.rad) * this.length
+    );
     var corner3 = this.diagonal.end;
-    var corner4 = new Point(this.diagonal.end.x, this.diagonal.start.y);
+    var corner4 = new Point(
+      corner1.x + Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
+      corner1.y + Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
+    );
     var center  = new Line(corner1, corner3).mid;
     return {
       corner1: corner1,
@@ -141,7 +157,6 @@ Object.defineProperty(Rectangle.prototype, 'points', {
       corner4: corner4,
       center: center
     }.map(function(name, point) {
-      var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
     }, this);
@@ -149,30 +164,29 @@ Object.defineProperty(Rectangle.prototype, 'points', {
 });
 
 Rectangle.prototype.setEnd = function(point) {
-  var point = point.untranslate(this.origin, this.rotation);
-
-  var quad = getAngle(this.diagonal.start, point).quadrant;
-
-  var x = this.fixedLength ?
-          this.diagonal.start.x + (quad == 2 || quad == 3 ? -1 : 1) * this.length :
-          point.x;
-  var y = this.fixedHeight ?
-          this.diagonal.start.y + (quad == 3 || quad == 4 ? -1 : 1) * this.height :
-          point.y;
-
-  this.diagonal.setEnd(new Point(x, y));
+  this.diagonal.setEnd(point);
 }
 
 Rectangle.prototype.drawPath = function(context) {
-  context.moveTo(0, 0);
-  context.lineTo(this.diagonal.end.x - this.diagonal.start.x, 0);
-  context.lineTo(this.diagonal.end.x - this.diagonal.start.x, this.diagonal.end.y - this.diagonal.start.y);
-  context.lineTo(0, this.diagonal.end.y - this.diagonal.start.y);
-  context.lineTo(0, 0);
+  context.moveTo(this.points.corner1.x, this.points.corner1.y);
+  context.lineTo(this.points.corner2.x, this.points.corner2.y);
+  context.lineTo(this.points.corner3.x, this.points.corner3.y);
+  context.lineTo(this.points.corner4.x, this.points.corner4.y);
+  context.lineTo(this.points.corner1.x, this.points.corner1.y);
+}
+
+Rectangle.prototype.translate = function(point) {
+  this.diagonal.translate(point);
+  this.origin = this.diagonal.start;
+}
+
+Rectangle.prototype.rotate = function(rotation) {
+  this.diagonal.rotate(new Angle(rotation.rad - this.rotation.rad));
+  this.rotation = rotation;
 }
 
 Rectangle.prototype.preview = function() {
-  new Line(this.diagonal.start, this.diagonal.end.translate(this.origin, this.rotation.rad)).preview(true);
+  this.diagonal.preview(true);
   this.draw(middle.context);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }

@@ -28,7 +28,11 @@ turn off settings (eg fixedLength)
 
 9/26
 
-rotate all shapes: change points/lines
+rotate all shapes: also rotate points/lines
+
+9/27
+
+update shiftCommands for Rectangle now that rectangle/diagonal programmed differently
 
 long term:
 
