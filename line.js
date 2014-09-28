@@ -43,10 +43,10 @@ Line.prototype.infoText = function() {
   return "length: " + commaSep(Math.round(this.length));
 }
 
-Line.prototype.setEnd = function(point) {
-  if(this.fixedLength || this.fixedRotation) {
-    var rotation = this.fixedRotation || new Line(this.start, point).angle;
-    var length   = this.fixedLength || new Line(this.start, point).length;
+Line.prototype.setEnd = function(point, params = {}) {
+  if(this.fixedLength || this.fixedRotation || params.fixedLength || params.fixedRotation) {
+    var rotation = this.fixedRotation || params.fixedRotation || new Line(this.start, point).angle;
+    var length   = this.fixedLength || params.fixedLength || new Line(this.start, point).length;
     this.end = new Point(
       this.start.x + Math.cos(rotation.rad) * length,
       this.start.y + Math.sin(rotation.rad) * length
@@ -97,7 +97,20 @@ Line.prototype.drawPath = function(context) {
 Line.prototype.preview = function(sketch) {
   new HorizontalLine(this.start.y).sketch(middle.context);
   new VerticalLine(this.start.x).sketch(middle.context);
-  new Arc(this.start, 10, new Angle(0), this.angle).draw(middle.context, { strokeStyle: 'blue', lineWidth: 0.5 });
+
+  new Arc(
+    this.start,
+    new Point(this.start.x + 10, this.start.y),
+    new Angle(0),
+    this.angle
+  ).draw(
+    middle.context,
+    {
+      strokeStyle: 'blue',
+      lineWidth: 0.5
+    }
+  );
+
   var angle = getAngle(front.startPoint, front.lastPoint);
   var textAlignment = front.textAlignments[angle.quadrant % 4];
   middle.save();
@@ -118,7 +131,13 @@ Line.prototype.preview = function(sketch) {
       this.start.y + textAlignment.yPlus
     );
   middle.restore();
-  sketch ? this.sketch(middle.context) : this.draw(middle.context);
+  if(sketch) {
+    this.sketch(middle.context);
+  } else {
+    if(middle.showText)
+      middle.context.fillText(this.infoText(), 10, 15);
+    this.draw(middle.context);
+  }
 }
 
 Line.prototype.translate = function(point) {
@@ -126,6 +145,11 @@ Line.prototype.translate = function(point) {
   this.origin = point;
   this.start = point;
   this.end = new Point(this.start.x + origDiff.x, this.start.y + origDiff.y);
+}
+
+Line.prototype.rotate = function(rotation) {
+  this.end = this.end.translate(this.start, rotation.rad);
+  if(this.fixedRotation) this.fixedRotation = new Angle(this.fixedRotation.rad + rotation.rad);
 }
 
 Line.prototype.copy = function() {

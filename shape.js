@@ -33,7 +33,7 @@ Shape.prototype.draw = function(context, params = {}) {
     context.lineWidth   = params.lineWidth   || this.lineWidth   || context.lineWidth;
     context.setLineDash(this.lineDash || []);
     context.layer.translate(this.origin);
-    context.rotate(this.rotation.rad);
+    if(!(this.constructor === Arc)) context.rotate(this.rotation.rad);
     context.beginPath();
       this.drawPath(context);
     context.stroke();
@@ -58,6 +58,12 @@ Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }
 Shape.prototype.translate = function(point) {
   this.origin = point;
   this.lines.forEach(function(line) { line.translate(point); });
+}
+
+Shape.prototype.copy = function() {
+  var copy = this._copy();
+  copy.rotation = this.rotation;
+  return copy;
 }
 
 // Shape public interface:

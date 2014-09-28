@@ -44,7 +44,7 @@ function commandMode() {
     (function(div) {
       div.appendChild((function(b) {
         b.className = "center";
-        b.textContent = "click to begin drawing";
+        b.textContent = "click on canvas to begin drawing";
         return b;
       })(document.createElement('b'))),
       div.id = "infodiv";
@@ -85,7 +85,7 @@ function drawCommands(e) {
     var shape = (function() {
       switch(e.which) {
         case charCodes['a']:
-          return new Arc(front.startPoint, new Line(front.startPoint, front.lastPoint).length);
+          return new Arc(front.startPoint, front.lastPoint);
         case charCodes['c']:
           return new Circle(front.startPoint, front.lastPoint);
         case charCodes['e']:

@@ -70,3 +70,5 @@ back.refresh = function() {
   this.clear();
   this.shapes.forEach(function(shape) { shape.draw(this.context); }, this);
 }
+
+middle.showText = true;

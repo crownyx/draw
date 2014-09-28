@@ -232,6 +232,7 @@ function rotateGroup(group) {
       shape.origAngle = shape.refLine.angle;
       shape.origRot = shape.rotation.rad;
     });
+    front.startPoint = refPoint;
 
     front.eventListeners.add('mousemove', 'setRotation', function(e) {
       middle.clear();
@@ -239,20 +240,8 @@ function rotateGroup(group) {
       var currPoint = getPoint(e);
       var angle = getAngle(refPoint, currPoint);
 
-      new HorizontalLine(refPoint.y).sketch(middle.context);
-      new Line(refPoint, currPoint).sketch(middle.context);
-      new Arc(refPoint, 15, new Angle(0), angle).sketch(middle.context);
+      new Line(refPoint, currPoint).preview(true);
 
-      middle.context.textAlign = 'right';
-//////////////////
-// change where //
-//////////////////
-      middle.context.fillText(
-        Math.round(angle.deg) + unescape("\xB0"),
-        front.lastPoint.x - 10,
-        front.lastPoint.y + 15
-      );
-      middle.context.textAlign = 'start';
       group.shapes.forEach(function(shape) {
         shape.translate(new Point(
           refPoint.x + Math.cos(shape.origAngle.rad + angle.rad) * shape.refLine.length,

@@ -2,7 +2,6 @@ function Rectangle(diagStart, diagEnd) {
   Shape.call(this);
 
   this.diagonal = new Line(diagStart, diagEnd);
-  this.diag = this.diagonal;
   this.origin = diagStart;
 
   this.lines = [this.diagonal];
@@ -20,11 +19,6 @@ function Rectangle(diagStart, diagEnd) {
           this.diagonal.setEnd(new Point(
             this.diagonal.start.x + length * (angle.quadrant == 2 || angle.quadrant == 3 ? -1 : 1),
             this.diagonal.start.y + height * (angle.quadrant == 3 || angle.quadrant == 4 ? -1 : 1)
-          ));
-          this.diag = this.diagonal.copy();
-          this.diag.setEnd(new Point(
-            this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + this.rotation.rad),
-            this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + this.rotation.rad)
           ));
         }
       }
@@ -64,11 +58,6 @@ function Rectangle(diagStart, diagEnd) {
             this.diagonal.start.x + length * (angle.quadrant == 2 || angle.quadrant == 3 ? -1 : 1),
             this.diagonal.start.y + height * (angle.quadrant == 3 || angle.quadrant == 4 ? -1 : 1)
           ));
-          this.diag = this.diagonal.copy();
-          this.diag.setEnd(new Point(
-            this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + this.rotation.rad),
-            this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + this.rotation.rad)
-          ));
         }
       }
     },
@@ -91,11 +80,6 @@ function Rectangle(diagStart, diagEnd) {
           this.diagonal.setEnd(new Point(
             this.diagonal.start.x + length * (angle.quadrant == 2 || angle.quadrant == 3 ? -1 : 1),
             this.diagonal.start.y + height * (angle.quadrant == 3 || angle.quadrant == 4 ? -1 : 1)
-          ));
-          this.diag = this.diagonal.copy();
-          this.diag.setEnd(new Point(
-            this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + this.rotation.rad),
-            this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + this.rotation.rad)
           ));
         }
       }
@@ -177,11 +161,6 @@ Rectangle.prototype.setEnd = function(point) {
           point.y;
 
   this.diagonal.setEnd(new Point(x, y));
-  this.diag = this.diagonal.copy();
-  this.diag.setEnd(new Point(
-    this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + this.rotation.rad),
-    this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + this.rotation.rad)
-  ));
 }
 
 Rectangle.prototype.drawPath = function(context) {
@@ -192,18 +171,10 @@ Rectangle.prototype.drawPath = function(context) {
   context.lineTo(0, 0);
 }
 
-Rectangle.prototype.rotate = function(rotation) {
-  this.diag = this.diagonal.copy();
-  this.diag.setEnd(new Point(
-    this.diagonal.start.x + this.diagonal.length * Math.cos(this.diagonal.angle.rad + rotation.rad),
-    this.diagonal.start.y + this.diagonal.length * Math.sin(this.diagonal.angle.rad + rotation.rad)
-  ));
-  this.rotation = rotation;
-}
-
 Rectangle.prototype.preview = function() {
-  this.diag.preview(true);
+  new Line(this.diagonal.start, this.diagonal.end.translate(this.origin, this.rotation.rad)).preview(true);
   this.draw(middle.context);
+  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }
 
 Rectangle.prototype.copy = function() {

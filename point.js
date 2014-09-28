@@ -39,7 +39,6 @@ function Point(x, y) {
   }
 
   this.same = function(point) {
-console.log(point.x + ' ' + this.x + ' ' + point.y + ' ' + this.y);
     return(
       (
         Math.floor(point.x) == Math.floor(this.x) ||

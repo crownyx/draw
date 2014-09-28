@@ -1,8 +1,3 @@
-9/11
-
-finish arc
-implement .preview() for all shapes
-
 9/16
 
 set angle in rotation
@@ -30,6 +25,10 @@ set endpoint after rotation
 9/25
 
 turn off settings (eg fixedLength)
+
+9/26
+
+rotate all shapes: change points/lines
 
 long term:
 

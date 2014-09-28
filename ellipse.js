@@ -72,6 +72,7 @@ Ellipse.prototype.drawPath = function(context) {
 Ellipse.prototype.preview = function() {
   new Line(this.origin, front.lastPoint).preview(true);
   this.draw(middle.context);
+  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }
 
 Object.defineProperty(Ellipse.prototype, 'circumference', {

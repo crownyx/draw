@@ -5,20 +5,18 @@ function design(shape) {
     if(e.which == charCodes['esc']) changeMode(commandMode);
   });
 
-  front.eventListeners.add('mousemove', 'setEnd',    function(e) { shape.setEnd(getPoint(e)); });
-
-  front.eventListeners.add('mousemove', 'drawShape', refreshMiddle = function()  {
-    middle.clear(); shape.preview();
+  front.eventListeners.add('mousemove', 'setEnd',    function(e) {
+    shape.setEnd(getPoint(e));
   });
 
-  front.eventListeners.add('click', 'completeShape', function()  { shape.nextStep(); });
-
-  front.eventListeners.add('mousemove', 'showText', function() {
-    middle.context.fillText(shape.infoText(), 10, 15);
+  front.eventListeners.add('mousemove', 'previewShape', refreshMiddle = function()  {
+    middle.clear();
+    shape.preview();
   });
+
+  front.eventListeners.add('click', 'nextStep', function()  { shape.nextStep(); });
 
   shape.preview();
-  front.context.fillText(shape.infoText(), 10, 15);
 
   replaceInfoText([
     '[a]: arc',
@@ -35,7 +33,8 @@ function design(shape) {
     '[SHIFT] +'
   ].concat(
     shape.shiftCommands.map(function(command) {
-      return '[' + command.key.toUpperCase() + ']: ' + (command.toggle ? 'toggle ' : 'set ') + command.forWhat;
+      var verb = command.toggle ? 'toggle ' : 'set ';
+      return '[' + command.key.toUpperCase() + ']: ' + verb + command.forWhat;
     })
   ).concat([
     '',
@@ -44,13 +43,8 @@ function design(shape) {
 
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
     if(e.which == charCodes['i']) {
-      front.eventListeners.suspend('showText');
+      middle.showText = !middle.showText;
       refreshMiddle();
-      window.eventListeners.add('keydown', 'showHideInfo', showInfo = function(e) {
-        front.eventListeners.resume('showText');
-        front.eventListeners.find('showText').callback();
-        window.eventListeners.add('keydown', 'showHideInfo', hideInfo);
-      });
     }
   });
 
@@ -59,6 +53,7 @@ function design(shape) {
       window.eventListeners.add('keydown', 'toggle' + command.forWhat.capitalize(), function(e) {
         if(e.shiftKey && e.which == charCodes[command.key]) {
           command.callback.call(shape);
+          refreshMiddle();
         }
       });
     } else {

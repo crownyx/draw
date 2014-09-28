@@ -56,6 +56,34 @@ function editMode() {
           translate(shape, origDiff);
         } else {
           switch(shape.constructor) {
+            case Arc:
+              var workingRadius = nearPoint.same(shape.points.end1) ? shape.startRadius : shape.endRadius;
+              var otherRadius = nearPoint.same(shape.points.end1) ? shape.endRadius : shape.startRadius;
+              shape._workingRadius = function() { return workingRadius; }
+              shape._otherRadius = function() { return otherRadius; }
+              shape.nextStep = Shape.prototype.nextStep;
+              shape.setEnd(nearPoint);
+              front.startPoint = shape.center;
+              design(shape);
+            break;
+            case Circle:
+              shape.setEnd(nearPoint);
+              front.startPoint = shape.center;
+              design(shape);
+            break;
+            case Ellipse:
+              if(nearPoint.same(shape.points.yTop) || nearPoint.same(shape.points.yBottom)) {
+                shape.yAxis.fixed = false;
+                shape.xAxis.fixed = true;
+                shape.setEnd(nearPoint);
+              } else if(nearPoint.same(shape.points.xLeft) || nearPoint.same(shape.points.xRight)) {
+                shape.xAxis.fixed = false;
+                shape.yAxis.fixed = true;
+                shape.setEnd(nearPoint);
+              }
+              front.startPoint = shape.center;
+              design(shape);
+            break;
             case Line:
               (function(backwards) {
                 var start = backwards ? shape.end : shape.start;
@@ -77,24 +105,6 @@ function editMode() {
               front.startPoint = opposite;
               rect.setEnd(nearPoint);
               design(rect);
-            break;
-            case Ellipse:
-              if(nearPoint.same(shape.points.yTop) || nearPoint.same(shape.points.yBottom)) {
-                shape.yAxis.fixed = false;
-                shape.xAxis.fixed = true;
-                shape.setEnd(nearPoint);
-              } else if(nearPoint.same(shape.points.xLeft) || nearPoint.same(shape.points.xRight)) {
-                shape.xAxis.fixed = false;
-                shape.yAxis.fixed = true;
-                shape.setEnd(nearPoint);
-              }
-              front.startPoint = shape.center;
-              design(shape);
-            break;
-            case Circle:
-              shape.setEnd(nearPoint);
-              front.startPoint = shape.center;
-              design(shape);
             break;
           }
           window.eventListeners.remove('exitDesignMode');
