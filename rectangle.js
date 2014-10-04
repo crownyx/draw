@@ -37,7 +37,9 @@ function Rectangle(diagStart, diagEnd) {
     {
       key: 'h',
       forWhat: 'height',
-      callback: function(height) { this.fixedHeight = parseInt(height); }
+      callback: function(height) {
+        this.fixedHeight = parseInt(height);
+      }
     },
     {
       key: 'l',
@@ -93,7 +95,12 @@ Rectangle.prototype.constructor = Rectangle;
 Object.defineProperty(Rectangle.prototype, 'length', {
   get: function() {
     if(this.fixedLength) {
-      return this.fixedLength;
+      switch(new Angle(this.diagonal.angle.rad - this.rotation.rad).quadrant) {
+        case 1:
+        case 4: return this.fixedLength; break;
+        case 2:
+        case 3: return -this.fixedLength; break;
+      }
     } else {
       var diagAngle = this.diagonal.angle.rad - this.rotation.rad;
       return Math.cos(diagAngle) * this.diagonal.length;
@@ -104,7 +111,12 @@ Object.defineProperty(Rectangle.prototype, 'length', {
 Object.defineProperty(Rectangle.prototype, 'height', {
   get: function() {
     if(this.fixedHeight) {
-      return this.fixedHeight;
+      switch(new Angle(this.diagonal.angle.rad - this.rotation.rad).quadrant) {
+        case 1:
+        case 2: return this.fixedHeight; break;
+        case 3:
+        case 4: return -this.fixedHeight; break;
+      }
     } else {
       var diagAngle = this.diagonal.angle.rad - this.rotation.rad;
       return Math.sin(diagAngle) * this.diagonal.length;
@@ -126,10 +138,10 @@ Object.defineProperty(Rectangle.prototype, 'perimeter', {
 
 Rectangle.prototype.infoText = function() {
   return(
-    'length: '       + commaSep(Math.round(this.length   )) +
-    ' | height: '    + commaSep(Math.round(this.height   )) +
-    ' | area: '      + commaSep(Math.round(this.area     )) +
-    ' | perimeter: ' + commaSep(Math.round(this.perimeter))
+    'length: '       + commaSep(Math.abs(Math.round(this.length   ))) +
+    ' | height: '    + commaSep(Math.abs(Math.round(this.height   ))) +
+    ' | area: '      + commaSep(Math.abs(Math.round(this.area     ))) +
+    ' | perimeter: ' + commaSep(Math.abs(Math.round(this.perimeter)))
   );
 }
 
@@ -164,7 +176,26 @@ Object.defineProperty(Rectangle.prototype, 'points', {
 });
 
 Rectangle.prototype.setEnd = function(point) {
-  this.diagonal.setEnd(point);
+  if(this.fixedHeight || this.fixedLength) {
+    var length = this.fixedLength, height = this.fixedHeight;
+    switch(new Angle(getAngle(this.diagonal.start, point).rad - this.rotation.rad).quadrant) {
+      case 2: if(this.fixedLength) length = -this.fixedLength; break;
+      case 3:
+        if(this.fixedLength) length = -this.fixedLength;
+        if(this.fixedHeight) height = -this.fixedHeight;
+      break;
+      case 4: if(this.fixedHeight) height = -this.fixedHeight; break;
+    }
+    var point = point.translate(this.diagonal.start, 2 * Math.PI - this.rotation.rad);
+    var xDiff = length || point.x - this.diagonal.start.x;
+    var yDiff = height || point.y - this.diagonal.start.y;
+    var x = this.diagonal.start.x + xDiff;
+    var y = this.diagonal.start.y + yDiff;
+    this.diagonal.setEnd(new Point(x, y));
+    this.diagonal.rotate(this.rotation);
+  } else {
+    this.diagonal.setEnd(point);
+  }
 }
 
 Rectangle.prototype.drawPath = function(context) {
@@ -195,6 +226,8 @@ Rectangle.prototype.copy = function() {
   var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
   newRect.origin = this.origin;
   newRect.rotation = this.rotation;
+  newRect.fixedHeight = this.fixedHeight;
+  newRect.fixedLength = this.fixedLength;
   newRect.setEnd = this.setEnd;
   return newRect;
 }
