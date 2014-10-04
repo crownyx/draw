@@ -149,14 +149,18 @@ Line.prototype.translate = function(point) {
 
 Line.prototype.rotate = function(rotation) {
   this.end = this.end.translate(this.start, rotation.rad);
-  if(this.fixedRotation) this.fixedRotation = new Angle(this.fixedRotation.rad + rotation.rad);
+  if(this.fixedRotation)
+    this.fixedRotation = new Angle(this.fixedRotation.rad + rotation.rad);
 }
 
 Line.prototype.copy = function() {
-  return new Line(
+  var newLine = new Line(
     new Point(this.start.x, this.start.y),
     new Point(this.end.x, this.end.y)
   );
+  newLine.fixedRotation = this.fixedRotation;
+  newLine.fixedLength = this.fixedLength;
+  return newLine;
 }
 
 ////////////////////

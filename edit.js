@@ -99,12 +99,13 @@ function editMode() {
                              nearPoint.same(shape.points.corner2) ? shape.points.corner4 :
                              nearPoint.same(shape.points.corner3) ? shape.points.corner1 :
                              shape.points.corner2;
-              var rect = shape;
-              rect.diagonal.start = opposite;
-              rect.origin = opposite;
-              front.startPoint = opposite;
-              rect.setEnd(nearPoint);
-              design(rect);
+              if(!shape.fixedEnd) {
+                shape.diagonal.start = opposite;
+                shape.origin = opposite;
+                front.startPoint = opposite;
+                shape.setEnd(nearPoint);
+              }
+              design(shape);
             break;
           }
           window.eventListeners.remove('exitDesignMode');
