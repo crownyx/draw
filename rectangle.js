@@ -12,6 +12,7 @@ function Rectangle(diagStart, diagEnd) {
       forWhat: 'area',
       callback: function(area) {
         if(this.fixedPerimeter) delete this.fixedPerimeter;
+        if(this.fixedRatio) delete this.fixedRatio;
         this.fixedArea = parseInt(area);
       }
     },
@@ -25,7 +26,10 @@ function Rectangle(diagStart, diagEnd) {
         this.diagonal.fixedRotation = refLine.angle;
         this.diagonal.fixedLength = refLine.length;
         this.fixedEnd = this.diagonal.end;
-      }
+      },
+      acceptChars: [
+        { charCode: charCodes['comma'], character: ',' }
+      ]
     },
     {
       key: 'h',
@@ -42,6 +46,7 @@ function Rectangle(diagStart, diagEnd) {
       forWhat: 'perimeter',
       callback: function(measure) {
         if(this.fixedArea) delete this.fixedArea;
+        if(this.fixedRatio) delete this.fixedRatio;
         this.fixedPerimeter = parseInt(measure);
       }
     },
@@ -50,23 +55,16 @@ function Rectangle(diagStart, diagEnd) {
       forWhat: 'ratio of sides',
       subtext: '(length:height)',
       callback: function(lh) {
-        var l = parseInt(lh.split(',')[0]), h = parseInt(lh.split(',')[1]);
-        this.setEnd = function(point) {
-          var angle = new Line(front.startPoint, point).angle;
-          var d = new Line(front.startPoint, point).length;
- 	  //lengh2 + height2 = d2
-          //tot = l + h
-          //(l / tot)2 + (h / tot)2 = d2
-          var length = Math.sqrt(((l*l) * (d*d)) / (l*l + h*h));
-          var height = Math.sqrt(((h*h) * (d*d)) / (h*h + l*l));
-          //var length = Math.sqrt(Math.pow(diagonal, 2) - Math.pow(h / (l + h), 2));
-          //var height = Math.sqrt(Math.pow(diagonal, 2) - Math.pow(l / (l + h), 2));
-          this.diagonal.setEnd(new Point(
-            this.diagonal.start.x + length * (angle.quadrant == 2 || angle.quadrant == 3 ? -1 : 1),
-            this.diagonal.start.y + height * (angle.quadrant == 3 || angle.quadrant == 4 ? -1 : 1)
-          ));
-        }
-      }
+        if(this.fixedArea) delete this.fixedArea;
+        if(this.fixedPerimeter) delete this.fixedPerimeter;
+        this.fixedRatio = {
+          length: parseInt(lh.split(':')[0]),
+          height: parseInt(lh.split(':')[1])
+        };
+      },
+      acceptChars: [
+        { charCode: charCodes['colon'], character: ':' }
+      ]
     }
   ];
 }

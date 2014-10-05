@@ -26,7 +26,10 @@ function Line(start, end) {
         var refLine = new Line(line.start, new Point(x, y));
         line.fixedRotation = refLine.angle;
         line.fixedLength = refLine.length;
-      }
+      },
+      acceptChars: [
+        { charCode: charCodes['comma'], character: ',' }
+      ]
     },
     {
       key: 'l',

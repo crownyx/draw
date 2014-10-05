@@ -1,4 +1,4 @@
-function getInput(promptText, propToFill, shape) {
+function getInput(promptText, propToFill, acceptChars, shape) {
   var mainText = promptText.main || promptText;
 
   var textToAdd = [{ className: 'center', text: mainText, id: 'inputdiv' }];
@@ -12,14 +12,22 @@ function getInput(promptText, propToFill, shape) {
   window.eventListeners.suspendAll();
 
   var input = [];
+  var acceptedChar;
 
   window.eventListeners.add('keydown', 'getInput', function(e) {
     if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
       b.textContent += (e.which - charCodes.zero);
       input.push(e.which - charCodes.zero);
-    } else if(e.which == charCodes['comma']) {
-      b.textContent += ',';
-      input.push(',');
+    } else if((function() {
+        var found = acceptChars.find(function(acceptChar) {
+          return e.which == acceptChar.charCode;
+        });
+        acceptedChar = (found || {}).character;
+        return acceptedChar;
+      })())
+    {
+      b.textContent += acceptedChar;
+      input.push(acceptedChar);
     } else if(e.which == charCodes.enter) {
       window.eventListeners.remove('getInput');
       window.eventListeners.resumeAll();
