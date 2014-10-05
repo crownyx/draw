@@ -17,14 +17,8 @@ canvas {
   background-color: rgb(225,225,225);
 }
 
-#infodiv {
-  font-size: small;
-}
-
-#infodiv b {
-  display: block;
-}
-
-#infodiv b.center {
-  text-align: center;
-}
+#infodiv          { font-size: small;   }
+#infodiv b        { display: block;     }
+#infodiv b.center { text-align: center; }
+#infodiv b.blue   { color: blue;        }
+#infodiv b.red    { color: red;         }

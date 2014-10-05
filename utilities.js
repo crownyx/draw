@@ -1,13 +1,18 @@
 function getInput(promptText, propToFill, acceptChars, shape) {
   var mainText = promptText.main || promptText;
 
-  var textToAdd = [{ className: 'center', text: mainText, id: 'inputdiv' }];
+  var textToAdd = [{ className: 'center red', text: mainText, id: 'inputdiv' }];
+  textToAdd.splice(1, 0, (function() {
+    var b = document.createElement('b');
+    b.className = 'center';
+    return b;
+  })());
   if(promptText.subtext)
-    textToAdd.push('', { className: 'center', text: promptText.subtext });
+    textToAdd.push({ className: 'center red', text: promptText.subtext });
   textToAdd.push('', '[esc]: cancel');
-  var replacement = replaceInfoText(textToAdd);
+  var replacement = replaceInfoText(textToAdd, 1);
 
-  var b = replacement.bs[0];
+  var b = replacement.bs[1];
 
   window.eventListeners.suspendAll();
 
@@ -52,11 +57,16 @@ function replaceInfoText(infoText) {
   var newdiv = document.createElement('div');
   newdiv.id = 'infodiv';
   var bs = infoText.map(function(text) {
-    var b = document.createElement('b');
-    if(text.id) b.id = text.id;
-    if(text.className) b.className = text.className;
-    var text = text.text || text;
-    if(text) { b.textContent = text; } else { b = document.createElement('br'); }
+    var b;
+    if(!(text instanceof HTMLElement)) {
+      b = document.createElement('b');
+      if(text.id) b.id = text.id;
+      if(text.className) b.className = text.className;
+      var text = text.text || text;
+      if(text) { b.textContent = text; } else { b = document.createElement('br'); }
+    } else {
+      b = text;
+    }
     newdiv.appendChild(b);
     return b;
   });

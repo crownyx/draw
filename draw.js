@@ -68,7 +68,7 @@ function commandMode() {
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = getPoint(e);
     changeMode();
-    design(new Line(front.startPoint, front.lastPoint));
+    design(new Line(front.startPoint, front.startPoint));
     window.eventListeners.add('keydown', 'drawCommands', drawCommands);
   });
 
