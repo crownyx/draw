@@ -28,7 +28,7 @@ function getInput(promptText, propToFill, acceptChars, shape) {
     {
       b.textContent += acceptedChar;
       input.push(acceptedChar);
-    } else if(e.which == charCodes.enter) {
+    } else if(e.which == charCodes['enter']) {
       window.eventListeners.remove('getInput');
       window.eventListeners.resumeAll();
       propToFill.call(shape, input.join(''));

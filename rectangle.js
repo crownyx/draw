@@ -57,10 +57,7 @@ function Rectangle(diagStart, diagEnd) {
       callback: function(lh) {
         if(this.fixedArea) delete this.fixedArea;
         if(this.fixedPerimeter) delete this.fixedPerimeter;
-        this.fixedRatio = {
-          length: parseInt(lh.split(':')[0]),
-          height: parseInt(lh.split(':')[1])
-        };
+        this.fixedRatio = parseInt(lh.split(':')[0])/parseInt(lh.split(':')[1]);
       },
       acceptChars: [
         { charCode: charCodes['colon'], character: ':' }
@@ -156,7 +153,7 @@ Object.defineProperty(Rectangle.prototype, 'points', {
 });
 
 Rectangle.prototype.setEnd = function(point) {
-  if(this.fixedHeight || this.fixedLength || this.fixedArea || this.fixedPerimeter) {
+  if(this.fixedHeight || this.fixedLength || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
     var length = this.fixedLength || Math.abs(point.x - this.diagonal.start.x);
     var height = this.fixedHeight || Math.abs(point.y - this.diagonal.start.y);
     var currAngle = new Angle(getAngle(this.diagonal.start, point).rad - this.rotation.rad);
@@ -179,6 +176,18 @@ Rectangle.prototype.setEnd = function(point) {
         var tan = Math.abs(Math.tan(currAngle.rad));
         height = this.fixedPerimeter * tan / 2 / (1 + tan);
         length = (this.fixedPerimeter - height * 2) / 2;
+      }
+    }
+    if(this.fixedRatio) {
+      if(this.fixedLength && !this.fixedHeight) {
+        height = this.fixedLength / this.fixedRatio;
+      } else if(this.fixedHeight && !this.fixedLength) {
+        length = this.fixedRatio * this.fixedHeight;
+      } else if(!this.fixedHeight && !this.fixedLength) {
+        var hypotenuse = new Line(this.diagonal.start, point);
+        var angle = Math.atan(1 / this.fixedRatio);
+        height = Math.sin(angle) * hypotenuse.length;
+        length = Math.cos(angle) * hypotenuse.length;
       }
     }
     switch(currAngle.quadrant) {
@@ -229,5 +238,6 @@ Rectangle.prototype.copy = function() {
   newRect.fixedArea = this.fixedArea;
   newRect.fixedPerimeter = this.fixedPerimeter;
   newRect.fixedEnd = this.fixedEnd;
+  newRect.fixedRatio = this.fixedRatio;
   return newRect;
 }
