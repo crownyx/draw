@@ -234,12 +234,14 @@ function rotateGroup(group) {
     });
     front.startPoint = refPoint;
 
+    var angle = new Angle(0);
+
     front.eventListeners.add('mousemove', 'setRotation', function(e) {
       middle.clear();
 
       var currPoint = getPoint(e);
-      var angle = getAngle(refPoint, currPoint);
-
+      var oldAngle = angle;
+      angle = getAngle(refPoint, currPoint);
       new Line(refPoint, currPoint).preview(true);
 
       group.shapes.forEach(function(shape) {
@@ -247,20 +249,22 @@ function rotateGroup(group) {
           refPoint.x + Math.cos(shape.origAngle.rad + angle.rad) * shape.refLine.length,
           refPoint.y + Math.sin(shape.origAngle.rad + angle.rad) * shape.refLine.length
         ));
-        shape.rotate(new Angle(shape.origRot + angle.rad));
+        shape.rotate(new Angle(angle.rad - oldAngle.rad));
       });
       group.draw(middle.context);
     });
 
     front.eventListeners.add('click', 'saveGroup', function(e) {
       var currPoint = getPoint(e);
-      var angle = getAngle(refPoint, currPoint);
+      var oldAngle = angle;
+      angle = getAngle(refPoint, currPoint);
+
       group.shapes.forEach(function(shape) {
         shape.translate(new Point(
           refPoint.x + Math.cos(shape.origAngle.rad + angle.rad) * shape.refLine.length,
           refPoint.y + Math.sin(shape.origAngle.rad + angle.rad) * shape.refLine.length
         ));
-        shape.rotate(new Angle(shape.origRot + angle.rad));
+        shape.rotate(new Angle(angle.rad - oldAngle.rad));
         shape.complete();
       });
       changeMode(commandMode);

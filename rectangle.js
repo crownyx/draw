@@ -218,8 +218,8 @@ Rectangle.prototype.translate = function(point) {
 }
 
 Rectangle.prototype.rotate = function(rotation) {
-  this.diagonal.rotate(new Angle(rotation.rad - this.rotation.rad));
-  this.rotation = rotation;
+  this.diagonal.rotate(rotation);
+  this.rotation = new Angle(this.rotation.rad + rotation.rad);
 }
 
 Rectangle.prototype.preview = function() {

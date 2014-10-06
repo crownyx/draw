@@ -26,13 +26,9 @@ set endpoint after rotation
 
 turn off settings (eg fixedLength)
 
-9/26
+10/5
 
-rotate all shapes: also rotate points/lines
-
-9/27
-
-update shiftCommands for Rectangle now that rectangle/diagonal programmed differently
+refactor shape.rotate()s because fixed line
 
 long term:
 

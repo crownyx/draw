@@ -75,7 +75,7 @@ Object.defineProperty(Line.prototype, 'center', {
 Object.defineProperty(Line.prototype, "points", {
   get: function() {
     return [this.start, this.mid, this.end].map(function(point) {
-      var point = point.translate(this.origin, this.rotation.rad);
+      //var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
     }, this);

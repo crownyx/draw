@@ -64,6 +64,8 @@ Object.defineProperty(Ellipse.prototype, 'points', {
 
 Ellipse.prototype.drawPath = function(context) {
   context.save();
+    context.translate(this.center.x, this.center.y);
+    context.rotate(this.rotation.rad);
     context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
     context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
   context.restore();
@@ -72,6 +74,10 @@ Ellipse.prototype.drawPath = function(context) {
 Ellipse.prototype.preview = function() {
   new Line(this.origin, front.lastPoint).preview(true);
   this.draw(middle.context);
+  if(this.rotation.deg % 90) {
+    this.yAxis.sketch(middle.context);
+    this.xAxis.sketch(middle.context);
+  }
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }
 
@@ -106,14 +112,20 @@ Ellipse.prototype.infoText = function() {
 
 Ellipse.prototype.setEnd = function(point) {
   var point = point.untranslate(this.origin, this.rotation);
-  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y));
-  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y));
+  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y).translate(this.origin, this.rotation.rad));
+  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y).translate(this.origin, this.rotation.rad));
+}
+
+Ellipse.prototype.rotate = function(rotation) {
+  this.rotation = this.rotation.plus(rotation);
+  this.yAxis.rotate(rotation);
+  this.xAxis.rotate(rotation);
 }
 
 Ellipse.prototype.copy = function() {
   var ellipse = new Ellipse(this.center, this.center);
-  ellipse.xAxis = new Line(this.center.copy(), this.xAxis.end.copy());
-  ellipse.yAxis = new Line(this.center.copy(), this.yAxis.end.copy());
+  ellipse.xAxis = this.xAxis.copy();
+  ellipse.yAxis = this.yAxis.copy();
   ellipse.origin = this.origin;
   ellipse.rotation = this.rotation;
   return ellipse;

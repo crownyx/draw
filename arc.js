@@ -81,14 +81,17 @@ Arc.prototype.infoText = function() {
 }
 
 Arc.prototype.drawPath = function(context) {
-  context.arc(
-    0,
-    0,
-    this.startRadius.length,
-    this.startRadius.angle.rad,
-    this.endRadius.angle.rad,
-    !this.clockwise
-  );
+  context.save();
+    context.translate(this.center.x, this.center.y);
+    context.arc(
+      0,
+      0,
+      this.startRadius.length,
+      this.startRadius.angle.rad,
+      this.endRadius.angle.rad,
+      !this.clockwise
+    );
+  context.restore();
 }
 
 Arc.prototype.setEnd = function(point) {

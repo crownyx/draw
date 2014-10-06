@@ -49,6 +49,9 @@ function Angle(rad) {
         case 3: return _rad - Math.PI; break;
         case 4: return 2 * Math.PI - _rad; break;
       }
-    })()
+    })(),
+    plus: function(otherAngle) {
+      return new Angle(this.rad + otherAngle.rad);
+    }
   };
 }
