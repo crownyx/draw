@@ -70,8 +70,7 @@ Object.defineProperty(Circle.prototype, 'area', {
 
 Circle.prototype.drawPath = function(context) {
   context.save();
-    context.translate(this.center.x, this.center.y);
-    context.arc(0, 0, this.radius.length, 0, 2 * Math.PI);
+    context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
   context.restore();
 }
 

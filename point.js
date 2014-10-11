@@ -4,11 +4,11 @@ function Point(x, y) {
 
   this.toString = function() { return "(x: " + this.x + ", y: " + this.y + ")"; }
 
-  this.fill = function(context, params = { radius: 2 }) {
+  this.fill = function(context, params = {}) {
     context.save();
       context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
       context.beginPath();
-        context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
+        context.arc(this.x, this.y, params.radius || 2, 0, 2 * Math.PI);
       context.fill();
     context.restore();
   }
@@ -72,3 +72,9 @@ function Point(x, y) {
   }
 }
 
+Point.from = function(point) {
+  return(new Point(
+    point.pageX - front.canvas.offsetLeft,
+    point.pageY - front.canvas.offsetTop
+  ));
+}

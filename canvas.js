@@ -32,7 +32,7 @@ var middle = new Canvas('drawlayer');
 var back   = new Canvas('backlayer');
 
 front.showPos = function() {
-  var angle = getAngle(front.startPoint, front.lastPoint);
+  var angle = Angle.from(front.startPoint, front.lastPoint);
   var textAlignment = front.textAlignments[angle.quadrant - 1];
   this.context.save();
     this.context.textAlign = textAlignment.textAlign;

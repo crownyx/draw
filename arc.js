@@ -21,7 +21,7 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
     {
       key: 'c',
       forWhat: 'clockwise',
-      toggle: true,
+      type: 'toggle',
       callback: function() { this.clockwise = !this.clockwise; }
     },
     {

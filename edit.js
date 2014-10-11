@@ -17,7 +17,7 @@ function editMode() {
   front.eventListeners.add('mousemove', 'findPoint', function(e) {
     if(front.eventListeners.find('selectPoint')) front.eventListeners.remove('selectPoint');
 
-    var currPoint = getPoint(e);
+    var currPoint = Point.from(e);
 
     var nearPoint = allPoints.filter(function(point) {
       return new Line(currPoint, point).length < 5;

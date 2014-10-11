@@ -18,10 +18,10 @@ window.onload = function() {
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
 
-  front.canvas.addEventListener('mousemove', function()  { front.clear();                 }, false);
-  front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = getPoint(e); }, false);
-  front.canvas.addEventListener('mousemove', function()  { front.showAxes();              }, false);
-  front.canvas.addEventListener('mousemove', function()  { front.showPos();               }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.clear();                   }, false);
+  front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = Point.from(e); }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.showAxes();                }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.showPos();                 }, false);
 
   this.refresh = function() { this.eventListeners.clear(); }
 
@@ -66,7 +66,7 @@ function commandMode() {
   }
 
   front.eventListeners.add('click', 'design', function(e) {
-    front.startPoint = getPoint(e);
+    front.startPoint = Point.from(e);
     changeMode();
     design(new Line(front.startPoint, front.startPoint));
     window.eventListeners.add('keydown', 'drawCommands', drawCommands);
@@ -86,6 +86,8 @@ function drawCommands(e) {
       switch(e.which) {
         case charCodes['a']:
           return new Arc(front.startPoint, front.lastPoint);
+        case charCodes['b']:
+          return new BezierCurve(front.startPoint, front.lastPoint);
         case charCodes['c']:
           return new Circle(front.startPoint, front.lastPoint);
         case charCodes['e']:
@@ -96,12 +98,14 @@ function drawCommands(e) {
           return new Rectangle(front.startPoint, front.lastPoint);
       }
     })();
-    if(shape) {
-      changeMode();
-      design(shape);
-      window.eventListeners.add('keydown', 'drawCommands', drawCommands);
-    }
+    if(shape) { window.designShape(shape); }
   }
+}
+
+window.designShape = function(shape) {
+  changeMode();
+  design(shape);
+  this.eventListeners.add('keydown', 'drawCommands', drawCommands);
 }
 
 function EventListenerCollection(receiver) {

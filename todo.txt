@@ -26,9 +26,10 @@ set endpoint after rotation
 
 turn off settings (eg fixedLength)
 
-10/5
+10/11
 
-refactor shape.rotate()s because fixed line
+finish bezier curves: preview, shiftCommands
+start triangle
 
 long term:
 

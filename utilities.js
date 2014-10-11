@@ -59,11 +59,16 @@ function replaceInfoText(infoText) {
   var bs = infoText.map(function(text) {
     var b;
     if(!(text instanceof HTMLElement)) {
-      b = document.createElement('b');
+      b = document.createElement('div');
+      b.className = 'button';
       if(text.id) b.id = text.id;
-      if(text.className) b.className = text.className;
       var text = text.text || text;
-      if(text) { b.textContent = text; } else { b = document.createElement('br'); }
+      b.textContent = text;
+      //b = document.createElement('b');
+      //if(text.id) b.id = text.id;
+      //if(text.className) b.className = text.className;
+      //var text = text.text || text;
+      //if(text) { b.textContent = text; } else { b = document.createElement('br'); }
     } else {
       b = text;
     }

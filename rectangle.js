@@ -156,7 +156,7 @@ Rectangle.prototype.setEnd = function(point) {
   if(this.fixedHeight || this.fixedLength || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
     var length = this.fixedLength || Math.abs(point.x - this.diagonal.start.x);
     var height = this.fixedHeight || Math.abs(point.y - this.diagonal.start.y);
-    var currAngle = new Angle(getAngle(this.diagonal.start, point).rad - this.rotation.rad);
+    var currAngle = new Angle(Angle.from(this.diagonal.start, point).rad - this.rotation.rad);
     if(this.fixedArea) {
       if(this.fixedLength && !this.fixedHeight) {
         height = this.fixedArea / length;

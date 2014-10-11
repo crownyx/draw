@@ -5,9 +5,7 @@ function design(shape) {
     if(e.which == charCodes['esc']) changeMode(commandMode);
   });
 
-  front.eventListeners.add('mousemove', 'setEnd',    function(e) {
-    shape.setEnd(getPoint(e));
-  });
+  front.eventListeners.add('mousemove', 'setEnd', function(e) { shape.setEnd(Point.from(e)); });
 
   front.eventListeners.add('mousemove', 'previewShape', refreshMiddle = function()  {
     middle.clear();
@@ -19,22 +17,19 @@ function design(shape) {
   shape.preview();
 
   replaceInfoText([
-    '[a]: arc',
-    '[b]: bezier curve',
-    '[c]: circle',
-    '[e]: ellipse',
-    '[l]: line',
-    '[r]: rectangle',
-    '[s]: square',
-    '[t]: triangle',
-    '',
-    '[i]: show/hide info',
-    '',
+    '[a] arc',
+    '[b] bezier curve',
+    '[c] circle',
+    '[e] ellipse',
+    '[l] line',
+    '[r] rectangle',
+    '[s] square',
+    '[t] triangle',
+    '[i] show/hide info',
     '[SHIFT] +'
   ].concat(
     shape.shiftCommands.map(function(command) {
-      var verb = command.toggle ? 'toggle ' : 'set ';
-      return '[' + command.key.toUpperCase() + ']: ' + verb + command.forWhat;
+      return '[' + command.key.toUpperCase() + ']: ' + (command.type || 'set') + ' ' + command.forWhat;
     })
   ).concat([
     '',
@@ -49,21 +44,31 @@ function design(shape) {
   });
 
   shape.shiftCommands.forEach(function(command) {
-    if(command.toggle) {
-      window.eventListeners.add('keydown', 'toggle' + command.forWhat.capitalize(), function(e) {
-        if(e.shiftKey && e.which == charCodes[command.key]) {
-          command.callback.call(shape);
-          refreshMiddle();
-        }
-      });
-    } else {
-      window.eventListeners.add('keydown', 'set' + command.forWhat.capitalize(), function(e) {
-        if(e.shiftKey && e.which == charCodes[command.key]) {
-          var helpText = 'enter ' + command.forWhat + ': ';
-          if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
-          getInput(helpText, command.callback, command.acceptChars || [], shape);
-        }
-      });
+    switch(command.type) {
+      case 'toggle':
+        window.eventListeners.add('keydown', 'toggle' + command.forWhat.capitalize(), function(e) {
+          if(e.shiftKey && e.which == charCodes[command.key]) {
+            command.callback.call(shape);
+            refreshMiddle();
+          }
+        });
+      break;
+      case 'switch to':
+        window.eventListeners.add('keydown', 'switchTo' + command.forWhat.capitalize(), function(e) {
+          if(e.shiftKey && e.which == charCodes[command.key]) {
+            window.designShape(command.switchTo.call(shape));
+          }
+        });
+      break;
+      default:
+        window.eventListeners.add('keydown', 'set' + command.forWhat.capitalize(), function(e) {
+          if(e.shiftKey && e.which == charCodes[command.key]) {
+            var helpText = 'enter ' + command.forWhat + ': ';
+            if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
+            getInput(helpText, command.callback, command.acceptChars || [], shape);
+          }
+        });
+      break;
     }
   });
 }

@@ -3,8 +3,8 @@ function Ellipse(radStart, radEnd) {
 
   this.origin = radStart;
 
-  this.xAxis = new Line(radStart, { x: radEnd.x, y: radStart.y });
-  this.yAxis = new Line(radStart, { x: radStart.x, y: radEnd.y });
+  this.xAxis = new Line(radStart, new Point(radEnd.x,   radStart.y));
+  this.yAxis = new Line(radStart, new Point(radStart.x, radEnd.y  ));
   this.rotation = new Angle(0);
 
   this.lines = [this.yAxis, this.xAxis];

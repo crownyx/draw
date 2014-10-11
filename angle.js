@@ -1,22 +1,3 @@
-function getPoint(point) {
-  return (new Point(
-    point.pageX - front.canvas.offsetLeft,
-    point.pageY - front.canvas.offsetTop
-  ));
-}
-
-function getQuadrant(lineStart, lineEnd) {
-  if(lineEnd.x >= lineStart.x && lineEnd.y > lineStart.y) {
-    return 1;
-  } else if(lineEnd.x < lineStart.x && lineEnd.y >= lineStart.y) {
-    return 2;
-  } else if(lineEnd.x <= lineStart.x && lineEnd.y < lineStart.y) {
-    return 3;
-  } else {
-    return 4;
-  }
-}
-
 function Angle(rad) {
   var _rad = (rad && !(rad % (2 * Math.PI)) ? rad : ((rad || 0) + 2 * Math.PI) % (2 * Math.PI));
   var _quad = Math.ceil(_rad / (0.5 * Math.PI)) || 4;
@@ -37,6 +18,9 @@ function Angle(rad) {
     })(),
     plus: function(otherAngle) {
       return new Angle(this.rad + otherAngle.rad);
+    },
+    minus: function(otherAngle) {
+      return new Angle(this.rad - otherAngle.rad);
     }
   };
 }

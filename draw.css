@@ -15,6 +15,7 @@ canvas {
   left: 18px;
   top: 20px;
   background-color: rgb(225,225,225);
+  overflow-y: auto;
 }
 
 #infodiv          { font-size: small;   }
@@ -22,3 +23,10 @@ canvas {
 #infodiv b.center { text-align: center; }
 #infodiv b.blue   { color: blue;        }
 #infodiv b.red    { color: red;         }
+
+#infodiv div.button {
+  background-color: rgb(175,175,175);
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+}

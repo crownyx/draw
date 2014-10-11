@@ -75,7 +75,6 @@ Object.defineProperty(Line.prototype, 'center', {
 Object.defineProperty(Line.prototype, "points", {
   get: function() {
     return [this.start, this.mid, this.end].map(function(point) {
-      //var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
     }, this);
@@ -89,7 +88,7 @@ Object.defineProperty(Line.prototype, 'length', {
 });
 
 Object.defineProperty(Line.prototype, 'angle', {
-  get: function() { return getAngle(this.start, this.end); },
+  get: function() { return Angle.from(this.start, this.end); },
 });
 
 Line.prototype.drawPath = function(context) {
@@ -114,7 +113,7 @@ Line.prototype.preview = function(sketch) {
     }
   );
 
-  var angle = getAngle(front.startPoint, front.lastPoint);
+  var angle = Angle.from(front.startPoint, front.lastPoint);
   var textAlignment = front.textAlignments[angle.quadrant % 4];
   middle.save();
     middle.context.textAlign = textAlignment.textAlign;
