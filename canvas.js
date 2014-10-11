@@ -1,6 +1,5 @@
 function Canvas(id) {
   this.id     = id;
-  this.shapes = [];
 }
 
 Object.defineProperty(Canvas.prototype, 'canvas', {
@@ -32,8 +31,8 @@ var middle = new Canvas('drawlayer');
 var back   = new Canvas('backlayer');
 
 front.showPos = function() {
-  var angle = Angle.from(front.startPoint, front.lastPoint);
-  var textAlignment = front.textAlignments[angle.quadrant - 1];
+  var angle = Angle.from(this.startPoint, this.lastPoint);
+  var textAlignment = this.textAlignments[angle.quadrant - 1];
   this.context.save();
     this.context.textAlign = textAlignment.textAlign;
     this.context.fillText(
@@ -66,9 +65,16 @@ front.textAlignments = [
   { xPlus: 15,  yPlus: -15, textAlign: 'left' }
 ]
 
+back.shapes = [];
+
 back.refresh = function() {
   this.clear();
   this.shapes.forEach(function(shape) { shape.draw(this.context); }, this);
 }
 
 middle.showText = true;
+
+middle.refresh = function() {
+  this.clear();
+  delete this.shape;
+}

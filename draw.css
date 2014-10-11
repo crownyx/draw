@@ -25,8 +25,38 @@ canvas {
 #infodiv b.red    { color: red;         }
 
 #infodiv div.button {
-  background-color: rgb(175,175,175);
-  margin: 5px;
-  padding: 5px;
-  border-radius: 5px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
+
+#infodiv div.button:last-child { margin-bottom: 5px; }
+
+#infodiv div.button div {
+  padding: 5px;
+  display: inline-block;
+}
+
+#infodiv div.button div.key_segment {
+  text-align: center;
+  border-radius: 5px 0px 0px 5px;
+  font-weight: bold;
+  color: white;
+}
+
+#infodiv div.button div.text_segment {
+  border-radius: 0px 5px 5px 0px;
+}
+
+#infodiv div.button.gray div.key_segment { background-color: rgb(100,100,100); }
+#infodiv div.button.gray div.text_segment { background-color: rgb(150,150,150); }
+
+#infodiv div.button.blue div.key_segment { background-color: rgb(100,100,160); }
+#infodiv div.button.blue div.text_segment { background-color: rgb(150,150,240); }
+
+#infodiv div.button.yellow div.key_segment { background-color: rgb(160,160,100); }
+#infodiv div.button.yellow div.text_segment { background-color: rgb(240,240,150); }
+
+#infodiv div.button.red div.key_segment { background-color: rgb(160,100,100); }
+#infodiv div.button.red div.text_segment { background-color: rgb(240,150,150); }
+
+#infodiv div.button div.key_segment span { position: relative; }

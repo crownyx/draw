@@ -18,10 +18,39 @@ window.onload = function() {
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
 
-  front.canvas.addEventListener('mousemove', function()  { front.clear();                   }, false);
-  front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = Point.from(e); }, false);
-  front.canvas.addEventListener('mousemove', function()  { front.showAxes();                }, false);
-  front.canvas.addEventListener('mousemove', function()  { front.showPos();                 }, false);
+  front.canvas.addEventListener('mousemove', function() { front.clear(); }, false);
+  front.canvas.addEventListener('mousemove', setLastPoint = function(e) {
+    front.lastPoint = Point.from(e);
+  }, false);
+  front.canvas.addEventListener('mousemove', function() { front.showAxes(); }, false);
+  front.canvas.addEventListener('mousemove', function() { front.showPos();  }, false);
+
+  window.addEventListener('keydown', function(e) {
+    if(!e.shiftKey && e.which == charCodes['g']) {
+      getInput(
+        { main: 'enter point', subtext: '(x,y)' },
+        function(xy) {
+          var x = parseInt(xy.split(',')[0]);
+          var y = parseInt(xy.split(',')[1]);
+          front.lastPoint = new Point(x, y);
+          front.clear();
+          front.showAxes();
+          front.showPos();
+          front.canvas.removeEventListener('mousemove', setLastPoint, false);
+          if(middle.shape) {
+            middle.shape.setEnd(front.lastPoint);
+            middle.clear();
+            middle.shape.preview();
+          }
+          front.canvas.addEventListener('click', resumeSetLastPoint = function() {
+            front.canvas.removeEventListener('click', resumeSetLastPoint, false);
+            front.canvas.addEventListener('mousemove', setLastPoint, false);
+          }, false);
+        },
+        [{ charCode: charCodes['comma'], character: ',' }]
+      );
+    }
+  }, false);
 
   this.refresh = function() { this.eventListeners.clear(); }
 
@@ -31,7 +60,7 @@ window.onload = function() {
 function changeMode(mode) {
   window.refresh();
   front.refresh();
-  middle.clear();
+  middle.refresh();
 
   if(mode) mode();
 }
@@ -66,7 +95,7 @@ function commandMode() {
   }
 
   front.eventListeners.add('click', 'design', function(e) {
-    front.startPoint = Point.from(e);
+    front.startPoint = front.lastPoint;
     changeMode();
     design(new Line(front.startPoint, front.startPoint));
     window.eventListeners.add('keydown', 'drawCommands', drawCommands);

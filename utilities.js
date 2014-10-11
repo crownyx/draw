@@ -36,11 +36,11 @@ function getInput(promptText, propToFill, acceptChars, shape) {
     } else if(e.which == charCodes['enter']) {
       window.eventListeners.remove('getInput');
       window.eventListeners.resumeAll();
-      propToFill.call(shape, input.join(''));
       document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
       middle.clear();
-      shape.setEnd(front.lastPoint);
-      shape.preview();
+      propToFill.call((shape || window), input.join(''));
+      if(shape) shape.setEnd(front.lastPoint);
+      if(shape) shape.preview();
     } else if(e.which == charCodes['backspace']) {
       b.textContent = b.textContent.slice(0, -1);
       input.pop();
@@ -61,14 +61,10 @@ function replaceInfoText(infoText) {
     if(!(text instanceof HTMLElement)) {
       b = document.createElement('div');
       b.className = 'button';
+      if(text.color) b.className += (' ' + text.color);
       if(text.id) b.id = text.id;
       var text = text.text || text;
       b.textContent = text;
-      //b = document.createElement('b');
-      //if(text.id) b.id = text.id;
-      //if(text.className) b.className = text.className;
-      //var text = text.text || text;
-      //if(text) { b.textContent = text; } else { b = document.createElement('br'); }
     } else {
       b = text;
     }
