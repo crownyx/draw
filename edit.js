@@ -1,5 +1,15 @@
 function editMode() {
-  replaceInfoText([{ textContent: 'select point', className: 'box' }]);
+  replaceInfoText([
+    {
+      textContent: 'select point',
+      className: 'box'
+    },
+    {
+      className: 'button',
+      textContent: 'esc:cancel',
+      color: 'red'
+    }
+  ]);
 
   var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
 

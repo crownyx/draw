@@ -8,6 +8,8 @@ function BezierCurve(start, end, control1, control2) {
   this.control1 = control1;
   this.control2 = control2;
 
+  this.lines = [];
+
   this.shiftCommands = [
     {
       key: 'q',
@@ -72,6 +74,65 @@ BezierCurve.prototype.nextStep = function() {
       this.nextStep = Shape.prototype.nextStep;
     }
   }
+}
+
+Object.defineProperty(BezierCurve.prototype, 'points', {
+  get: function() {
+    var points = [
+      this.start,
+      this.center,
+      this.control1,
+      this.end
+    ];
+    if(!this.quadratic) points.splice(2, 0, this.control2);
+    return points.map(function(point) {
+      point.shape = this;
+      return point;
+    }, this);
+  }
+});
+
+Object.defineProperty(BezierCurve.prototype, 'center', {
+  get: function() {
+    return new Line(this.start, this.end).mid;
+  }
+});
+
+Object.defineProperty(BezierCurve.prototype, 'origin', {
+  get: function() { return this.center; }
+});
+
+BezierCurve.prototype.translate = function(transPoint) {
+  var center = this.center;
+  ['start', 'control1', 'control2', 'end'].forEach(function(point) {
+    if(this[point]) {
+      var refLine = new Line(center, this[point]);
+      refLine.translate(transPoint);
+      this[point] = refLine.end;
+    }
+  }, this);
+}
+
+BezierCurve.prototype.rotate = function(rotation) {
+  var center = this.center;
+  ['start', 'control1', 'control2', 'end'].forEach(function(point) {
+    if(this[point]) {
+      var refLine = new Line(center, this[point]);
+      refLine.rotate(rotation);
+      this[point] = refLine.end;
+    }
+  }, this);
+}
+
+BezierCurve.prototype.copy = function() {
+  var curve = new BezierCurve(
+    this.start.copy(),
+    this.end.copy(),
+    this.control1.copy()
+  );
+  if(!this.quadratic) curve.control2 = this.control2.copy();
+  curve.quadratic = this.quadratic;
+  return curve;
 }
 
 Object.defineProperty(BezierCurve.prototype, 'name', {

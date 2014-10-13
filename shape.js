@@ -54,12 +54,6 @@ Shape.prototype.translate = function(point) {
   this.lines.forEach(function(line) { line.translate(point); });
 }
 
-Shape.prototype.copy = function() {
-  var copy = this._copy();
-  copy.rotation = this.rotation;
-  return copy;
-}
-
 Object.defineProperty(Shape.prototype, 'name', {
   get: function() {
     return this.constructor.name;
