@@ -52,25 +52,52 @@ function getInput(promptText, propToFill, acceptChars, shape) {
   });
 }
 
-function replaceInfoText(infoText) {
+function replaceInfoText(itemsToAdd) {
   var infodiv = document.getElementById('infodiv');
   var newdiv = document.createElement('div');
   newdiv.id = 'infodiv';
-  var bs = infoText.map(function(text) {
-    var b;
-    if(!(text instanceof HTMLElement)) {
-      b = document.createElement('div');
-      b.className = 'button';
-      if(text.color) b.className += (' ' + text.color);
-      if(text.id) b.id = text.id;
-      var text = text.text || text;
-      b.textContent = text;
+
+  itemsToAdd = itemsToAdd.map(function(item) {
+    var div;
+    if(item.className == 'button') {
+      div = generateButton(item.textContent.split(':')[0], item.textContent.split(':')[1], item.color);
     } else {
-      b = text;
+      div = document.createElement('div');
+      div.className = item.className;
+      div.textContent = item.textContent;
     }
-    newdiv.appendChild(b);
-    return b;
+    newdiv.appendChild(div);
+    return div;
   });
   document.getElementById('infopanel').replaceChild(newdiv, infodiv);
-  return { olddiv: infodiv, newdiv: newdiv, bs: bs };
+
+  itemsToAdd.forEach(function(button) {
+    if(button.button) {
+      var keySegment = button.getElementsByClassName('key_segment')[0];
+      var textSegment = button.getElementsByClassName('text_segment')[0];
+      keySegment.style.width  = document.getElementById('infodiv').clientWidth * 0.2 + 'px';
+      textSegment.style.width = document.getElementById('infodiv').clientWidth - parseInt(keySegment.style.width) - 30 + 'px';
+      keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 5 + 'px';
+      keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 5 - textSegment.clientHeight + 10) / 2 + 'px';
+    }
+  });
+
+  return { olddiv: infodiv, newdiv: newdiv, bs: itemsToAdd };
+}
+
+function generateButton(keyText, infoText, color) {
+  var button = document.createElement('div');
+  button.className = color + ' button';
+  var key = document.createElement('div');
+  key.className = 'key_segment';
+  var text = document.createElement('div');
+  text.className = 'text_segment';
+  var keySpan = document.createElement('span');
+  keySpan.textContent = keyText;
+  text.textContent = infoText;
+  key.appendChild(keySpan);
+  button.appendChild(key);
+  button.appendChild(text);
+  button.button = true;
+  return button;
 }

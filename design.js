@@ -18,62 +18,39 @@ function design(shape) {
 
   shape.preview();
 
-  /* generateButton */ function generateButton(keyText, infoText, color) {
-  /*                */   var button = document.createElement('div');
-  /*                */   button.className = color + ' button';
-  /*                */   var key = document.createElement('div');
-  /*                */   key.className = 'key_segment';
-  /*                */   var text = document.createElement('div');
-  /*                */   text.className = 'text_segment';
-  /*                */   var keySpan = document.createElement('span');
-  /*                */   keySpan.textContent = keyText;
-  /*                */   text.textContent = infoText;
-  /*                */   key.appendChild(keySpan);
-  /*                */   button.appendChild(key);
-  /*                */   button.appendChild(text);
-  /*                */   return button;
-  /*                */ }
-
-  var buttons = [
-    'a:arc',
-    'b:bezier curve',
-    'c:circle',
-    'e:ellipse',
-    'l:line',
-    'r:rectangle',
-    's:square',
-    't:triangle',
-  ].map(function(command) {
-    return generateButton(command.split(':')[0], command.split(':')[1], 'gray');
+  replaceInfoText([{
+    className: 'box',
+    textContent: shape.name
+  }].concat([
+      'a:arc',
+      'b:bezier curve',
+      'c:circle',
+      'e:ellipse',
+      'l:line',
+      'r:rectangle',
+      's:square',
+      't:triangle',
+    ].map(function(command) {
+      return({
+        className: 'button',
+        color: 'gray',
+        textContent: command
+      });
+    })
+  ).concat({
+    className: 'button',
+    color: 'yellow',
+    textContent: 'i:show/hide info'
   }).concat(
-    generateButton('i', 'show/hide info', 'yellow')
-  ).concat(
     shape.shiftCommands.map(function(command) {
-      return(generateButton(
-        command.key.toUpperCase(),
-        (command.type || 'set') + ' ' + command.forWhat,
-        'blue'
-      ));
+      return({
+        className: 'button',
+        color: 'blue',
+        textContent: command.key.toUpperCase() + ':' + (command.type || 'set') + ' ' + command.forWhat
+      });
     }),
-    generateButton('esc', 'stop drawing', 'red')
-  );
-
-  var infodiv = document.getElementById('infodiv');
-  var newdiv = document.createElement('div');
-  newdiv.id = 'infodiv';
-
-  buttons.forEach(function(button) { newdiv.appendChild(button); });
-
-  document.getElementById('infopanel').replaceChild(newdiv, infodiv);
-
-  buttons.forEach(function(button) {
-    var keySegment = button.getElementsByClassName('key_segment')[0];
-    var textSegment = button.getElementsByClassName('text_segment')[0];
-    keySegment.style.width  = document.getElementById('infodiv').clientWidth * 0.2 + 'px';
-    textSegment.style.width = document.getElementById('infodiv').clientWidth - parseInt(keySegment.style.width) - 30 + 'px';
-    keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 5 + 'px';
-    keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 5 - textSegment.clientHeight + 10) / 2 + 'px';
-  });
+    { className: 'button', textContent: 'esc:stop drawing', color: 'red' }
+  ));
 
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
     if(e.which == charCodes['i']) {

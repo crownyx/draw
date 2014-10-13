@@ -230,9 +230,9 @@ Rectangle.prototype.preview = function() {
 
 Rectangle.prototype.copy = function() {
   var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
-  newRect.origin = this.origin;
+  newRect.origin = this.origin.copy();
   newRect.diagonal = this.diagonal.copy();
-  newRect.rotation = this.rotation;
+  newRect.rotation = this.rotation.copy();
   newRect.fixedHeight = this.fixedHeight;
   newRect.fixedLength = this.fixedLength;
   newRect.fixedArea = this.fixedArea;

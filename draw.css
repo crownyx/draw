@@ -19,6 +19,15 @@ canvas {
 }
 
 #infodiv          { font-size: small;   }
+
+#infodiv div.box {
+  text-align: center;
+  border-bottom: 1px solid black;
+  margin-bottom: 5px;
+  padding: 5px;
+  font-weight: bold;
+}
+
 #infodiv b        { display: block;     }
 #infodiv b.center { text-align: center; }
 #infodiv b.blue   { color: blue;        }

@@ -60,6 +60,12 @@ Shape.prototype.copy = function() {
   return copy;
 }
 
+Object.defineProperty(Shape.prototype, 'name', {
+  get: function() {
+    return this.constructor.name;
+  }
+}); 
+
 // Shape public interface:
 //   .shiftCommands: array of objects: { key: ..., forWhat: ..., subtext: ..., callback: ... }
 //   .infoText     : returns text to display in upper lefthand corner

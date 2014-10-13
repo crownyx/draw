@@ -21,6 +21,9 @@ function Angle(rad) {
     },
     minus: function(otherAngle) {
       return new Angle(this.rad - otherAngle.rad);
+    },
+    copy: function() {
+      return new Angle(this.rad);
     }
   };
 }

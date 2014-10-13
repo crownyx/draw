@@ -15,6 +15,7 @@ function BezierCurve(start, end, control1, control2) {
       type: 'toggle',
       callback: function() {
         this.quadratic = !this.quadratic;
+        front.infodiv.getElementsByClassName('box')[0].textContent = this.name;
       }
     }
   ];
@@ -30,7 +31,7 @@ BezierCurve.prototype.preview = function() {
 
 BezierCurve.prototype.drawPath = function(context) {
   context.moveTo(this.start.x, this.start.y);
-  if(this.quadratic || !this.control2) {
+  if(this.quadratic) {
     context.quadraticCurveTo(
       (this.control1 || this.start).x,
       (this.control1 || this.start).y,
@@ -41,8 +42,8 @@ BezierCurve.prototype.drawPath = function(context) {
     context.bezierCurveTo(
       (this.control1 || this.start).x,
       (this.control1 || this.start).y,
-      (this.control2 || this.end).x,
-      (this.control2 || this.end).y,
+      (this.control2 || this.control1 || this.end).x,
+      (this.control2 || this.control1 || this.end).y,
       this.end.x,
       this.end.y
     );
@@ -72,3 +73,9 @@ BezierCurve.prototype.nextStep = function() {
     }
   }
 }
+
+Object.defineProperty(BezierCurve.prototype, 'name', {
+  get: function() {
+    return 'Bezier Curve, ' + (this.quadratic ? 'Quadratic ' : 'Cubic ');
+  }
+});

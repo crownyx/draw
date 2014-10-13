@@ -1,6 +1,4 @@
-function Canvas(id) {
-  this.id     = id;
-}
+function Canvas(id) { this.id = id; }
 
 Object.defineProperty(Canvas.prototype, 'canvas', {
   get: function() { return document.getElementById(this.id); }
@@ -64,6 +62,12 @@ front.textAlignments = [
   { xPlus: -15, yPlus: -15, textAlign: 'right'},
   { xPlus: 15,  yPlus: -15, textAlign: 'left' }
 ]
+
+Object.defineProperty(front, 'infodiv', {
+  get: function() {
+    return document.getElementById('infodiv');
+  }
+});
 
 back.shapes = [];
 

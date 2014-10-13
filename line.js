@@ -160,7 +160,7 @@ Line.prototype.copy = function() {
     new Point(this.start.x, this.start.y),
     new Point(this.end.x, this.end.y)
   );
-  newLine.fixedRotation = this.fixedRotation;
+  if(this.fixedRotation) newLine.fixedRotation = this.fixedRotation.copy();
   newLine.fixedLength = this.fixedLength;
   return newLine;
 }

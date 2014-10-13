@@ -70,6 +70,21 @@ function Point(x, y) {
       return this;
     }
   }
+
+  this.preview = function() {
+    new AxisPair(this).sketch(middle.context);
+    var angle = Angle.from(front.startPoint, front.lastPoint);
+    var textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
+    middle.save();
+      middle.context.textAlign = textAlignment.textAlign;
+      middle.context.fillText(
+        'x: '   + Math.round(front.startPoint.x) +
+        ', y: ' + Math.round(front.startPoint.y),
+        this.x + textAlignment.xPlus,
+        this.y + textAlignment.yPlus
+      );
+    middle.restore();
+  }
 }
 
 Point.from = function(point) {

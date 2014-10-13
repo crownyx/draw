@@ -69,30 +69,19 @@ function commandMode() {
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
 
-  front.infopanel.replaceChild(
-    (function(div) {
-      div.appendChild((function(b) {
-        b.className = "center";
-        b.textContent = "click on canvas to begin drawing";
-        return b;
-      })(document.createElement('b'))),
-      div.id = "infodiv";
-      return div;
-    })(document.createElement('div')),
-    document.getElementById('infodiv')
-  );
+  var helpText = [{
+    className: 'box',
+    textContent: 'click on canvas to begin drawing'
+  }];
 
   if(back.shapes.length) {
-    document.getElementById('infodiv').appendChild(document.createElement('br'));
-    document.getElementById('infodiv').appendChild((function(b) {
-      b.textContent = "[s]: select shape(s)";
-      return b;
-    })(document.createElement('b')));
-    document.getElementById('infodiv').appendChild((function(b) {
-      b.textContent = "[e]: edit shape(s)";
-      return b;
-    })(document.createElement('b')));
+    helpText.push(
+      { className: 'button', textContent: 's:select shape(s)', color: 'gray' },
+      { className: 'button', textContent: 'e:edit shape(s)', color: 'gray' }
+    )
   }
+
+  replaceInfoText(helpText);
 
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = front.lastPoint;

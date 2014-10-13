@@ -1,5 +1,5 @@
 function editMode() {
-  replaceInfoText([{ text: 'select point', className: 'center' }]);
+  replaceInfoText([{ textContent: 'select point', className: 'box' }]);
 
   var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
 
@@ -50,10 +50,32 @@ function editMode() {
         back.refresh();
 
         if(nearPoint.same(shape.center)) {
+          replaceInfoText([
+            {
+              className: 'button',
+              textContent: 't:translate',
+              color: 'gray'
+            },
+            {
+              className: 'button',
+              textContent: 'r:rotate',
+              color: 'gray'
+            },
+            {
+              className: 'button',
+              textContent: 'esc:cancel',
+              color: 'red'
+            }
+          ]);
+          shape.draw(middle.context, { strokeStyle: 'blue' });
           front.startPoint = shape.center;
-          shape.draw(middle.context);
-          var origDiff = { x: shape.origin.x - nearPoint.x, y: shape.origin.y - nearPoint.y };
-          translate(shape, origDiff);
+          shape.center.preview();
+          window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
+            switch(e.which) {
+              case charCodes['t']: translate(new Group([shape.copy()]), nearPoint); break;
+              case charCodes['r']: rotate(new Group([shape.copy()]), nearPoint); break;
+            }
+          });
         } else {
           switch(shape.constructor) {
             case Arc:
