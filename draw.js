@@ -22,33 +22,47 @@ window.onload = function() {
   front.canvas.addEventListener('mousemove', setLastPoint = function(e) {
     front.lastPoint = Point.from(e);
   }, false);
-  front.canvas.addEventListener('mousemove', function() { front.showAxes(); }, false);
-  front.canvas.addEventListener('mousemove', function() { front.showPos();  }, false);
+  front.canvas.addEventListener('mousemove', function(e) { front.showAxes(e); }, false);
+  front.canvas.addEventListener('mousemove', function(e) { front.showPos(e); }, false);
 
   window.addEventListener('keydown', function(e) {
     if(!e.shiftKey && e.which == charCodes['g']) {
       getInput(
-        { main: 'enter point', subtext: '(x,y)' },
+        { main: 'enter point:', subtext: '(x,y)' },
         function(xy) {
-          var x = parseInt(xy.split(',')[0]);
-          var y = parseInt(xy.split(',')[1]);
-          front.lastPoint = new Point(x, y);
-          front.clear();
-          front.showAxes();
-          front.showPos();
-          front.canvas.removeEventListener('mousemove', setLastPoint, false);
-          if(middle.shape) {
-            middle.shape.setEnd(front.lastPoint);
-            middle.clear();
-            middle.shape.preview();
-          }
-          front.canvas.addEventListener('click', resumeSetLastPoint = function() {
-            front.canvas.removeEventListener('click', resumeSetLastPoint, false);
+          if(xy == 'x') {
             front.canvas.addEventListener('mousemove', setLastPoint, false);
-          }, false);
+            front.eventListeners.remove('showSetPoint');
+          } else {
+            var x = parseInt(xy.split(',')[0]);
+            var y = parseInt(xy.split(',')[1]);
+            setPoint = new Point(x, y);
+            front.lastPoint = setPoint;
+            front.canvas.removeEventListener('mousemove', setLastPoint, false);
+            front.eventListeners.add('mousemove', 'showSetPoint', function() {
+              new AxisPair(setPoint).sketch(front.context);
+            });
+            front.canvas.addEventListener('click', resumeSetLastPoint = function(e) {
+              front.eventListeners.remove('showSetPoint');
+              front.canvas.removeEventListener('click', resumeSetLastPoint, false);
+              front.canvas.addEventListener('mousemove', setLastPoint, false);
+            }, false);
+          }
+          middle.redraw();
         },
-        [{ charCode: charCodes['comma'], character: ',' }]
+        [
+          {
+            charCode: charCodes['comma'],
+            character: ','
+          },
+          {
+            charCode: charCodes['x'],
+            character: 'x'
+          }
+        ]
       );
+    } else if(e.which == charCodes['esc']) {
+      front.canvas.addEventListener('mousemove', setLastPoint, false);
     }
   }, false);
 
@@ -72,13 +86,18 @@ function commandMode() {
   var helpText = [{
     className: 'box',
     textContent: 'click on canvas to begin drawing'
+  },
+  {
+    className: 'button',
+    textContent: 'g:go to point',
+    color: 'yellow'
   }];
 
   if(back.shapes.length) {
-    helpText.push(
-      { className: 'button', textContent: 's:select shape(s)', color: 'gray' },
-      { className: 'button', textContent: 'e:edit shape(s)', color: 'gray' }
-    )
+    helpText.splice(1, 0,
+      { className: 'button', textContent: 's:select shape(s)', color: 'green' },
+      { className: 'button', textContent: 'e:edit shape(s)', color: 'green' }
+    );
   }
 
   replaceInfoText(helpText);
@@ -137,9 +156,11 @@ function EventListenerCollection(receiver) {
     },
     remove: function(callbackName) {
       var cb = this.active[callbackName];
-      receiver.removeEventListener(cb.eventType, cb.callback, false);
-      delete this.active[callbackName];
-      return cb;
+      if(cb) {
+        receiver.removeEventListener(cb.eventType, cb.callback, false);
+        delete this.active[callbackName];
+        return cb;
+      }
     },
     suspend: function(callbackName) {
       var cb = this.find(callbackName);

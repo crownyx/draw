@@ -1,11 +1,9 @@
 9/16
 
 set angle in rotation
-go to point in translation
 
 9/17
 
-goTo point before drawing
 after shiftCommand callback, update infoText
 select rotation: create axes and move degree text
 finish shiftCOmmands for all shapes
@@ -30,6 +28,14 @@ turn off settings (eg fixedLength)
 
 finish bezier curves: preview, shiftCommands
 start triangle
+
+10/13
+
+edit by changing points directly
+
+10/14
+
+using go to while rotating: on first mousemove, shape rotates again.  Issue with subtracting old angle
 
 long term:
 

@@ -77,6 +77,7 @@ Circle.prototype.drawPath = function(context) {
 Circle.prototype.preview = function() {
   this.radius.preview(true);
   this.draw(middle.context);
+  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }
 
 Circle.prototype.fill = function(context) {
@@ -89,7 +90,7 @@ Circle.prototype.infoText = function() {
   return(
     'radius length: '    + commaSep(Math.round(this.radius.length)) +
     ' | circumference: ' + commaSep(Math.round(this.circumference)) +
-    ' | area: '          + commaSep(Math.round(this.area)         )
+    ' | area: '          + commaSep(Math.round(this.area         ))
   );
 }
 

@@ -33,7 +33,7 @@ function design(shape) {
     ].map(function(command) {
       return({
         className: 'button',
-        color: 'gray',
+        color: 'green',
         textContent: command
       });
     })
@@ -41,6 +41,11 @@ function design(shape) {
     className: 'button',
     color: 'yellow',
     textContent: 'i:show/hide info'
+  },
+  {
+    className: 'button',
+    color: 'yellow',
+    textContent: 'g:go to point'
   }).concat(
     shape.shiftCommands.map(function(command) {
       return({
@@ -49,7 +54,7 @@ function design(shape) {
         textContent: command.key.toUpperCase() + ':' + (command.type || 'set') + ' ' + command.forWhat
       });
     }),
-    { className: 'button', textContent: 'esc:stop drawing', color: 'red' }
+    { className: 'button', textContent: 'esc:cancel', color: 'red' }
   ));
 
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {

@@ -28,32 +28,37 @@ var front  = new Canvas('frontlayer');
 var middle = new Canvas('drawlayer');
 var back   = new Canvas('backlayer');
 
-front.showPos = function() {
-  var angle = Angle.from(this.startPoint, this.lastPoint);
+front.setPoints = [];
+
+front.showPos = function(e) {
+  var currPoint = Point.from(e);
+  var angle = Angle.from(this.startPoint, currPoint);
   var textAlignment = this.textAlignments[angle.quadrant - 1];
   this.context.save();
     this.context.textAlign = textAlignment.textAlign;
     this.context.fillText(
-      "x: "   + this.lastPoint.x +
-      ", y: " + this.lastPoint.y,
-      this.lastPoint.x + textAlignment.xPlus,
-      this.lastPoint.y + textAlignment.yPlus
+      "x: "   + currPoint.x +
+      ", y: " + currPoint.y,
+      currPoint.x + textAlignment.xPlus,
+      currPoint.y + textAlignment.yPlus
     );
   this.context.restore();
 };
 
-front.showAxes = function() {
+front.showAxes = function(e) {
   this.context.lineWidth = 0.5;
-    new AxisPair(this.lastPoint).draw(this.context);
+    new AxisPair(Point.from(e)).draw(this.context);
   this.context.lineWidth = 1;
 }
 
 front.refresh = function() {
   this.clear();
 
-  this.showPos();
-  this.showAxes();
+  this.showPos(this.lastPoint);
+  this.showAxes(this.lastPoint);
   this.eventListeners.clear();
+
+  this.setPoints = [];
 }
 
 front.textAlignments = [
@@ -81,4 +86,8 @@ middle.showText = true;
 middle.refresh = function() {
   this.clear();
   delete this.shape;
+  delete this.group;
+  this.redraw = function() { }
 }
+
+middle.redraw = function() { }

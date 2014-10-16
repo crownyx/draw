@@ -18,20 +18,6 @@ function Line(start, end) {
       }
     },
     {
-      key: 'e',
-      forWhat: 'endpoint',
-      subtext: '(x & y coordinates separated by comma)',
-      callback: function(xy) {
-        var x = parseInt(xy.split(',')[0]), y = parseInt(xy.split(',')[1]);
-        var refLine = new Line(line.start, new Point(x, y));
-        line.fixedRotation = refLine.angle;
-        line.fixedLength = refLine.length;
-      },
-      acceptChars: [
-        { charCode: charCodes['comma'], character: ',' }
-      ]
-    },
-    {
       key: 'l',
       forWhat: 'length',
       callback: function(length) { line.fixedLength = parseInt(length); }

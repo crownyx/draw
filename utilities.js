@@ -1,18 +1,26 @@
 function getInput(promptText, propToFill, acceptChars, shape) {
   var mainText = promptText.main || promptText;
 
-  var textToAdd = [{ className: 'center red', text: mainText, id: 'inputdiv' }];
-  textToAdd.splice(1, 0, (function() {
-    var b = document.createElement('b');
-    b.className = 'center';
-    return b;
-  })());
-  if(promptText.subtext)
-    textToAdd.push({ className: 'center red', text: promptText.subtext });
-  textToAdd.push('', '[esc]: cancel');
-  var replacement = replaceInfoText(textToAdd, 1);
+  var replacement = replaceInfoText([{
+    className: 'box',
+    textContent: mainText,
+    id: 'inputbox'
+  },
+  {
+    className: 'button',
+    textContent: 'esc:cancel',
+    color: 'red'
+  }]);
 
-  var b = replacement.bs[1];
+  var inputbox = document.getElementById('inputbox');
+  var inputfield = document.createElement('div');
+  inputbox.appendChild(inputfield);
+
+  if(promptText.subtext) {
+    var subtext = document.createElement('div');
+    subtext.textContent = promptText.subtext;
+    inputbox.appendChild(subtext);
+  }
 
   window.eventListeners.suspendAll();
 
@@ -21,7 +29,7 @@ function getInput(promptText, propToFill, acceptChars, shape) {
 
   window.eventListeners.add('keydown', 'getInput', function(e) {
     if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
-      b.textContent += (e.which - charCodes.zero);
+      inputfield.textContent += (e.which - charCodes.zero);
       input.push(e.which - charCodes.zero);
     } else if((function() {
         var found = acceptChars.find(function(acceptChar) {
@@ -31,7 +39,7 @@ function getInput(promptText, propToFill, acceptChars, shape) {
         return acceptedChar;
       })())
     {
-      b.textContent += acceptedChar;
+      inputfield.textContent += acceptedChar;
       input.push(acceptedChar);
     } else if(e.which == charCodes['enter']) {
       window.eventListeners.remove('getInput');
@@ -42,7 +50,7 @@ function getInput(promptText, propToFill, acceptChars, shape) {
       if(shape) shape.setEnd(front.lastPoint);
       if(shape) shape.preview();
     } else if(e.which == charCodes['backspace']) {
-      b.textContent = b.textContent.slice(0, -1);
+      inputfield.textContent = inputfield.textContent.slice(0, -1);
       input.pop();
     } else if(e.which == charCodes['esc']) {
       window.eventListeners.remove('getInput');
@@ -64,6 +72,7 @@ function replaceInfoText(itemsToAdd) {
     } else {
       div = document.createElement('div');
       div.className = item.className;
+      div.id = item.id;
       div.textContent = item.textContent;
     }
     newdiv.appendChild(div);
@@ -71,16 +80,20 @@ function replaceInfoText(itemsToAdd) {
   });
   document.getElementById('infopanel').replaceChild(newdiv, infodiv);
 
-  itemsToAdd.forEach(function(button) {
-    if(button.button) {
-      var keySegment = button.getElementsByClassName('key_segment')[0];
-      var textSegment = button.getElementsByClassName('text_segment')[0];
-      keySegment.style.width  = document.getElementById('infodiv').clientWidth * 0.2 + 'px';
-      textSegment.style.width = document.getElementById('infodiv').clientWidth - parseInt(keySegment.style.width) - 30 + 'px';
-      keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 5 + 'px';
-      keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 5 - textSegment.clientHeight + 10) / 2 + 'px';
-    }
-  });
+  (adjustSizes = function() {
+    itemsToAdd.forEach(function(button) {
+      if(button.button) {
+        var keySegment = button.getElementsByClassName('key_segment')[0];
+        var textSegment = button.getElementsByClassName('text_segment')[0];
+        var clientWidth = document.getElementById('infodiv').clientWidth;
+        keySegment.style.width  = clientWidth * 0.2 + 'px';
+        textSegment.style.width = clientWidth - parseInt(keySegment.style.width) - 30 + 'px';
+        keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 5 + 'px';
+        if(document.getElementById('infodiv').clientWidth != clientWidth) adjustSizes();
+        keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 5 - textSegment.clientHeight + 10) / 2 + 'px';
+      }
+    });
+  })();
 
   return { olddiv: infodiv, newdiv: newdiv, bs: itemsToAdd };
 }

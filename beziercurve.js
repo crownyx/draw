@@ -59,6 +59,7 @@ BezierCurve.prototype.nextStep = function() {
   this.preview = function() {
     new Line(this.start, this.control1).preview(true);
     new Line(this.end, this.control1).sketch(middle.context);
+    new AxisPair(this.end).sketch(middle.context);
     this.draw(middle.context);
   }
   this.nextStep = function() {
@@ -69,6 +70,8 @@ BezierCurve.prototype.nextStep = function() {
       this.preview = function() {
         new Line(this.start, this.control1).preview(true);
         new Line(this.end, this.control2).sketch(middle.context);
+        new AxisPair(this.end).sketch(middle.context);
+        new AxisPair(this.control1).sketch(middle.context);
         this.draw(middle.context);
       }
       this.nextStep = Shape.prototype.nextStep;

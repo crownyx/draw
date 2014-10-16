@@ -64,12 +64,12 @@ function editMode() {
             {
               className: 'button',
               textContent: 't:translate',
-              color: 'gray'
+              color: 'green'
             },
             {
               className: 'button',
               textContent: 'r:rotate',
-              color: 'gray'
+              color: 'green'
             },
             {
               className: 'button',

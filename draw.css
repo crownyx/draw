@@ -68,4 +68,10 @@ canvas {
 #infodiv div.button.red div.key_segment { background-color: rgb(160,100,100); }
 #infodiv div.button.red div.text_segment { background-color: rgb(240,150,150); }
 
+#infodiv div.button.brown div.key_segment { background-color: rgb(120,60,18) }
+#infodiv div.button.brown div.text_segment { background-color: rgb(160,80,24) }
+
+#infodiv div.button.green div.key_segment { background-color: rgb(100,160,100) }
+#infodiv div.button.green div.text_segment { background-color: rgb(150,240,150) }
+
 #infodiv div.button div.key_segment span { position: relative; }
