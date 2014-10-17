@@ -28,8 +28,6 @@ var front  = new Canvas('frontlayer');
 var middle = new Canvas('drawlayer');
 var back   = new Canvas('backlayer');
 
-front.setPoints = [];
-
 front.showPos = function(e) {
   var currPoint = Point.from(e);
   var angle = Angle.from(this.startPoint, currPoint);
@@ -57,8 +55,6 @@ front.refresh = function() {
   this.showPos(this.lastPoint);
   this.showAxes(this.lastPoint);
   this.eventListeners.clear();
-
-  this.setPoints = [];
 }
 
 front.textAlignments = [

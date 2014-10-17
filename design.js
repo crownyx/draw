@@ -7,7 +7,7 @@ function design(shape) {
     if(e.which == charCodes['esc']) changeMode(commandMode);
   });
 
-  front.eventListeners.add('mousemove', 'setEnd', function(e) { shape.setEnd(front.lastPoint); });
+  front.eventListeners.add('mousemove', 'setEnd', function(e) { shape.setEnd(front.setPoint || front.lastPoint); });
 
   front.eventListeners.add('mousemove', 'previewShape', refreshMiddle = function()  {
     middle.clear();
