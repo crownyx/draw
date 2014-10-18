@@ -29,7 +29,7 @@ var middle = new Canvas('drawlayer');
 var back   = new Canvas('backlayer');
 
 front.showPos = function(e) {
-  var currPoint = Point.from(e);
+  var currPoint = e ? Point.from(e) : this.lastPoint;
   var angle = Angle.from(this.startPoint, currPoint);
   var textAlignment = this.textAlignments[angle.quadrant - 1];
   this.context.save();
@@ -43,18 +43,23 @@ front.showPos = function(e) {
   this.context.restore();
 };
 
-front.showAxes = function(e) {
+front.showAxes = function() {
   this.context.lineWidth = 0.5;
-    new AxisPair(Point.from(e)).draw(this.context);
+    new AxisPair(this.lastPoint).draw(this.context);
   this.context.lineWidth = 1;
 }
 
 front.refresh = function() {
   this.clear();
 
-  this.showPos(this.lastPoint);
-  this.showAxes(this.lastPoint);
+  this.showPos();
+  this.showAxes();
   this.eventListeners.clear();
+
+  if(this.setPoint) {
+    this.showPos(this.setPoint);
+    new AxisPair(this.setPoint).sketch(this.context);
+  }
 }
 
 front.textAlignments = [
@@ -74,7 +79,9 @@ back.shapes = [];
 
 back.refresh = function() {
   this.clear();
-  this.shapes.forEach(function(shape) { shape.draw(this.context); }, this);
+  this.shapes.forEach(function(shape) {
+    shape.draw(this.context);
+  }, this);
 }
 
 middle.showText = true;

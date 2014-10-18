@@ -14,7 +14,10 @@ function design(shape) {
     shape.preview();
   });
 
-  front.eventListeners.add('click', 'nextStep', function()  { shape.nextStep(); });
+  front.eventListeners.add('click', 'nextStep', function() {
+    delete front.setPoint;
+    shape.nextStep();
+  });
 
   shape.preview();
 

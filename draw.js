@@ -20,8 +20,14 @@ window.onload = function() {
 
   front.canvas.addEventListener('mousemove', function()  { front.clear(); }, false);
   front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = Point.from(e); }, false);
-  front.canvas.addEventListener('mousemove', function(e) { front.showAxes(e); }, false);
-  front.canvas.addEventListener('mousemove', function(e) { front.showPos(e); }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.showAxes(); }, false);
+  front.canvas.addEventListener('mousemove', function()  { front.showPos(); }, false);
+  front.canvas.addEventListener('mousemove', function()  {
+    if(front.setPoint) {
+      front.showPos(front.setPoint);
+      new AxisPair(front.setPoint).sketch(front.context);
+    }
+  }, false);
 
   window.addEventListener('keydown', function(e) {
     if(!e.shiftKey && e.which == charCodes['g']) {
@@ -29,44 +35,25 @@ window.onload = function() {
         { main: 'enter point:', subtext: '(x,y)' },
         function(xy) {
           if(xy == 'x') {
-            front.eventListeners.remove('showSetPoint');
             delete front.setPoint;
           } else {
             var x = parseInt(xy.split(',')[0]);
             var y = parseInt(xy.split(',')[1]);
-            setPoint = new Point(x, y);
-            front.setPoint = setPoint;
-
-            /* showSetPoint */ function showSetPoint() {
-            /*              */   front.context.fillText(
-            /*              */     "x: "   + setPoint.x + ", y: " + setPoint.y, setPoint.x + 10, setPoint.y - 10
-            /*              */   );
-            /*              */   new AxisPair(setPoint).sketch(front.context);
-            /*              */ }
-            /*              */ showSetPoint();
-
-            front.eventListeners.add('mousemove', 'showSetPoint', function() { showSetPoint(); });
-            front.canvas.addEventListener('click', resumeSetLastPoint = function(e) {
-              front.eventListeners.remove('showSetPoint');
-              delete front.setPoint;
-              front.canvas.removeEventListener('click', resumeSetLastPoint, false);
-            }, false);
+            front.setPoint = new Point(x, y);
           }
-          middle.redraw();
+          front.showPos(front.setPoint);
+          new AxisPair(front.setPoint).sketch(front.context);
+          if(middle.shape) {
+            middle.shape.setEnd(front.setPoint);
+            middle.clear();
+            middle.shape.preview();
+          }
         },
         [
-          {
-            charCode: charCodes['comma'],
-            character: ','
-          },
-          {
-            charCode: charCodes['x'],
-            character: 'x'
-          }
+          { charCode: charCodes['comma'], character: ',' },
+          { charCode: charCodes['x'], character: 'x' }
         ]
       );
-    } else if(e.which == charCodes['esc']) {
-      front.canvas.addEventListener('mousemove', setLastPoint, false);
     }
   }, false);
 
@@ -108,8 +95,9 @@ function commandMode() {
 
   front.eventListeners.add('click', 'design', function(e) {
     front.startPoint = front.setPoint || front.lastPoint;
+    delete front.setPoint;
     changeMode();
-    design(new Line(front.startPoint, front.startPoint));
+    design(new Line(front.startPoint, front.lastPoint));
     window.eventListeners.add('keydown', 'drawCommands', drawCommands);
   });
 
@@ -126,17 +114,17 @@ function drawCommands(e) {
     var shape = (function() {
       switch(e.which) {
         case charCodes['a']:
-          return new Arc(front.startPoint, front.lastPoint);
+          return new Arc(front.startPoint, front.setPoint || front.lastPoint);
         case charCodes['b']:
-          return new BezierCurve(front.startPoint, front.lastPoint);
+          return new BezierCurve(front.startPoint, front.setPoint || front.lastPoint);
         case charCodes['c']:
-          return new Circle(front.startPoint, front.lastPoint);
+          return new Circle(front.startPoint, front.setPoint || front.lastPoint);
         case charCodes['e']:
-          return new Ellipse(front.startPoint, front.lastPoint);
+          return new Ellipse(front.startPoint, front.setPoint || front.lastPoint);
         case charCodes['l']:
-          return new Line(front.startPoint, front.lastPoint);
+          return new Line(front.startPoint, front.setPoint || front.lastPoint);
         case charCodes['r']:
-          return new Rectangle(front.startPoint, front.lastPoint);
+          return new Rectangle(front.startPoint, front.setPoint || front.lastPoint);
       }
     })();
     if(shape) { window.designShape(shape); }
