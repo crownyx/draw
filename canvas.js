@@ -90,7 +90,4 @@ middle.refresh = function() {
   this.clear();
   delete this.shape;
   delete this.group;
-  this.redraw = function() { }
 }
-
-middle.redraw = function() { }

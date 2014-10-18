@@ -4,23 +4,27 @@ function translate(group, refPoint) {
   front.startPoint = refPoint;
 
   middle.group = group;
-  middle.group.translating = true;
+
 
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 
-  /* middle.redraw */ middle.redraw = function() {
-  /*               */   this.clear();
-  /*               */   var translationPath = new Line(front.startPoint, front.lastPoint);
-  /*               */   translationPath.preview(true);
-  /*               */   front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
-  /*               */   this.group.shapes.forEach(function(shape) {
-  /*               */     shape.refLine.translate(front.lastPoint);
-  /*               */     shape.translate(shape.refLine.end);
-  /*               */   });
-  /*               */   this.group.draw(middle.context);
-  /*               */ }
+  middle.group.setEnd = function(point) {
+    this.shapes.forEach(function(shape) {
+      shape.refLine.translate(point);
+      shape.translate(shape.refLine.end);
+    });
+  }
 
-  middle.redraw();
+  middle.group.preview = function() {
+    var translationPath = new Line(front.startPoint, front.setPoint || front.lastPoint);
+    translationPath.preview(true);
+    front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
+    this.draw(middle.context);
+  }
+
+  middle.group.setEnd(front.setPoint || front.lastPoint);
+  middle.clear();
+  middle.group.preview();
 
   replaceInfoText([
     {
@@ -35,12 +39,14 @@ function translate(group, refPoint) {
   ]);
 
   front.eventListeners.add('mousemove', 'moveGroup', function() {
-    middle.redraw();
+    middle.group.setEnd(front.setPoint || front.lastPoint);
+    middle.clear();
+    middle.group.preview();
   });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.redraw();
-    group.shapes.forEach(function(shape) {
+    middle.group.setEnd(front.setPoint || front.lastPoint);
+    middle.group.shapes.forEach(function(shape) {
       delete shape.refLine;
       shape.complete();
     });
@@ -58,7 +64,21 @@ function rotate(group, refPoint) {
   front.startPoint = refPoint;
 
   middle.group = group;
-  middle.group.rotating = true;
+
+  middle.group.setEnd = function(point) {
+    var angle = Angle.from(front.startPoint, point);
+    this.shapes.forEach(function(shape) {
+      shape.refLine.rotate(angle.minus(this.rotation));
+      shape.translate(shape.refLine.end);
+      shape.rotate(angle.minus(this.rotation));
+    }, this);
+    this.rotation = angle;
+  }
+
+  middle.group.preview = function() {
+    new Line(front.startPoint, front.setPoint || front.lastPoint).preview(true);
+    this.draw(middle.context);
+  }
 
   replaceInfoText([
     {
@@ -74,29 +94,21 @@ function rotate(group, refPoint) {
 
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 
-  group.rotation = Angle.from(refPoint, front.lastPoint);
+  group.rotation = new Angle(0);
 
-  /* middle.redraw */ middle.redraw = function() {
-  /*               */   this.clear();
-  /*               */   new Line(front.startPoint, front.lastPoint).preview(true);
-  /*               */   var angle = Angle.from(front.startPoint, front.lastPoint).minus(this.group.rotation);
-  /*               */   this.group.shapes.forEach(function(shape) {
-  /*               */     shape.refLine.rotate(angle);
-  /*               */     shape.translate(shape.refLine.end);
-  /*               */     shape.rotate(angle);
-  /*               */   });
-  /*               */   this.group.draw(this.context);
-  /*               */   this.group.rotation = Angle.from(front.startPoint, front.lastPoint);
-  /*               */ }
-
-  middle.redraw();
+  middle.group.setEnd(front.setPoint || front.lastPoint);
+  middle.clear();
+  middle.group.preview();
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
-    middle.redraw();
+    middle.group.setEnd(front.setPoint || front.lastPoint);
+    middle.clear();
+    middle.group.preview();
   });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.redraw();
+    middle.group.setEnd(front.setPoint || front.lastPoint);
+    middle.clear();
     group.shapes.forEach(function(shape) {
       delete shape.refLine;
       shape.complete();

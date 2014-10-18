@@ -41,12 +41,15 @@ window.onload = function() {
             var y = parseInt(xy.split(',')[1]);
             front.setPoint = new Point(x, y);
           }
+          front.clear();
+          front.showPos();
+          front.showAxes();
           front.showPos(front.setPoint);
           new AxisPair(front.setPoint).sketch(front.context);
-          if(middle.shape) {
-            middle.shape.setEnd(front.setPoint);
+          if(middle.shape || middle.group) {
+            (middle.shape || middle.group).setEnd(front.setPoint);
             middle.clear();
-            middle.shape.preview();
+            (middle.shape || middle.group).preview();
           }
         },
         [
@@ -71,7 +74,9 @@ function changeMode(mode) {
 }
 
 function commandMode() {
+  delete front.setPoint;
   front.startPoint = new Point(0, front.canvas.height);
+  front.refresh();
   front.lastPoint  = new Point(front.canvas.width, 0);
 
   var helpText = [{
@@ -93,7 +98,7 @@ function commandMode() {
 
   replaceInfoText(helpText);
 
-  front.eventListeners.add('click', 'design', function(e) {
+  front.eventListeners.add('click', 'design', function() {
     front.startPoint = front.setPoint || front.lastPoint;
     delete front.setPoint;
     changeMode();
