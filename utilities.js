@@ -88,6 +88,7 @@ function replaceInfoText(itemsToAdd) {
         var clientWidth = document.getElementById('infodiv').clientWidth;
         keySegment.style.width  = clientWidth * 0.2 + 'px';
         textSegment.style.width = clientWidth - parseInt(keySegment.style.width) - 30 + 'px';
+        button.style.width = parseInt(keySegment.style.width) + parseInt(textSegment.style.width) + 20 + 'px';
         keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 5 + 'px';
         if(document.getElementById('infodiv').clientWidth != clientWidth) adjustSizes();
         keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 5 - textSegment.clientHeight + 10) / 2 + 'px';

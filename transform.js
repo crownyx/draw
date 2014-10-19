@@ -66,13 +66,15 @@ function rotate(group, refPoint) {
   middle.group = group;
 
   middle.group.setEnd = function(point) {
-    var angle = Angle.from(front.startPoint, point);
-    this.shapes.forEach(function(shape) {
-      shape.refLine.rotate(angle.minus(this.rotation));
-      shape.translate(shape.refLine.end);
-      shape.rotate(angle.minus(this.rotation));
-    }, this);
-    this.rotation = angle;
+    if(point.distance(front.startPoint) > 5) {
+      var angle = Angle.from(front.startPoint, point);
+      this.shapes.forEach(function(shape) {
+        shape.refLine.rotate(angle.minus(this.rotation));
+        shape.translate(shape.refLine.end);
+        shape.rotate(angle.minus(this.rotation));
+      }, this);
+      this.rotation = angle;
+    }
   }
 
   middle.group.preview = function() {

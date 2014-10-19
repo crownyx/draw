@@ -2,7 +2,7 @@ function editMode() {
   replaceInfoText([
     {
       textContent: 'select point',
-      className: 'box'
+      className: 'box top'
     },
     {
       className: 'button',

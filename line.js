@@ -14,13 +14,25 @@ function Line(start, end) {
       forWhat: 'angle',
       subtext: '(in degrees)',
       callback: function(deg) {
-        line.fixedRotation = new Angle(parseInt(deg) / 180 * Math.PI);
-      }
+        if(deg == 'x') {
+          delete line.fixedRotation;
+        } else {
+          line.fixedRotation = new Angle(parseInt(deg) / 180 * Math.PI);
+        }
+      },
+      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
     },
     {
       key: 'l',
       forWhat: 'length',
-      callback: function(length) { line.fixedLength = parseInt(length); }
+      callback: function(length) {
+        if(length == 'x') {
+          delete line.fixedLength;
+        } else {
+          line.fixedLength = parseInt(length);
+        }
+      },
+      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
     },
   ];
 }

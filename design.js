@@ -22,7 +22,7 @@ function design(shape) {
   shape.preview();
 
   replaceInfoText([{
-    className: 'box',
+    className: 'box top',
     textContent: shape.name
   }].concat([
       'a:arc',

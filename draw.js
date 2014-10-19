@@ -35,19 +35,21 @@ window.onload = function() {
         { main: 'enter point:', subtext: '(x,y)' },
         function(xy) {
           if(xy == 'x') {
+            document.infodiv.bottom.clear();
             delete front.setPoint;
           } else {
             var x = parseInt(xy.split(',')[0]);
             var y = parseInt(xy.split(',')[1]);
             front.setPoint = new Point(x, y);
+            document.infodiv.bottom = 'To cancel set point, type "g", then enter "x"';
           }
           front.clear();
           front.showPos();
           front.showAxes();
-          front.showPos(front.setPoint);
-          new AxisPair(front.setPoint).sketch(front.context);
+          front.showPos(front.setPoint || front.lastPoint);
+          new AxisPair(front.setPoint || front.lastPoint).sketch(front.context);
           if(middle.shape || middle.group) {
-            (middle.shape || middle.group).setEnd(front.setPoint);
+            (middle.shape || middle.group).setEnd(front.setPoint || front.lastPoint);
             middle.clear();
             (middle.shape || middle.group).preview();
           }
@@ -62,6 +64,7 @@ window.onload = function() {
 
   this.refresh = function() { this.eventListeners.clear(); }
 
+  setUpInfoDiv();
   changeMode(commandMode);
 }
 
@@ -80,7 +83,7 @@ function commandMode() {
   front.lastPoint  = new Point(front.canvas.width, 0);
 
   var helpText = [{
-    className: 'box',
+    className: 'box top',
     textContent: 'click on canvas to begin drawing'
   },
   {

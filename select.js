@@ -4,7 +4,7 @@ function selectMode() {
 
   replaceInfoText([
     (function(box) {
-      box.className = 'box';
+      box.className = 'box top';
       box.textContent = 'select shape(s) by point(s)';
       return box;
     })(document.createElement('div'))
@@ -19,16 +19,16 @@ function selectMode() {
     var selectRect = new Rectangle(Point.from(e), front.lastPoint);
 
 
-/*selectedPoints:*/ function selectedPoints() {
-/*               */   var leftMost  = Math.min(selectRect.diagonal.end.x, selectRect.diagonal.start.x);
-/*               */   var rightMost = Math.max(selectRect.diagonal.end.x, selectRect.diagonal.start.x);
-/*               */   var upperMost = Math.min(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
-/*               */   var lowerMost = Math.max(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
-/*               */
-/*               */   return allPoints.filter(function(point) {
-/*               */     return(point.x > leftMost && point.x < rightMost && point.y > upperMost && point.y < lowerMost);
-/*               */   });
-/*               */ }
+    /*selectedPoints:*/ function selectedPoints() {
+    /*               */   var leftMost  = Math.min(selectRect.diagonal.end.x, selectRect.diagonal.start.x);
+    /*               */   var rightMost = Math.max(selectRect.diagonal.end.x, selectRect.diagonal.start.x);
+    /*               */   var upperMost = Math.min(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
+    /*               */   var lowerMost = Math.max(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
+    /*               */
+    /*               */   return allPoints.filter(function(point) {
+    /*               */     return(point.x > leftMost && point.x < rightMost && point.y > upperMost && point.y < lowerMost);
+    /*               */   });
+    /*               */ }
 
     front.eventListeners.add('mousemove', 'resizeSelection', function(e) {
       selectRect.setEnd(Point.from(e));
@@ -87,7 +87,7 @@ function deleteOrTransform(group) {
     return({
       className: 'button',
       textContent: buttonText,
-      color: 'gray'
+      color: 'green'
     });
   }).concat({
     className: 'button', textContent: 'esc:cancel', color: 'red'
