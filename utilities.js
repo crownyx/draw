@@ -61,42 +61,44 @@ function getInput(promptText, propToFill, acceptChars, shape) {
 }
 
 function replaceInfoText(itemsToAdd) {
-  var infodiv = document.getElementById('infodiv');
-  var newdiv = document.createElement('div');
-  newdiv.id = 'infodiv';
+  document.body.infodiv.top = itemsToAdd.splice(0, 1)[0];
+  document.body.infodiv.buttons = itemsToAdd;
+  //var infodiv = document.getElementById('infodiv');
+  //var newdiv = document.createElement('div');
+  //newdiv.id = 'infodiv';
 
-  itemsToAdd = itemsToAdd.map(function(item) {
-    var div;
-    if(item.className == 'button') {
-      div = generateButton(item.textContent.split(':')[0], item.textContent.split(':')[1], item.color);
-    } else {
-      div = document.createElement('div');
-      div.className = item.className;
-      div.id = item.id;
-      div.textContent = item.textContent;
-    }
-    newdiv.appendChild(div);
-    return div;
-  });
-  document.getElementById('infopanel').replaceChild(newdiv, infodiv);
+  //itemsToAdd = itemsToAdd.map(function(item) {
+  //  var div;
+  //  if(item.className == 'button') {
+  //    div = generateButton(item.textContent.split(':')[0], item.textContent.split(':')[1], item.color);
+  //  } else {
+  //    div = document.createElement('div');
+  //    div.className = item.className;
+  //    div.id = item.id;
+  //    div.textContent = item.textContent;
+  //  }
+  //  newdiv.appendChild(div);
+  //  return div;
+  //});
+  //document.getElementById('infopanel').replaceChild(newdiv, infodiv);
 
-  (adjustSizes = function() {
-    itemsToAdd.forEach(function(button) {
-      if(button.button) {
-        var keySegment = button.getElementsByClassName('key_segment')[0];
-        var textSegment = button.getElementsByClassName('text_segment')[0];
-        var clientWidth = document.getElementById('infodiv').clientWidth;
-        keySegment.style.width  = clientWidth * 0.2 + 'px';
-        textSegment.style.width = clientWidth - parseInt(keySegment.style.width) - 30 + 'px';
-        button.style.width = parseInt(keySegment.style.width) + parseInt(textSegment.style.width) + 20 + 'px';
-        keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 5 + 'px';
-        if(document.getElementById('infodiv').clientWidth != clientWidth) adjustSizes();
-        keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 5 - textSegment.clientHeight + 10) / 2 + 'px';
-      }
-    });
-  })();
+  //(adjustSizes = function() {
+  //  itemsToAdd.forEach(function(button) {
+  //    if(button.button) {
+  //      var keySegment = button.getElementsByClassName('key_segment')[0];
+  //      var textSegment = button.getElementsByClassName('text_segment')[0];
+  //      var clientWidth = document.getElementById('infodiv').clientWidth;
+  //      button.style.width = clientWidth + 'px';
+  //      keySegment.style.width  = clientWidth * 0.15 + 'px';
+  //      textSegment.style.width = clientWidth - parseFloat(keySegment.style.width) - 12 + 'px';
+  //      keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 3 + 'px';
+  //      keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 3 - textSegment.clientHeight + 6) / 2 + 'px';
+  //      if(document.getElementById('infodiv').clientWidth != clientWidth) adjustSizes();
+  //    }
+  //  });
+  //})();
 
-  return { olddiv: infodiv, newdiv: newdiv, bs: itemsToAdd };
+  //return { olddiv: infodiv, newdiv: newdiv, bs: itemsToAdd };
 }
 
 function generateButton(keyText, infoText, color) {

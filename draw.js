@@ -9,11 +9,8 @@ window.onload = function() {
   back.canvas.width    = window.innerWidth  - 202;
   back.canvas.height   = window.innerHeight - 40;
 
-  document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 42 + 'px';
+  document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 15 + 'px';
   document.getElementById('infopanel').style.height = window.innerHeight - 40 + 'px';
-
-  front.infopanel = document.getElementById('infopanel');
-  front.infopanel.infodiv = document.getElementById('infodiv');
 
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
