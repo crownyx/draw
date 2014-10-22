@@ -19,22 +19,21 @@ var infopanel = {
     this.adjustChildSizes();
   },
   get bottom() {
-    return {
-      clear: function() {
-        var boxBottom = document.getElementById('infopanel').getElementsByClassName('box bottom')[0];
-        if(boxBottom) document.getElementById('infopanel').removeChild(boxBottom);
-      },
-      get textContent() {
-        return document.getElementById('infopanel').getElementsByClassName('box bottom')[0].textContent;
-      }
-    }
+    var _infopanel = document.getElementById('infopanel');
+    var bottom = _infopanel.getElementsByClassName('box bottom')[0];
+    bottom.remove = function() { _infopanel.removeChild(bottom); }
+    return bottom;
   },
   set bottom(textContent) {
-    document.getElementById('infopanel').appendChild((function(box) {
-      box.className = "box bottom";
-      box.textContent = textContent;
-      return box;
-    })(document.createElement('div')));
+    var _infopanel = document.getElementById('infopanel');
+    var box = document.createElement('div');
+    box.className = 'box bottom';
+    box.textContent = textContent;
+    if(_infopanel.getElementsByClassName('box bottom').length) {
+      _infopanel.replaceChild(box, document.getElementsByClassName('box bottom')[0]);
+    } else {
+      _infopanel.appendChild(box);
+    }
     this.adjustChildSizes();
   },
   get buttons() {
@@ -54,7 +53,9 @@ var infopanel = {
   set buttons(buttonsArray) {
     var _infopanel = document.getElementById('infopanel');
     this.buttons.forEach(function(button) { _infopanel.removeChild(button); });
-    buttonsArray.forEach(function(button) { _infopanel.appendChild(button); });
+    buttonsArray.forEach(function(button) {
+      _infopanel.insertBefore(button, _infopanel.getElementsByClassName('box bottom')[0]);
+    });
     this.adjustChildSizes();
   },
   adjustChildSizes: function() {

@@ -1,20 +1,16 @@
 function getInput(promptText, propToFill, acceptChars, shape) {
   var mainText = promptText.main || promptText;
 
-  document.body.infodiv.top = (function(div) {
-    div.textContent = mainText;
-    div.id = 'inputbox';
-    return div;
-  })(document.createElement('div'));
+  var oldTop = infopanel.top.textContent;
+  infopanel.top = mainText;
 
-  var inputbox = document.getElementById('inputbox');
   var inputfield = document.createElement('div');
-  inputbox.appendChild(inputfield);
+  infopanel.top.appendChild(inputfield);
 
   if(promptText.subtext) {
     var subtext = document.createElement('div');
     subtext.textContent = promptText.subtext;
-    inputbox.appendChild(subtext);
+    infopanel.top.appendChild(subtext);
   }
 
   window.eventListeners.suspendAll();
@@ -39,7 +35,7 @@ function getInput(promptText, propToFill, acceptChars, shape) {
     } else if(e.which == charCodes['enter']) {
       window.eventListeners.remove('getInput');
       window.eventListeners.resumeAll();
-      document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
+      infopanel.top = oldTop;
       middle.clear();
       propToFill.call((shape || window), input.join(''));
       if(shape) shape.setEnd(front.lastPoint);
@@ -50,7 +46,7 @@ function getInput(promptText, propToFill, acceptChars, shape) {
     } else if(e.which == charCodes['esc']) {
       window.eventListeners.remove('getInput');
       window.eventListeners.resumeAll();
-      document.getElementById('infopanel').replaceChild(replacement.olddiv, replacement.newdiv);
+      infopanel.top = oldTop;
     }
   });
 }

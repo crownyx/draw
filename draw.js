@@ -32,13 +32,13 @@ window.onload = function() {
         { main: 'enter point:', subtext: '(x,y)' },
         function(xy) {
           if(xy == 'x') {
-            document.infodiv.bottom.clear();
+            infopanel.bottom.remove();
             delete front.setPoint;
           } else {
             var x = parseInt(xy.split(',')[0]);
             var y = parseInt(xy.split(',')[1]);
             front.setPoint = new Point(x, y);
-            document.infodiv.bottom = 'To cancel set point, type "g", then enter "x"';
+            infopanel.bottom = 'To cancel set point, type "g", then enter "x"';
           }
           front.clear();
           front.showPos();

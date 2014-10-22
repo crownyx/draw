@@ -21,10 +21,12 @@ canvas {
   color: white;
 }
 
+#infopanel div.box.top { border-top: 1px solid white; }
+
 #infopanel div.box.bottom {
   margin-top: 3px;
-  border-top: 1px solid white;
   border-bottom: 1px solid white;
+  padding: 3px;
 }
 
 #infopanel div.button {
