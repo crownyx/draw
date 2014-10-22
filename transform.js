@@ -26,17 +26,8 @@ function translate(group, refPoint) {
   middle.clear();
   middle.group.preview();
 
-  replaceInfoText([
-    {
-      className: 'box',
-      textContent: 'move shape(s), then click to save'
-    },
-    {
-      className: 'button',
-      textContent: 'esc:cancel',
-      color: 'red'
-    }
-  ]);
+  infopanel.top = 'move shape(s), then click to save';
+  infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
   front.eventListeners.add('mousemove', 'moveGroup', function() {
     middle.group.setEnd(front.setPoint || front.lastPoint);
@@ -82,17 +73,8 @@ function rotate(group, refPoint) {
     this.draw(middle.context);
   }
 
-  replaceInfoText([
-    {
-      className: 'box',
-      textContent: 'choose angle of rotation, then click.'
-    },
-    {
-      className: 'button',
-      textContent: 'esc:cancel',
-      color: 'red'
-    }
-  ]);
+  infopanel.top = 'choose angle of rotation, then click.';
+  infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 

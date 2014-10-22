@@ -11,59 +11,55 @@ canvas {
 #infopanel {
   position: absolute;
   top: 20px;
-  background-color: black;
-  overflow-y: auto;
+  font-size: small;
 }
 
-#infodiv { font-size: small; }
-
-#infodiv div.box {
+#infopanel div.box {
   text-align: center;
-  border-bottom: 1px solid black;
   margin-bottom: 3px;
   font-weight: bold;
   color: white;
 }
 
-#infodiv div.box.bottom {
+#infopanel div.box.bottom {
   margin-top: 3px;
-  border-top: 1px solid black;
-  background-color: gray;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
 }
 
-#infodiv div.button {
+#infopanel div.button {
   margin-top: 1px;
 }
 
-#infodiv div.button:last-child { margin-bottom: 3px; }
+#infopanel div.button:last-child { margin-bottom: 3px; }
 
-#infodiv div.button div {
+#infopanel div.button div {
   padding: 3px;
   display: inline-block;
 }
 
-#infodiv div.button div.key_segment {
+#infopanel div.button div.key_segment {
   text-align: center;
   font-weight: bold;
   color: white;
 }
 
-#infodiv div.button.gray div.key_segment { background-color: rgb(100,100,100); }
-#infodiv div.button.gray div.text_segment { background-color: rgb(150,150,150); }
+#infopanel div.button.gray div.key_segment { background-color: rgb(100,100,100); }
+#infopanel div.button.gray div.text_segment { background-color: rgb(150,150,150); }
 
-#infodiv div.button.blue div.key_segment { background-color: rgb(100,100,160); }
-#infodiv div.button.blue div.text_segment { background-color: rgb(150,150,240); }
+#infopanel div.button.blue div.key_segment { background-color: rgb(100,100,160); }
+#infopanel div.button.blue div.text_segment { background-color: rgb(150,150,240); }
 
-#infodiv div.button.yellow div.key_segment { background-color: rgb(160,160,100); }
-#infodiv div.button.yellow div.text_segment { background-color: rgb(240,240,150); }
+#infopanel div.button.yellow div.key_segment { background-color: rgb(160,160,100); }
+#infopanel div.button.yellow div.text_segment { background-color: rgb(240,240,150); }
 
-#infodiv div.button.red div.key_segment { background-color: rgb(160,100,100); }
-#infodiv div.button.red div.text_segment { background-color: rgb(240,150,150); }
+#infopanel div.button.red div.key_segment { background-color: rgb(160,100,100); }
+#infopanel div.button.red div.text_segment { background-color: rgb(240,150,150); }
 
-#infodiv div.button.brown div.key_segment { background-color: rgb(120,60,18) }
-#infodiv div.button.brown div.text_segment { background-color: rgb(160,80,24) }
+#infopanel div.button.brown div.key_segment { background-color: rgb(120,60,18) }
+#infopanel div.button.brown div.text_segment { background-color: rgb(160,80,24) }
 
-#infodiv div.button.green div.key_segment { background-color: rgb(100,160,100) }
-#infodiv div.button.green div.text_segment { background-color: rgb(150,240,150) }
+#infopanel div.button.green div.key_segment { background-color: rgb(100,160,100) }
+#infopanel div.button.green div.text_segment { background-color: rgb(150,240,150) }
 
-#infodiv div.button div.key_segment span { position: relative; }
+#infopanel div.button div.key_segment span { position: relative; }

@@ -2,13 +2,8 @@ function selectMode() {
   var selected = [];
   var selectedCopies = [];
 
-  replaceInfoText([
-    (function(box) {
-      box.className = 'box top';
-      box.textContent = 'select shape(s) by point(s)';
-      return box;
-    })(document.createElement('div'))
-  ]);
+  infopanel.top = 'select shape(s) by drawing rectangle around point(s)';
+  infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
   var allPoints = back.shapes.flatMap(function(shape) { return shape.points.values; });
   allPoints.forEach(function(point) { point.fill(middle.context); });
@@ -79,19 +74,13 @@ function selectMode() {
 }
 
 function deleteOrTransform(group) {
-  replaceInfoText([
-    'd:delete',
-    'r:rotate',
-    't:translate',
-  ].map(function(buttonText) {
-    return({
-      className: 'button',
-      textContent: buttonText,
-      color: 'green'
-    });
-  }).concat({
-    className: 'button', textContent: 'esc:cancel', color: 'red'
-  }));
+  infopanel.top.remove();
+  infopanel.buttons = [
+    Button('d',   'delete',    'green'),
+    Button('r',   'rotate',    'green'),
+    Button('t',   'translate', 'green'),
+    Button('esc', 'cancel',    'red')
+  ];
 
   window.eventListeners.add('keydown', 'selectCommands', function(e) {
     switch(e.which) {
@@ -120,16 +109,8 @@ function Group(shapes) {
 ////////////////////
 
 function translateGroup(group) {
-  replaceInfoText([{
-      className: 'box',
-      textContent: 'choose reference point for translation',
-    },
-    {
-      className: 'button',
-      textContent: 'esc:cancel',
-      color: 'red'
-    }
-  ]);
+  infopanel.top = 'click to choose reference point for translation';
+  infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
   var allPoints = group.shapes.flatMap(function(shape) { return shape.points.values; });
 
@@ -160,17 +141,8 @@ function translateGroup(group) {
 /////////////////
 
 function rotateGroup(group) {
-  replaceInfoText([
-    {
-      className: 'box',
-      textContent: 'click to choose center of rotation'
-    },
-    {
-      className: 'button',
-      textContent: 'esc:cancel',
-      color: 'red'
-    }
-  ]);
+  infopanel.top = 'click to choose center of rotation';
+  infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
   var allPoints = group.shapes.flatMap(function(shape) { return shape.points.values; });
 

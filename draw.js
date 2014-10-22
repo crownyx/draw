@@ -61,7 +61,6 @@ window.onload = function() {
 
   this.refresh = function() { this.eventListeners.clear(); }
 
-  setUpInfoDiv();
   changeMode(commandMode);
 }
 
@@ -79,24 +78,15 @@ function commandMode() {
   front.refresh();
   front.lastPoint  = new Point(front.canvas.width, 0);
 
-  var helpText = [{
-    className: 'box top',
-    textContent: 'click on canvas to begin drawing'
-  },
-  {
-    className: 'button',
-    textContent: 'g:go to point',
-    color: 'yellow'
-  }];
+  infopanel.top = 'click on canvas to begin drawing';
+  infopanel.buttons = [Button('g', 'go to point', 'yellow')];
 
   if(back.shapes.length) {
-    helpText.splice(1, 0,
-      { className: 'button', textContent: 's:select shape(s)', color: 'green' },
-      { className: 'button', textContent: 'e:edit shape(s)', color: 'green' }
+    infopanel.buttons.add(
+      Button('s', 'select shape(s)', 'green'),
+      Button('e', 'edit shape(s)', 'green')
     );
   }
-
-  replaceInfoText(helpText);
 
   front.eventListeners.add('click', 'design', function() {
     front.startPoint = front.setPoint || front.lastPoint;

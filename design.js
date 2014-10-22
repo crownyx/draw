@@ -21,44 +21,33 @@ function design(shape) {
 
   shape.preview();
 
-  replaceInfoText([{
-    className: 'box top',
-    textContent: shape.name
-  }].concat([
-      'a:arc',
-      'b:bezier curve',
-      'c:circle',
-      'e:ellipse',
-      'l:line',
-      'r:rectangle',
-      's:square',
-      't:triangle',
-    ].map(function(command) {
-      return({
-        className: 'button',
-        color: 'green',
-        textContent: command
-      });
-    })
-  ).concat({
-    className: 'button',
-    color: 'yellow',
-    textContent: 'i:show/hide info'
-  },
-  {
-    className: 'button',
-    color: 'yellow',
-    textContent: 'g:go to point'
-  }).concat(
-    shape.shiftCommands.map(function(command) {
-      return({
-        className: 'button',
-        color: 'blue',
-        textContent: command.key.toUpperCase() + ':' + (command.type || 'set') + ' ' + command.forWhat
-      });
-    }),
-    { className: 'button', textContent: 'esc:cancel', color: 'red' }
-  ));
+  /* set up infopanel */ infopanel.top = shape.name;
+  /*                  */ 
+  /*                  */ infopanel.buttons = [
+  /*                  */   Button('a', 'arc',          'green'),
+  /*                  */   Button('b', 'bezier curve', 'green'),
+  /*                  */   Button('c', 'circle',       'green'),
+  /*                  */   Button('e', 'ellipse',      'green'),
+  /*                  */   Button('l', 'line',         'green'),
+  /*                  */   Button('r', 'rectangle',    'green'),
+  /*                  */   Button('s', 'square',       'green'),
+  /*                  */   Button('t', 'triangle',     'green')
+  /*                  */ ];
+  /*                  */ 
+  /*                  */ infopanel.buttons.add(
+  /*                  */   Button('i', 'show/hide info', 'yellow'),
+  /*                  */   Button('g', 'go to point',    'yellow')
+  /*                  */ );
+  /*                  */ 
+  /*                  */ shape.shiftCommands.forEach(function(command) {
+  /*                  */   infopanel.buttons.add(Button(
+  /*                  */     command.key.toUpperCase(),
+  /*                  */     (command.type || 'set') + ' ' + command.forWhat,
+  /*                  */     'blue'
+  /*                  */   ));
+  /*                  */ });
+  /*                  */
+  /*                  */ infopanel.buttons.add(Button('esc', 'cancel', 'red'));
 
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
     if(e.which == charCodes['i']) {

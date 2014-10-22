@@ -1,15 +1,6 @@
 function editMode() {
-  replaceInfoText([
-    {
-      textContent: 'select point',
-      className: 'box top'
-    },
-    {
-      className: 'button',
-      textContent: 'esc:cancel',
-      color: 'red'
-    }
-  ]);
+  infopanel.top = 'select point';
+  infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
   var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
 
@@ -60,23 +51,12 @@ function editMode() {
         back.refresh();
 
         if(nearPoint.same(shape.center)) {
-          replaceInfoText([
-            {
-              className: 'button',
-              textContent: 't:translate',
-              color: 'green'
-            },
-            {
-              className: 'button',
-              textContent: 'r:rotate',
-              color: 'green'
-            },
-            {
-              className: 'button',
-              textContent: 'esc:cancel',
-              color: 'red'
-            }
-          ]);
+          infopanel.buttons = [
+            Button('t',   'translate', 'green'),
+            Button('r',   'rotate',    'green'),
+            Button('esc', 'cancel',    'red')
+          ];
+
           shape.draw(middle.context, { strokeStyle: 'blue' });
           front.startPoint = shape.center;
           shape.center.preview();
