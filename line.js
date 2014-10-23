@@ -12,7 +12,7 @@ function Line(start, end) {
     {
       key: 'a',
       forWhat: 'angle',
-      subtext: '(in degrees)',
+      subtext: '(degrees)',
       callback: function(deg) {
         if(deg == 'x') {
           delete line.fixedRotation;
@@ -148,9 +148,9 @@ Line.prototype.translate = function(point) {
 }
 
 Line.prototype.rotate = function(rotation) {
-  this.end = this.end.translate(this.start, rotation.rad);
+  this.end = this.end.translate(this.start, rotation);
   if(this.fixedRotation)
-    this.fixedRotation = new Angle(this.fixedRotation.rad + rotation.rad);
+    this.fixedRotation = this.fixedRotation.rad.plus(rotation);
 }
 
 Line.prototype.copy = function() {

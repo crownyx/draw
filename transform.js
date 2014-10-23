@@ -68,13 +68,19 @@ function rotate(group, refPoint) {
     }
   }
 
+  var targetPoint = front.setPoint || front.lastPoint;
+
   middle.group.preview = function() {
-    new Line(front.startPoint, front.setPoint || front.lastPoint).preview(true);
+    new Line(front.startPoint, targetPoint).preview(true);
     this.draw(middle.context);
   }
 
   infopanel.top = 'choose angle of rotation, then click.';
-  infopanel.buttons = [Button('esc', 'cancel', 'red')];
+  infopanel.buttons = [
+    Button('g', 'go to point', 'yellow'),
+    Button('A', 'set angle', 'blue'),
+    Button('esc', 'cancel', 'red')
+  ];
 
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 
@@ -85,13 +91,35 @@ function rotate(group, refPoint) {
   middle.group.preview();
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
-    middle.group.setEnd(front.setPoint || front.lastPoint);
-    middle.clear();
-    middle.group.preview();
+    if(!group.fixedRotation) {
+      targetPoint = front.setPoint || front.lastPoint;
+      middle.group.setEnd(targetPoint);
+      middle.clear();
+      middle.group.preview();
+    }
+  });
+
+  window.eventListeners.add('keydown', 'setAngle', function(e) {
+    if(e.shiftKey && e.which == charCodes['a']) {
+      getInput(
+        { main: 'enter angle:', subtext: '(degrees)' },
+        function(deg) {
+          if(deg == 'x') {
+            delete middle.group.fixedRotation;
+          } else {
+            middle.group.fixedRotation = true;
+            targetPoint = refPoint.plus(front.canvas.width).translate(refPoint, Angle.fromDeg(parseInt(deg)));
+            middle.group.setEnd(targetPoint);
+            middle.clear();
+            middle.group.preview();
+          }
+        }
+      );
+    }
   });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.group.setEnd(front.setPoint || front.lastPoint);
+    middle.group.setEnd(targetPoint);
     middle.clear();
     group.shapes.forEach(function(shape) {
       delete shape.refLine;

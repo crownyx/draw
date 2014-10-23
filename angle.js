@@ -38,3 +38,7 @@ Angle.from = function(start, end) {
     0
   );
 }
+
+Angle.fromDeg = function(deg) {
+  return new Angle(deg / 180 * Math.PI);
+}

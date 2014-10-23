@@ -1,4 +1,4 @@
-function getInput(promptText, propToFill, acceptChars, shape) {
+function getInput(promptText, propToFill, acceptChars = [], shape) {
   var mainText = promptText.main || promptText;
 
   var oldTop = infopanel.top.textContent;

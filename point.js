@@ -22,11 +22,11 @@ function Point(x, y) {
     context.restore();
   }
 
-  this.translate = function(refPoint, radians) {
+  this.translate = function(refPoint, rotation) {
     var refLine = new Line(refPoint, this);
     var origAngle = refLine.angle.rad;
-    var newPoint = new Point(refPoint.x + Math.cos(radians + origAngle) * refLine.length,
-                             refPoint.y + Math.sin(radians + origAngle) * refLine.length);
+    var newPoint = new Point(refPoint.x + Math.cos(rotation.rad + origAngle) * refLine.length,
+                             refPoint.y + Math.sin(rotation.rad + origAngle) * refLine.length);
     return newPoint;
   }
 
@@ -59,9 +59,9 @@ function Point(x, y) {
     return Math.sqrt(Math.pow(this.x - otherPoint.x, 2) + Math.pow(this.y - otherPoint.y, 2));
   }
 
-  this.copy = function() {
-    return new Point(this.x, this.y);
-  }
+  this.plus = function(x, y) { return new Point(this.x + x, this.y + (y || 0)); }
+
+  this.copy = function() { return new Point(this.x, this.y); }
 
   this.absolute = function() {
     if(this.shape) {
