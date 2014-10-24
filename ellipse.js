@@ -55,7 +55,7 @@ Object.defineProperty(Ellipse.prototype, 'points', {
       xLeft: new Point(this.center.x - this.xAxis.length, this.center.y),
       center: this.center
     }.map(function(name, point) {
-      var point = point.translate(this.origin, this.rotation.rad);
+      var point = point.translate(this.origin, this.rotation);
       point.shape = this;
       return point;
     }, this);
@@ -112,8 +112,8 @@ Ellipse.prototype.infoText = function() {
 
 Ellipse.prototype.setEnd = function(point) {
   var point = point.untranslate(this.origin, this.rotation);
-  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y).translate(this.origin, this.rotation.rad));
-  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y).translate(this.origin, this.rotation.rad));
+  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y).translate(this.origin, this.rotation));
+  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y).translate(this.origin, this.rotation));
 }
 
 Ellipse.prototype.rotate = function(rotation) {

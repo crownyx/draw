@@ -32,23 +32,22 @@ window.onload = function() {
         { main: 'enter point:', subtext: '(x,y)' },
         function(xy) {
           if(xy == 'x') {
-            infopanel.bottom.remove();
+            if(infopanel.bottom) infopanel.bottom.remove();
             delete front.setPoint;
           } else {
             var x = parseInt(xy.split(',')[0]);
             var y = parseInt(xy.split(',')[1]);
-            front.setPoint = new Point(x, y);
-            infopanel.bottom = 'To cancel set point, type "g", then enter "x"';
+            if(typeof x === 'number' && !isNaN(x) && typeof y === 'number' && !isNaN(y)) {
+              front.setPoint = new Point(x, y);
+              infopanel.bottom = 'To unchoose point, type "g", then enter "x"';
+            }
           }
-          front.clear();
-          front.showPos();
-          front.showAxes();
-          front.showPos(front.setPoint || front.lastPoint);
-          new AxisPair(front.setPoint || front.lastPoint).sketch(front.context);
+          front.redraw();
           if(middle.shape || middle.group) {
+            if(middle.group) delete middle.group.fixedRotation;
             (middle.shape || middle.group).setEnd(front.setPoint || front.lastPoint);
             middle.clear();
-            (middle.shape || middle.group).preview();
+            (middle.shape || middle.group).preview(front.setPoint || front.lastPoint);
           }
         },
         [
@@ -79,7 +78,7 @@ function commandMode() {
   front.lastPoint  = new Point(front.canvas.width, 0);
 
   infopanel.top = 'click on canvas to begin drawing';
-  infopanel.buttons = [Button('g', 'go to point', 'yellow')];
+  infopanel.buttons = [Button('g', 'choose point', 'yellow')];
 
   if(back.shapes.length) {
     infopanel.buttons.add(

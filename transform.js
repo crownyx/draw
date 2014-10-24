@@ -70,8 +70,8 @@ function rotate(group, refPoint) {
 
   var targetPoint = front.setPoint || front.lastPoint;
 
-  middle.group.preview = function() {
-    new Line(front.startPoint, targetPoint).preview(true);
+  middle.group.preview = function(point) {
+    new Line(front.startPoint, point).preview(true);
     this.draw(middle.context);
   }
 
@@ -88,14 +88,14 @@ function rotate(group, refPoint) {
 
   middle.group.setEnd(front.setPoint || front.lastPoint);
   middle.clear();
-  middle.group.preview();
+  middle.group.preview(targetPoint);
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
     if(!group.fixedRotation) {
       targetPoint = front.setPoint || front.lastPoint;
       middle.group.setEnd(targetPoint);
       middle.clear();
-      middle.group.preview();
+      middle.group.preview(targetPoint);
     }
   });
 
@@ -106,20 +106,29 @@ function rotate(group, refPoint) {
         function(deg) {
           if(deg == 'x') {
             delete middle.group.fixedRotation;
+            targetPoint = front.lastPoint;
           } else {
+            delete front.setPoint;
+            if(infopanel.bottom) infopanel.bottom.remove();
+            front.redraw();
             middle.group.fixedRotation = true;
-            targetPoint = refPoint.plus(front.canvas.width).translate(refPoint, Angle.fromDeg(parseInt(deg)));
-            middle.group.setEnd(targetPoint);
-            middle.clear();
-            middle.group.preview();
+            targetPoint = refPoint.plus(
+              front.canvas.width
+            ).translate(
+              refPoint, Angle.fromDeg(parseInt(deg))
+            );
           }
-        }
+          middle.group.setEnd(targetPoint);
+          middle.clear();
+          middle.group.preview(targetPoint);
+        },
+        [{ charCode: charCodes['x'], character: 'x' }]
       );
     }
   });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.group.setEnd(targetPoint);
+    middle.group.setEnd(front.setPoint || front.lastPoint);
     middle.clear();
     group.shapes.forEach(function(shape) {
       delete shape.refLine;

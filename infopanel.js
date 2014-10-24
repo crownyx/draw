@@ -21,7 +21,7 @@ var infopanel = {
   get bottom() {
     var _infopanel = document.getElementById('infopanel');
     var bottom = _infopanel.getElementsByClassName('box bottom')[0];
-    bottom.remove = function() { _infopanel.removeChild(bottom); }
+    if(bottom) bottom.remove = function() { if(bottom) _infopanel.removeChild(bottom); }
     return bottom;
   },
   set bottom(textContent) {

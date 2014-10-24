@@ -49,6 +49,17 @@ front.showAxes = function() {
   this.context.lineWidth = 1;
 }
 
+front.redraw = function() {
+  this.clear();
+  this.showPos();
+  this.showAxes();
+
+  if(this.setPoint) {
+    this.showPos(this.setPoint);
+    new AxisPair(this.setPoint).sketch(this.context);
+  }
+}
+
 front.refresh = function() {
   this.clear();
 
