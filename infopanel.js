@@ -13,15 +13,17 @@ var infopanel = {
     boxTop.id = 'boxtop';
     if(document.getElementById('boxtop')) {
       _infopanel.replaceChild(boxTop, document.getElementById('boxtop'));
+    } else if(this.buttons.length) {
+      _infopanel.insertBefore(boxTop, _infopanel.getElementsByClassName('button')[0]);
     } else {
       _infopanel.appendChild(boxTop);
     }
-    this.adjustChildSizes();
+    this.resizeButtons();
   },
   get bottom() {
     var _infopanel = document.getElementById('infopanel');
     var bottom = _infopanel.getElementsByClassName('box bottom')[0];
-    if(bottom) bottom.remove = function() { if(bottom) _infopanel.removeChild(bottom); }
+    if(bottom) bottom.remove = function() { _infopanel.removeChild(bottom); }
     return bottom;
   },
   set bottom(textContent) {
@@ -34,7 +36,7 @@ var infopanel = {
     } else {
       _infopanel.appendChild(box);
     }
-    this.adjustChildSizes();
+    this.resizeButtons();
   },
   get buttons() {
     var buttons = [];
@@ -46,7 +48,7 @@ var infopanel = {
       for(var i = 0; i < arguments.length; i++) {
         _infopanel.insertBefore(arguments[i], _infopanel.getElementsByClassName('box bottom')[0]);
       }
-      infopanel.adjustChildSizes();
+      infopanel.resizeButtons();
     }
     return buttons;
   },
@@ -56,19 +58,19 @@ var infopanel = {
     buttonsArray.forEach(function(button) {
       _infopanel.insertBefore(button, _infopanel.getElementsByClassName('box bottom')[0]);
     });
-    this.adjustChildSizes();
+    this.resizeButtons();
   },
-  adjustChildSizes: function() {
+  resizeButtons: function() {
     this.buttons.forEach(function(button) {
       var keySegment = button.getElementsByClassName('key_segment')[0];
       var textSegment = button.getElementsByClassName('text_segment')[0];
       var clientWidth = document.getElementById('infopanel').clientWidth;
       button.style.width = clientWidth + 'px';
       keySegment.style.width  = clientWidth * 0.15 + 'px';
-      textSegment.style.width = clientWidth - parseFloat(keySegment.style.width) - 12 + 'px';
+      textSegment.style.width = clientWidth - parseFloat(keySegment.style.width) - 18 + 'px';
       keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 3 + 'px';
       keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 3 - textSegment.clientHeight + 6) / 2 + 'px';
-      if(document.getElementById('infopanel').clientWidth != clientWidth) this.adjustChildSizes();
+      if(document.getElementById('infopanel').clientWidth != clientWidth) this.resizeButtons();
     }, this);
   }
 }

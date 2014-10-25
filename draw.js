@@ -3,14 +3,14 @@ window.onload = function() {
   front.eventListeners = new EventListenerCollection(front.canvas);
 
   front.canvas.width   = window.innerWidth  - 202;
-  front.canvas.height  = window.innerHeight - 40;
+  front.canvas.height  = window.innerHeight - 10;
   middle.canvas.width  = window.innerWidth  - 202;
-  middle.canvas.height = window.innerHeight - 40;
+  middle.canvas.height = window.innerHeight - 10;
   back.canvas.width    = window.innerWidth  - 202;
-  back.canvas.height   = window.innerHeight - 40;
+  back.canvas.height   = window.innerHeight - 10;
 
-  document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 15 + 'px';
-  document.getElementById('infopanel').style.height = window.innerHeight - 40 + 'px';
+  document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 17 + 'px';
+  document.getElementById('infopanel').style.height = front.canvas.height - 2 + 'px';
 
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
@@ -72,7 +72,11 @@ function changeMode(mode) {
 }
 
 function commandMode() {
-  delete front.setPoint;
+  if(front.setPoint) {
+    delete front.setPoint;
+    infopanel.bottom.remove();
+  }
+
   front.startPoint = new Point(0, front.canvas.height);
   front.refresh();
   front.lastPoint  = new Point(front.canvas.width, 0);

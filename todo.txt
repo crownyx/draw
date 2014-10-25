@@ -1,40 +1,10 @@
-9/16
-
-set angle in rotation
-
-9/17
-
-after shiftCommand callback, update infoText
-select rotation: create axes and move degree text
-finish shiftCOmmands for all shapes
-rectangle: area/perimeter
-ellipse: xAxis, yAxis, area, perimeter
-refine infoText for all shapes
-
-9/20
-
 double check ellipse circumference formula
 turn help/commands into buttons
-
-9/21
-
 set endpoint after rotation
-
-9/25
-
 turn off settings (eg fixedLength)
-
-10/11
-
 finish bezier curves: preview, shiftCommands
 start triangle
-
-10/13
-
 edit by changing points directly
-
-10/14
-
 using go to while rotating: on first mousemove, shape rotates again.  Issue with subtracting old angle
 
 long term:

@@ -15,7 +15,10 @@ function design(shape) {
   });
 
   front.eventListeners.add('click', 'nextStep', function() {
-    delete front.setPoint;
+    if(front.setPoint) {
+      delete front.setPoint;
+      infopanel.bottom.remove();
+    }
     shape.nextStep();
   });
 

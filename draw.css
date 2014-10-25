@@ -1,17 +1,19 @@
-body { background-color: black; }
+body { background-color: black; margin: 5px; }
 
 canvas {
   position: absolute;
   right: 5px;
-  top: 20px;
 }
 
 #backlayer { background-color: white; }
 
 #infopanel {
   position: absolute;
-  top: 20px;
   font-size: small;
+  border: 1px solid white;
+  border-right: 0px;
+  padding-right: 3px;
+  padding-left: 3px;
 }
 
 #infopanel div.box {
@@ -21,7 +23,9 @@ canvas {
   color: white;
 }
 
-#infopanel div.box.top { border-top: 1px solid white; }
+#infopanel div.box.top {
+  padding-bottom: 3px;
+}
 
 #infopanel div.box.bottom {
   margin-top: 3px;

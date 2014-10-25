@@ -78,8 +78,8 @@ function Point(x, y) {
     middle.save();
       middle.context.textAlign = textAlignment.textAlign;
       middle.context.fillText(
-        'x: '   + Math.round(front.startPoint.x) +
-        ', y: ' + Math.round(front.startPoint.y),
+        'x: '   + Math.round(this.x) +
+        ', y: ' + Math.round(this.y),
         this.x + textAlignment.xPlus,
         this.y + textAlignment.yPlus
       );

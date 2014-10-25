@@ -4,11 +4,37 @@ function translate(group, refPoint) {
   front.startPoint = refPoint;
 
   middle.group = group;
+  middle.group.origin = refPoint;
 
+  infopanel.top = 'choose translation point, then click';
+  infopanel.buttons = [
+    Button('g', 'choose point', 'yellow'),
+    Button('D', 'set distance', 'blue'),
+    Button('esc', 'cancel', 'red')
+  ];
+
+  window.eventListeners.add('keydown', 'setDistance', function(e) {
+    if(e.shiftKey && e.which == charCodes['d']) {
+      getInput(
+        'enter distance: ',
+        function(distance) {
+          front.eventListeners.add('mousemove', 'moveGroup', function(e) {
+            var angle = Angle.from(front.startPoint, front.lastPoint);
+            var adjusted = front.startPoint.plus(parseInt(distance)).translate(front.startPoint, angle);
+            middle.group.setEnd(adjusted);
+            middle.clear();
+            adjusted.preview();
+            middle.group.preview();
+          });
+        }
+      )
+    }
+  });
 
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 
   middle.group.setEnd = function(point) {
+    this.origin = point;
     this.shapes.forEach(function(shape) {
       shape.refLine.translate(point);
       shape.translate(shape.refLine.end);
@@ -16,7 +42,7 @@ function translate(group, refPoint) {
   }
 
   middle.group.preview = function() {
-    var translationPath = new Line(front.startPoint, front.setPoint || front.lastPoint);
+    var translationPath = new Line(front.startPoint, middle.group.origin);
     translationPath.preview(true);
     front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
     this.draw(middle.context);
@@ -26,9 +52,6 @@ function translate(group, refPoint) {
   middle.clear();
   middle.group.preview();
 
-  infopanel.top = 'move shape(s), then click to save';
-  infopanel.buttons = [Button('esc', 'cancel', 'red')];
-
   front.eventListeners.add('mousemove', 'moveGroup', function() {
     middle.group.setEnd(front.setPoint || front.lastPoint);
     middle.clear();
@@ -36,7 +59,6 @@ function translate(group, refPoint) {
   });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.group.setEnd(front.setPoint || front.lastPoint);
     middle.group.shapes.forEach(function(shape) {
       delete shape.refLine;
       shape.complete();
@@ -77,7 +99,7 @@ function rotate(group, refPoint) {
 
   infopanel.top = 'choose angle of rotation, then click.';
   infopanel.buttons = [
-    Button('g', 'go to point', 'yellow'),
+    Button('g', 'choose point', 'yellow'),
     Button('A', 'set angle', 'blue'),
     Button('esc', 'cancel', 'red')
   ];
@@ -128,8 +150,6 @@ function rotate(group, refPoint) {
   });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.group.setEnd(front.setPoint || front.lastPoint);
-    middle.clear();
     group.shapes.forEach(function(shape) {
       delete shape.refLine;
       shape.complete();
