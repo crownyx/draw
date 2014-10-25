@@ -71,10 +71,10 @@ function Point(x, y) {
     }
   }
 
-  this.preview = function() {
+  this.preview = function(quadAdd = 1) {
     new AxisPair(this).sketch(middle.context);
     var angle = Angle.from(front.startPoint, front.lastPoint);
-    var textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
+    var textAlignment = front.textAlignments[(angle.quadrant + quadAdd) % 4];
     middle.save();
       middle.context.textAlign = textAlignment.textAlign;
       middle.context.fillText(

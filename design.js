@@ -39,7 +39,7 @@ function design(shape) {
   /*                  */ 
   /*                  */ infopanel.buttons.add(
   /*                  */   Button('i', 'show/hide info', 'yellow'),
-  /*                  */   Button('g', 'go to point',    'yellow')
+  /*                  */   Button('g', 'choose point',    'yellow')
   /*                  */ );
   /*                  */ 
   /*                  */ shape.shiftCommands.forEach(function(command) {

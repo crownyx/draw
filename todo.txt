@@ -4,6 +4,7 @@ turn off settings (eg fixedLength)
 finish bezier curves: preview, shiftCommands
 start triangle
 edit by changing points directly
+guidelines/points
 
 long term:
 

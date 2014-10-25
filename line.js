@@ -15,9 +15,9 @@ function Line(start, end) {
       subtext: '(degrees)',
       callback: function(deg) {
         if(deg == 'x') {
-          delete line.fixedRotation;
+          delete line.fixedAngle;
         } else {
-          line.fixedRotation = new Angle(parseInt(deg) / 180 * Math.PI);
+          line.fixedAngle = new Angle(parseInt(deg) / 180 * Math.PI);
         }
       },
       acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
@@ -45,8 +45,8 @@ Line.prototype.infoText = function() {
 }
 
 Line.prototype.setEnd = function(point, params = {}) {
-  if(this.fixedLength || this.fixedRotation || params.fixedLength || params.fixedRotation) {
-    var rotation = this.fixedRotation || params.fixedRotation || new Line(this.start, point).angle;
+  if(this.fixedLength || this.fixedAngle || params.fixedLength || params.fixedAngle) {
+    var rotation = this.fixedAngle || params.fixedAngle || new Line(this.start, point).angle;
     var length   = this.fixedLength || params.fixedLength || new Line(this.start, point).length;
     this.end = new Point(
       this.start.x + Math.cos(rotation.rad) * length,
@@ -103,6 +103,7 @@ Line.prototype.preview = function() {
   this.angle.preview();
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   this.draw(middle.context);
+  if(this.fixedLength || this.fixedAngle) this.end.preview(2);
 }
 
 Line.prototype.sketchPreview = function() {
@@ -120,8 +121,8 @@ Line.prototype.translate = function(point) {
 
 Line.prototype.rotate = function(rotation) {
   this.end = this.end.translate(this.start, rotation);
-  if(this.fixedRotation)
-    this.fixedRotation = this.fixedRotation.rad.plus(rotation);
+  if(this.fixedAngle)
+    this.fixedAngle = this.fixedAngle.rad.plus(rotation);
 }
 
 Line.prototype.copy = function() {
@@ -129,7 +130,7 @@ Line.prototype.copy = function() {
     new Point(this.start.x, this.start.y),
     new Point(this.end.x, this.end.y)
   );
-  if(this.fixedRotation) newLine.fixedRotation = this.fixedRotation.copy();
+  if(this.fixedAngle) newLine.fixedAngle = this.fixedAngle.copy();
   newLine.fixedLength = this.fixedLength;
   return newLine;
 }

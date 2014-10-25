@@ -38,7 +38,7 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
       infopanel.top = oldTop;
       middle.clear();
       propToFill.call((shape || window), input.join(''));
-      if(shape) shape.setEnd(front.lastPoint);
+      if(shape) shape.setEnd(front.setPoint || front.lastPoint);
       if(shape) shape.preview();
     } else if(e.which == charCodes['backspace']) {
       inputfield.textContent = inputfield.textContent.slice(0, -1);
