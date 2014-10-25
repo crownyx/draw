@@ -1,11 +1,9 @@
 double check ellipse circumference formula
 turn help/commands into buttons
-set endpoint after rotation
 turn off settings (eg fixedLength)
 finish bezier curves: preview, shiftCommands
 start triangle
 edit by changing points directly
-using go to while rotating: on first mousemove, shape rotates again.  Issue with subtracting old angle
 
 long term:
 

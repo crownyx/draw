@@ -75,7 +75,7 @@ Circle.prototype.drawPath = function(context) {
 }
 
 Circle.prototype.preview = function() {
-  this.radius.preview(true);
+  this.radius.sketchPreview();
   this.draw(middle.context);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }

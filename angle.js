@@ -1,32 +1,65 @@
 function Angle(rad) {
-  var _rad = (rad && !(rad % (2 * Math.PI)) ? rad : ((rad || 0) + 2 * Math.PI) % (2 * Math.PI));
-  var _quad = Math.ceil(_rad / (0.5 * Math.PI)) || 4;
-  return {
-    rad: _rad,
-    deg: (_rad / Math.PI * 180),
-    quadrant: _quad,
-    get perp() {
-      return new Angle(this.rad + Math.PI);
-    },
-    refAngle: (function() {
-      switch(_quad) {
-        case 1: return _rad; break;
-        case 2: return Math.PI - _rad; break;
-        case 3: return _rad - Math.PI; break;
-        case 4: return 2 * Math.PI - _rad; break;
-      }
-    })(),
-    plus: function(otherAngle) {
-      return new Angle(this.rad + otherAngle.rad);
-    },
-    minus: function(otherAngle) {
-      return new Angle(this.rad - otherAngle.rad);
-    },
-    copy: function() {
-      return new Angle(this.rad);
-    }
-  };
+  this.rad = (rad && !(rad % (2 * Math.PI)) ? rad : ((rad || 0) + 2 * Math.PI) % (2 * Math.PI));
 }
+
+Object.defineProperty(Angle.prototype, 'quadrant', {
+  get: function() {
+    return Math.ceil(this.rad / (0.5 * Math.PI)) || 4;
+  }
+});
+
+Object.defineProperty(Angle.prototype, 'deg', {
+  get: function() {
+    return this.rad / Math.PI * 180;
+  }
+});
+
+Object.defineProperty(Angle.prototype, 'perp', {
+  get: function() {
+    return new Angle(this.rad + Math.PI);
+  }
+});
+
+Object.defineProperty(Angle.prototype, 'refAngle', {
+  get: function() {
+    switch(_quad) {
+      case 1: return this.rad; break;
+      case 2: return Math.PI - this.rad; break;
+      case 3: return this.rad - Math.PI; break;
+      case 4: return 2 * Math.PI - this.rad; break;
+    }
+  }
+});
+
+Angle.prototype.plus  = function(otherAngle) { return new Angle(this.rad + otherAngle.rad); }
+Angle.prototype.minus = function(otherAngle) { return new Angle(this.rad - otherAngle.rad); }
+
+Angle.prototype.draw = function(context, params = {}) {
+  new Arc(
+    this.center,
+    this.center.plus(params.radius || 10),
+    new Angle(0),
+    this
+  ).draw(context, params.style);
+}
+
+Angle.prototype.preview = function() {
+  this.draw(middle.context, { style: { strokeStyle: 'blue', lineWidth: 0.5 } });
+
+  var angle = Angle.from(front.startPoint, front.lastPoint);
+  var textAlignment = front.textAlignments[angle.quadrant % 4];
+
+  middle.save();
+    middle.context.textAlign = textAlignment.textAlign;
+    middle.context.fillText(
+      Math.round(this.deg) + unescape("\xB0"),
+      this.center.x + textAlignment.xPlus,
+      this.center.y + textAlignment.yPlus
+    );
+  middle.restore();
+}
+
+Angle.prototype.copy = function() { return new Angle(this.rad); }
 
 Angle.from = function(start, end) {
   var atan = Math.atan((end.y - start.y) / (end.x - start.x));

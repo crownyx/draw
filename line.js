@@ -86,7 +86,11 @@ Object.defineProperty(Line.prototype, 'length', {
 });
 
 Object.defineProperty(Line.prototype, 'angle', {
-  get: function() { return Angle.from(this.start, this.end); },
+  get: function() {
+    var angle = Angle.from(this.start, this.end);
+    angle.center = this.start;
+    return angle;
+  }
 });
 
 Line.prototype.drawPath = function(context) {
@@ -94,50 +98,17 @@ Line.prototype.drawPath = function(context) {
   context.lineTo(this.end.x, this.end.y);
 }
 
-Line.prototype.preview = function(sketch) {
-  new HorizontalLine(this.start.y).sketch(middle.context);
-  new VerticalLine(this.start.x).sketch(middle.context);
+Line.prototype.preview = function() {
+  this.start.preview();
+  this.angle.preview();
+  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
+  this.draw(middle.context);
+}
 
-  new Arc(
-    this.start,
-    new Point(this.start.x + 10, this.start.y),
-    new Angle(0),
-    this.angle
-  ).draw(
-    middle.context,
-    {
-      strokeStyle: 'blue',
-      lineWidth: 0.5
-    }
-  );
-
-  var angle = Angle.from(front.startPoint, front.lastPoint);
-  var textAlignment = front.textAlignments[angle.quadrant % 4];
-  middle.save();
-    middle.context.textAlign = textAlignment.textAlign;
-    middle.context.fillText(
-      Math.round(this.angle.deg) + unescape("\xB0"),
-      this.start.x + textAlignment.xPlus,
-      this.start.y + textAlignment.yPlus
-    );
-  middle.restore();
-  textAlignment = front.textAlignments[(angle.quadrant + 1) % 4];
-  middle.save();
-    middle.context.textAlign = textAlignment.textAlign;
-    middle.context.fillText(
-      'x: '   + Math.round(front.startPoint.x) +
-      ', y: ' + Math.round(front.startPoint.y),
-      this.start.x + textAlignment.xPlus,
-      this.start.y + textAlignment.yPlus
-    );
-  middle.restore();
-  if(sketch) {
-    this.sketch(middle.context);
-  } else {
-    if(middle.showText)
-      middle.context.fillText(this.infoText(), 10, 15);
-    this.draw(middle.context);
-  }
+Line.prototype.sketchPreview = function() {
+  this.start.preview();
+  this.angle.preview();
+  this.sketch(middle.context);
 }
 
 Line.prototype.translate = function(point) {

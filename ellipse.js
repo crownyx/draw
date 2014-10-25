@@ -72,7 +72,8 @@ Ellipse.prototype.drawPath = function(context) {
 }
 
 Ellipse.prototype.preview = function() {
-  new Line(this.origin, front.lastPoint).preview(true);
+  var refLine = new Line(this.origin, front.setPoint || front.lastPoint);
+  refLine.sketchPreview();
   this.draw(middle.context);
   if(this.rotation.deg % 90) {
     this.yAxis.sketch(middle.context);

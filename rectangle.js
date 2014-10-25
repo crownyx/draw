@@ -223,7 +223,7 @@ Rectangle.prototype.rotate = function(rotation) {
 }
 
 Rectangle.prototype.preview = function() {
-  this.diagonal.preview(true);
+  this.diagonal.sketchPreview();
   this.draw(middle.context);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }

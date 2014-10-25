@@ -17,7 +17,7 @@ function BezierCurve(start, end, control1, control2) {
       type: 'toggle',
       callback: function() {
         this.quadratic = !this.quadratic;
-        front.infodiv.getElementsByClassName('box')[0].textContent = this.name;
+        infopanel.top = this.name;
       }
     }
   ];
@@ -27,7 +27,7 @@ BezierCurve.prototype = new Shape;
 BezierCurve.prototype.constructor = BezierCurve;
 
 BezierCurve.prototype.preview = function() {
-  new Line(this.start, this.end).preview(true);
+  new Line(this.start, this.end).sketchPreview();
   this.draw(middle.context);
 }
 
@@ -57,9 +57,8 @@ BezierCurve.prototype.setEnd = function(point) { this.end = point; }
 BezierCurve.prototype.nextStep = function() {
   this.setEnd = function(point) { this.control1 = point; }
   this.preview = function() {
-    new Line(this.start, this.control1).preview(true);
-    new Line(this.end, this.control1).sketch(middle.context);
-    new AxisPair(this.end).sketch(middle.context);
+    new Line(this.start, this.control1).sketchPreview();
+    new Line(this.end, this.control1).sketchPreview();
     this.draw(middle.context);
   }
   this.nextStep = function() {
@@ -68,10 +67,9 @@ BezierCurve.prototype.nextStep = function() {
     } else {
       this.setEnd = function(point) { this.control2 = point; }
       this.preview = function() {
-        new Line(this.start, this.control1).preview(true);
-        new Line(this.end, this.control2).sketch(middle.context);
-        new AxisPair(this.end).sketch(middle.context);
-        new AxisPair(this.control1).sketch(middle.context);
+        new Line(this.start, this.control1).sketchPreview();
+        new Line(this.end, this.control2).sketchPreview();
+        this.control1.preview();
         this.draw(middle.context);
       }
       this.nextStep = Shape.prototype.nextStep;

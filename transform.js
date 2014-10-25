@@ -43,7 +43,7 @@ function translate(group, refPoint) {
 
   middle.group.preview = function() {
     var translationPath = new Line(front.startPoint, middle.group.origin);
-    translationPath.preview(true);
+    translationPath.sketchPreview();
     front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
     this.draw(middle.context);
   }
@@ -93,7 +93,7 @@ function rotate(group, refPoint) {
   var targetPoint = front.setPoint || front.lastPoint;
 
   middle.group.preview = function(point) {
-    new Line(front.startPoint, point).preview(true);
+    new Line(front.startPoint, point).sketchPreview();
     this.draw(middle.context);
   }
 
