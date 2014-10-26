@@ -2,11 +2,11 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
   Shape.call(this);
 
   this.startRadius = new Line(radiusStart, radiusEnd);
-  if(startAngle) this.startRadius.setEnd(radiusEnd, { fixedRotation: startAngle });
+  if(startAngle) this.startRadius.setEnd(radiusEnd, { fixedAngle: startAngle });
 
   this.endRadius = this.startRadius.copy();
   this.endRadius.setEnd(
-    this.endRadius.end, { fixedRotation: endAngle || new Angle(2 * Math.PI) }
+    this.endRadius.end, { fixedAngle: endAngle || new Angle(2 * Math.PI) }
   );
 
   this.clockwise = true;
@@ -29,7 +29,7 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
       forWhat: 'end angle',
       subtext: '(in degrees)',
       callback: function(deg) {
-        this.endRadius.fixedRotation = new Angle(parseInt(deg) / 180 * Math.PI);
+        this.endRadius.fixedAngle = new Angle(parseInt(deg) / 180 * Math.PI);
         this.nextStep = Shape.prototype.nextStep;
       }
     },
@@ -46,7 +46,7 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
       forWhat: 'start angle',
       subtext: '(in degrees)',
       callback: function(deg) {
-        this.startRadius.fixedRotation = new Angle(parseInt(deg) / 180 * Math.PI);
+        this.startRadius.fixedAngle = new Angle(parseInt(deg) / 180 * Math.PI);
       }
     }
   ];
@@ -81,22 +81,19 @@ Arc.prototype.infoText = function() {
 }
 
 Arc.prototype.drawPath = function(context) {
-  context.save();
-    context.translate(this.center.x, this.center.y);
-    context.arc(
-      0,
-      0,
-      this.startRadius.length,
-      this.startRadius.angle.rad,
-      this.endRadius.angle.rad,
-      !this.clockwise
-    );
-  context.restore();
+  context.arc(
+    this.center.x,
+    this.center.y,
+    this.startRadius.length,
+    this.startRadius.angle.rad,
+    this.endRadius.angle.rad,
+    !this.clockwise
+  );
 }
 
 Arc.prototype.setEnd = function(point) {
   this._workingRadius().setEnd(point);
-  this._otherRadius().setEnd(point, { fixedRotation: this._otherRadius().angle });
+  this._otherRadius().setEnd(point, { fixedAngle: this._otherRadius().angle });
 }
 
 Arc.prototype.nextStep = function() {

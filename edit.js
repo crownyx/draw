@@ -60,7 +60,7 @@ function editMode() {
 
           shape.draw(middle.context, { strokeStyle: 'blue' });
           front.startPoint = shape.center;
-          shape.center.preview();
+          shape.center.round().preview();
           window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
             switch(e.which) {
               case charCodes['t']: translate(new Group([shape.copy()]), nearPoint); break;

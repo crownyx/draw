@@ -63,6 +63,8 @@ function Point(x, y) {
 
   this.copy = function() { return new Point(this.x, this.y); }
 
+  this.round = function() { return new Point(Math.round(this.x), Math.round(this.y)); }
+
   this.absolute = function() {
     if(this.shape) {
       return this.translate(this.shape.origin, this.shape.rotation.rad);
@@ -71,19 +73,23 @@ function Point(x, y) {
     }
   }
 
-  this.preview = function(quadAdd = 1) {
+  this.preview = function(angle, quadAdd = -1) {
     new AxisPair(this).sketch(middle.context);
-    var angle = Angle.from(front.startPoint, front.lastPoint);
+    this.showCoords(middle.context, angle, quadAdd);
+  }
+
+  this.showCoords = function(context, angle, quadAdd = -1) {
+    var angle = angle || Angle.from(front.startPoint, this);
     var textAlignment = front.textAlignments[(angle.quadrant + quadAdd) % 4];
-    middle.save();
-      middle.context.textAlign = textAlignment.textAlign;
-      middle.context.fillText(
-        'x: '   + Math.round(this.x) +
-        ', y: ' + Math.round(this.y),
+    context.save();
+      context.textAlign = textAlignment.textAlign;
+      context.fillText(
+        "x: "   + this.x +
+        ", y: " + this.y,
         this.x + textAlignment.xPlus,
         this.y + textAlignment.yPlus
       );
-    middle.restore();
+    context.restore();
   }
 }
 

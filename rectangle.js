@@ -11,55 +11,69 @@ function Rectangle(diagStart, diagEnd) {
       key: 'a',
       forWhat: 'area',
       callback: function(area) {
-        if(this.fixedPerimeter) delete this.fixedPerimeter;
-        if(this.fixedRatio) delete this.fixedRatio;
-        this.fixedArea = parseInt(area);
-      }
-    },
-    {
-      key: 'e',
-      forWhat: 'endpoint of diagonal',
-      subtext: '(x & y coordinates separated by comma)',
-      callback: function(xy) {
-        var x = parseInt(xy.split(',')[0]), y = parseInt(xy.split(',')[1]);
-        var refLine = new Line(this.diagonal.start, new Point(x, y));
-        this.diagonal.fixedRotation = refLine.angle;
-        this.diagonal.fixedLength = refLine.length;
-        this.fixedEnd = this.diagonal.end;
+        if(area == 'x') {
+          delete this.fixedArea;
+        } else {
+          if(this.fixedPerimeter) delete this.fixedPerimeter;
+          if(this.fixedRatio) delete this.fixedRatio;
+          this.fixedArea = parseInt(area);
+        }
       },
-      acceptChars: [
-        { charCode: charCodes['comma'], character: ',' }
-      ]
+      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
     },
     {
       key: 'h',
       forWhat: 'height',
-      callback: function(height) { this.fixedHeight = parseInt(height); }
+      callback: function(height) {
+        if(height == 'x') {
+          delete this.fixedHeight;
+        } else {
+          this.fixedHeight = parseInt(height);
+        }
+      },
+      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
     },
     {
       key: 'l',
       forWhat: 'length',
-      callback: function(length) { this.fixedLength = parseInt(length); }
+      callback: function(length) {
+        if(length == 'x') {
+          delete this.fixedLength;
+        } else {
+          this.fixedLength = parseInt(length);
+        }
+      },
+      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
     },
     {
       key: 'p',
       forWhat: 'perimeter',
       callback: function(measure) {
-        if(this.fixedArea) delete this.fixedArea;
-        if(this.fixedRatio) delete this.fixedRatio;
-        this.fixedPerimeter = parseInt(measure);
-      }
+        if(measure == 'x') {
+          delete this.fixedPerimeter;
+        } else {
+          if(this.fixedArea) delete this.fixedArea;
+          if(this.fixedRatio) delete this.fixedRatio;
+          this.fixedPerimeter = parseInt(measure);
+        }
+      },
+      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
     },
     {
       key: 'r',
       forWhat: 'ratio of sides',
       subtext: '(length:height)',
       callback: function(lh) {
-        if(this.fixedArea) delete this.fixedArea;
-        if(this.fixedPerimeter) delete this.fixedPerimeter;
-        this.fixedRatio = parseInt(lh.split(':')[0])/parseInt(lh.split(':')[1]);
+        if(lh == 'x') {
+          delete this.fixedRatio;
+        } else {
+          if(this.fixedArea) delete this.fixedArea;
+          if(this.fixedPerimeter) delete this.fixedPerimeter;
+          this.fixedRatio = parseInt(lh.split(':')[0])/parseInt(lh.split(':')[1]);
+        }
       },
       acceptChars: [
+        { charCode: charCodes['x'], character: 'x' },
         { charCode: charCodes['colon'], character: ':' }
       ]
     }
@@ -79,8 +93,8 @@ Object.defineProperty(Rectangle.prototype, 'length', {
         case 3: return -this.fixedLength; break;
       }
     } else {
-      var diagAngle = this.diagonal.angle.rad - this.rotation.rad;
-      return Math.cos(diagAngle) * this.diagonal.length;
+      var diagAngle = this.diagonal.angle.minus(this.rotation);
+      return Math.cos(diagAngle.rad) * this.diagonal.length;
     }
   }
 });
@@ -154,9 +168,9 @@ Object.defineProperty(Rectangle.prototype, 'points', {
 
 Rectangle.prototype.setEnd = function(point) {
   if(this.fixedHeight || this.fixedLength || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
-    var length = this.fixedLength || Math.abs(point.x - this.diagonal.start.x);
-    var height = this.fixedHeight || Math.abs(point.y - this.diagonal.start.y);
-    var currAngle = new Angle(Angle.from(this.diagonal.start, point).rad - this.rotation.rad);
+    var diagAngle = Angle.from(this.diagonal.start, point).minus(this.rotation);
+    var length = this.fixedLength || Math.cos(diagAngle.rad) * new Line(this.diagonal.start, point).length;
+    var height = this.fixedHeight || Math.sin(diagAngle.rad) * new Line(this.diagonal.start, point).length;
     if(this.fixedArea) {
       if(this.fixedLength && !this.fixedHeight) {
         height = this.fixedArea / length;
@@ -190,10 +204,10 @@ Rectangle.prototype.setEnd = function(point) {
         length = Math.cos(angle) * hypotenuse.length;
       }
     }
-    switch(currAngle.quadrant) {
-      case 2: length = -length; break;
-      case 3: length = -length; height = -height; break;
-      case 4: height = -height; break;
+    switch(diagAngle.quadrant) {
+      case 2: if(this.fixedLength) length = -length; break;
+      case 3: if(this.fixedLength) length = -length; if(this.fixedHeight) height = -height; break;
+      case 4: if(this.fixedHeight) height = -height; break;
     }
     var x = this.diagonal.start.x + length;
     var y = this.diagonal.start.y + height;
@@ -226,6 +240,9 @@ Rectangle.prototype.preview = function() {
   this.diagonal.sketchPreview();
   this.draw(middle.context);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
+  if(this.fixedLength || this.fixedHeight || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
+    this.diagonal.end.round().preview(0, 2);
+  }
 }
 
 Rectangle.prototype.copy = function() {

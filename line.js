@@ -99,15 +99,15 @@ Line.prototype.drawPath = function(context) {
 }
 
 Line.prototype.preview = function() {
-  this.start.preview();
+  this.start.round().preview(Angle.from(front.startPoint, front.lastPoint), 1);
   this.angle.preview();
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   this.draw(middle.context);
-  if(this.fixedLength || this.fixedAngle) this.end.preview(2);
+  if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2);
 }
 
 Line.prototype.sketchPreview = function() {
-  this.start.preview();
+  this.start.round().preview(Angle.from(front.startPoint, front.lastPoint), 1);
   this.angle.preview();
   this.sketch(middle.context);
 }

@@ -31,8 +31,13 @@ Object.defineProperty(Angle.prototype, 'refAngle', {
   }
 });
 
-Angle.prototype.plus  = function(otherAngle) { return new Angle(this.rad + otherAngle.rad); }
-Angle.prototype.minus = function(otherAngle) { return new Angle(this.rad - otherAngle.rad); }
+Angle.prototype.plus  = function(otherAngle) {
+  return new Angle(this.rad + (otherAngle instanceof Angle ? otherAngle.rad : otherAngle));
+}
+
+Angle.prototype.minus = function(otherAngle) {
+  return new Angle(this.rad - (otherAngle instanceof Angle ? otherAngle.rad : otherAngle));
+}
 
 Angle.prototype.draw = function(context, params = {}) {
   new Arc(
