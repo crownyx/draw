@@ -166,15 +166,15 @@ Object.defineProperty(Rectangle.prototype, 'points', {
 Rectangle.prototype.setEnd = function(point) {
   if(this.fixedHeight || this.fixedLength || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
     var diagAngle = Angle.from(this.diagonal.start, point).minus(this.rotation);
-    var length = this.fixedLength || Math.cos(diagAngle.rad) * new Line(this.diagonal.start, point).length;
-    var height = this.fixedHeight || Math.sin(diagAngle.rad) * new Line(this.diagonal.start, point).length;
+    var length = this.fixedLength || Math.abs(Math.cos(diagAngle.rad) * new Line(this.diagonal.start, point).length);
+    var height = this.fixedHeight || Math.abs(Math.sin(diagAngle.rad) * new Line(this.diagonal.start, point).length);
     if(this.fixedArea) {
       if(this.fixedLength && !this.fixedHeight) {
         height = this.fixedArea / length;
       } else if(this.fixedHeight && !this.fixedLength) {
         length = this.fixedArea / height;
       } else if(!this.fixedHeight && !this.fixedLength) {
-        height = Math.sqrt(this.fixedArea * Math.abs(Math.tan(currAngle.rad)));
+        height = Math.sqrt(this.fixedArea * Math.abs(Math.tan(diagAngle.rad)));
         length = this.fixedArea / height;
       }
     }
@@ -184,7 +184,7 @@ Rectangle.prototype.setEnd = function(point) {
       } else if(this.fixedHeight && !this.fixedLength) {
         length = (this.fixedPerimeter - height) / 2;
       } else if(!this.fixedHeight && !this.fixedLength) {
-        var tan = Math.abs(Math.tan(currAngle.rad));
+        var tan = Math.abs(Math.tan(diagAngle.rad));
         height = this.fixedPerimeter * tan / 2 / (1 + tan);
         length = (this.fixedPerimeter - height * 2) / 2;
       }
@@ -202,9 +202,9 @@ Rectangle.prototype.setEnd = function(point) {
       }
     }
     switch(diagAngle.quadrant) {
-      case 2: if(this.fixedLength) length = -length; break;
-      case 3: if(this.fixedLength) length = -length; if(this.fixedHeight) height = -height; break;
-      case 4: if(this.fixedHeight) height = -height; break;
+      case 2: length = -length; break;
+      case 3: length = -length; height = -height; break;
+      case 4: height = -height; break;
     }
     var x = this.diagonal.start.x + length;
     var y = this.diagonal.start.y + height;
