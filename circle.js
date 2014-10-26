@@ -13,8 +13,13 @@ function Circle(radStart, radEnd) {
       key: 'a',
       forWhat: 'area',
       callback: function(area) {
-        circle.radius.fixedLength = Math.sqrt(parseInt(area) / Math.PI);
-      }
+        if(area == 'x') {
+          delete circle.radius.fixedLength;
+        } else {
+          circle.radius.fixedLength = Math.sqrt(parseInt(area) / Math.PI);
+        }
+      },
+      acceptChars: ['x']
     },
     {
       key: 'c',

@@ -18,15 +18,16 @@ function translate(group, refPoint) {
       getInput(
         'enter distance: ',
         function(distance) {
-          front.eventListeners.add('mousemove', 'moveGroup', function(e) {
-            var angle = Angle.from(front.startPoint, front.lastPoint);
-            var adjusted = front.startPoint.plus(parseInt(distance)).translate(front.startPoint, angle);
-            middle.group.setEnd(adjusted);
+          if(distance == 'x') {
+            delete middle.group.fixedDistance;
+          } else {
+            middle.group.fixedDistance = parseInt(distance.replace(',', ''));
+            middle.group.setEnd(front.lastPoint);
             middle.clear();
-            adjusted.preview();
             middle.group.preview();
-          });
-        }
+          }
+        },
+        ['x', ',']
       )
     }
   });
@@ -34,6 +35,10 @@ function translate(group, refPoint) {
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 
   middle.group.setEnd = function(point) {
+    if(middle.group.fixedDistance) {
+      var angle = Angle.from(front.startPoint, front.lastPoint);
+      point = front.startPoint.plus(middle.group.fixedDistance).translate(front.startPoint, angle);
+    }
     this.origin = point;
     this.shapes.forEach(function(shape) {
       shape.refLine.translate(point);
@@ -44,6 +49,7 @@ function translate(group, refPoint) {
   middle.group.preview = function() {
     var translationPath = new Line(front.startPoint, middle.group.origin);
     translationPath.sketchPreview();
+    if(middle.group.fixedDistance) middle.group.origin.round().preview(0, 2, { strokeStyle: 'green' });
     front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
     this.draw(middle.context);
   }
@@ -144,7 +150,7 @@ function rotate(group, refPoint) {
           middle.clear();
           middle.group.preview(targetPoint);
         },
-        [{ charCode: charCodes['x'], character: 'x' }]
+        ['x']
       );
     }
   });

@@ -16,10 +16,10 @@ function Rectangle(diagStart, diagEnd) {
         } else {
           if(this.fixedPerimeter) delete this.fixedPerimeter;
           if(this.fixedRatio) delete this.fixedRatio;
-          this.fixedArea = parseInt(area);
+          this.fixedArea = parseInt(area.replace(',', ''));
         }
       },
-      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
+      acceptChars: ['x', ',']
     },
     {
       key: 'h',
@@ -28,10 +28,10 @@ function Rectangle(diagStart, diagEnd) {
         if(height == 'x') {
           delete this.fixedHeight;
         } else {
-          this.fixedHeight = parseInt(height);
+          this.fixedHeight = parseInt(height.replace(',', ''));
         }
       },
-      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
+      acceptChars: ['x', ',']
     },
     {
       key: 'l',
@@ -40,10 +40,10 @@ function Rectangle(diagStart, diagEnd) {
         if(length == 'x') {
           delete this.fixedLength;
         } else {
-          this.fixedLength = parseInt(length);
+          this.fixedLength = parseInt(length.replace(',', ''));
         }
       },
-      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
+      acceptChars: ['x', ',']
     },
     {
       key: 'p',
@@ -54,10 +54,10 @@ function Rectangle(diagStart, diagEnd) {
         } else {
           if(this.fixedArea) delete this.fixedArea;
           if(this.fixedRatio) delete this.fixedRatio;
-          this.fixedPerimeter = parseInt(measure);
+          this.fixedPerimeter = parseInt(measure.replace(',', ''));
         }
       },
-      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
+      acceptChars: ['x', ',']
     },
     {
       key: 'r',
@@ -72,10 +72,7 @@ function Rectangle(diagStart, diagEnd) {
           this.fixedRatio = parseInt(lh.split(':')[0])/parseInt(lh.split(':')[1]);
         }
       },
-      acceptChars: [
-        { charCode: charCodes['x'], character: 'x' },
-        { charCode: charCodes['colon'], character: ':' }
-      ]
+      acceptChars: ['x', ':']
     }
   ];
 }
@@ -241,7 +238,7 @@ Rectangle.prototype.preview = function() {
   this.draw(middle.context);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   if(this.fixedLength || this.fixedHeight || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
-    this.diagonal.end.round().preview(0, 2);
+    this.diagonal.end.round().preview(0, 2, { strokeStyle: 'green' });
   }
 }
 

@@ -22,7 +22,7 @@ window.onload = function() {
   front.canvas.addEventListener('mousemove', function()  {
     if(front.setPoint) {
       front.showPos(front.setPoint);
-      new AxisPair(front.setPoint).sketch(front.context);
+      new AxisPair(front.setPoint).sketch(front.context, { strokeStyle: 'rgb(160,160,100)' });
     }
   }, false);
 
@@ -50,10 +50,7 @@ window.onload = function() {
             (middle.shape || middle.group).preview(front.setPoint || front.lastPoint);
           }
         },
-        [
-          { charCode: charCodes['comma'], character: ',' },
-          { charCode: charCodes['x'], character: 'x' }
-        ]
+        ['x', ',']
       );
     }
   }, false);

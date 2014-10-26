@@ -14,10 +14,10 @@ Shape.prototype.nextStep = function() {
   changeMode(commandMode);
 }
 
-Shape.prototype.sketch = function(context) {
+Shape.prototype.sketch = function(context, params = {}) {
   context.save();
-    context.strokeStyle = "blue";
-    context.lineWidth = 0.5;
+    context.strokeStyle = params.strokeStyle || "blue";
+    //context.lineWidth = 0.5;
     context.setLineDash([5]);
     context.beginPath();
       this.drawPath(context);

@@ -73,13 +73,13 @@ function Point(x, y) {
     }
   }
 
-  this.preview = function(angle, quadAdd = -1) {
-    new AxisPair(this).sketch(middle.context);
-    this.showCoords(middle.context, angle, quadAdd);
+  this.preview = function(angle, quadAdd = -1, params = {}) {
+    new AxisPair(this).sketch(middle.context, params);
+    this.showCoords(middle.context, angle, quadAdd + 2 ? quadAdd : -1);
   }
 
   this.showCoords = function(context, angle, quadAdd = -1) {
-    var angle = angle || Angle.from(front.startPoint, this);
+    var angle = angle || Angle.from(front.startPoint, front.lastPoint);
     var textAlignment = front.textAlignments[(angle.quadrant + quadAdd) % 4];
     context.save();
       context.textAlign = textAlignment.textAlign;

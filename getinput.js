@@ -23,10 +23,9 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
       inputfield.textContent += (e.which - charCodes.zero);
       input.push(e.which - charCodes.zero);
     } else if((function() {
-        var found = acceptChars.find(function(acceptChar) {
-          return e.which == acceptChar.charCode;
+        acceptedChar = acceptChars.find(function(acceptChar) {
+          return e.which == charCodes[acceptChar];
         });
-        acceptedChar = (found || {}).character;
         return acceptedChar;
       })())
     {

@@ -56,7 +56,7 @@ front.redraw = function() {
 
   if(this.setPoint) {
     this.showPos(this.setPoint);
-    new AxisPair(this.setPoint).sketch(this.context);
+    new AxisPair(this.setPoint).sketch(this.context, { strokeStyle: 'rgb(160,160,100)' });
   }
 }
 

@@ -20,7 +20,7 @@ function Line(start, end) {
           line.fixedAngle = new Angle(parseInt(deg) / 180 * Math.PI);
         }
       },
-      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
+      acceptChars: ['x']
     },
     {
       key: 'l',
@@ -29,10 +29,10 @@ function Line(start, end) {
         if(length == 'x') {
           delete line.fixedLength;
         } else {
-          line.fixedLength = parseInt(length);
+          line.fixedLength = parseInt(length.replace(',', ''));
         }
       },
-      acceptChars: [{ charCode: charCodes['x'], character: 'x' }]
+      acceptChars: ['x', ',']
     },
   ];
 }
@@ -103,7 +103,7 @@ Line.prototype.preview = function() {
   this.angle.preview();
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   this.draw(middle.context);
-  if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2);
+  if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
 }
 
 Line.prototype.sketchPreview = function() {
@@ -155,9 +155,9 @@ function AxisPair(origin) {
       this.vertical.draw(context);
       this.horizontal.draw(context);
     },
-    sketch: function(context) {
-      this.vertical.sketch(context);
-      this.horizontal.sketch(context);
+    sketch: function(context, params) {
+      this.vertical.sketch(context, params);
+      this.horizontal.sketch(context, params);
     }
   }
 }
