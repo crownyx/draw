@@ -9,6 +9,7 @@ function translate(group, refPoint) {
   infopanel.top = 'choose translation point, then click';
   infopanel.buttons = [
     Button('g', 'choose point', 'yellow'),
+    Button('A', 'set angle', 'blue'),
     Button('D', 'set distance', 'blue'),
     Button('esc', 'cancel', 'red')
   ];
@@ -32,12 +33,32 @@ function translate(group, refPoint) {
     }
   });
 
+  window.eventListeners.add('keydown', 'setAngle', function(e) {
+    if(e.shiftKey && e.which == charCodes['a']) {
+      getInput(
+        { main: 'enter angle: ', subtext: '(in degrees)' },
+        function(deg) {
+          if(deg == 'x') {
+            delete middle.group.fixedAngle;
+          } else {
+            middle.group.fixedAngle = Angle.fromDeg(parseInt(deg));
+            middle.group.setEnd(front.lastPoint);
+            middle.clear();
+            middle.group.preview();
+          }
+        },
+        ['x']
+      );
+    }
+  });
+
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
 
   middle.group.setEnd = function(point) {
-    if(middle.group.fixedDistance) {
-      var angle = Angle.from(front.startPoint, front.lastPoint);
-      point = front.startPoint.plus(middle.group.fixedDistance).translate(front.startPoint, angle);
+    if(middle.group.fixedDistance || middle.group.fixedAngle) {
+      var distance = middle.group.fixedDistance || new Line(front.startPoint, point).length;
+      var angle = middle.group.fixedAngle || Angle.from(front.startPoint, front.lastPoint);
+      point = front.startPoint.plus(distance).translate(front.startPoint, angle);
     }
     this.origin = point;
     this.shapes.forEach(function(shape) {
@@ -49,7 +70,8 @@ function translate(group, refPoint) {
   middle.group.preview = function() {
     var translationPath = new Line(front.startPoint, middle.group.origin);
     translationPath.sketchPreview();
-    if(middle.group.fixedDistance) middle.group.origin.round().preview(0, 2, { strokeStyle: 'green' });
+    if(middle.group.fixedDistance || middle.group.fixedAngle)
+      middle.group.origin.round().preview(0, 2, { strokeStyle: 'green' });
     front.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
     this.draw(middle.context);
   }
