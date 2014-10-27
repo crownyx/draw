@@ -25,11 +25,23 @@ var infopanel = {
       bottom.className = 'bottom';
     }
     bottom.remove = function() { _infopanel.removeChild(bottom); }
-    bottom.add = function(textContent) {
+    bottom.add = function(textContent, id) {
       var newDiv = _infopanel.appendChild(document.createElement('div'));
       newDiv.className = 'box bottom';
-      newDiv.textContent = textContent;
+      if(id) newDiv.id = id;
+      var mainDiv = newDiv.appendChild(document.createElement('div'));
+      mainDiv.textContent = textContent.main || textContent;
+      if(textContent.mainColor) mainDiv.style.color = textContent.mainColor;
+      if(textContent.subtext) {
+        var subDiv = newDiv.appendChild(document.createElement('div'));
+        subDiv.textContent = textContent.subtext;
+      }
       infopanel.resizeButtons();
+    }
+    bottom.find = function(id) {
+      var infobox = document.getElementById(id);
+      if(infobox) infobox.remove = function() { _infopanel.removeChild(infobox); }
+      return infobox;
     }
     return bottom;
   },

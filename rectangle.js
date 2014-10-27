@@ -6,10 +6,13 @@ function Rectangle(diagStart, diagEnd) {
 
   this.lines = [this.diagonal];
 
+  var rectangle = this;
+
   this.shiftCommands = [
     {
       key: 'a',
       forWhat: 'area',
+      prettify: function() { return commaSep(rectangle.fixedArea); },
       callback: function(area) {
         if(area == 'x') {
           delete this.fixedArea;
@@ -24,6 +27,7 @@ function Rectangle(diagStart, diagEnd) {
     {
       key: 'h',
       forWhat: 'height',
+      prettify: function() { return commaSep(rectangle.fixedHeight); },
       callback: function(height) {
         if(height == 'x') {
           delete this.fixedHeight;
@@ -36,6 +40,7 @@ function Rectangle(diagStart, diagEnd) {
     {
       key: 'l',
       forWhat: 'length',
+      prettify: function() { return commaSep(rectangle.fixedLength); },
       callback: function(length) {
         if(length == 'x') {
           delete this.fixedLength;
@@ -48,6 +53,7 @@ function Rectangle(diagStart, diagEnd) {
     {
       key: 'p',
       forWhat: 'perimeter',
+      prettify: function() { return commaSep(rectangle.fixedPerimeter); },
       callback: function(measure) {
         if(measure == 'x') {
           delete this.fixedPerimeter;
@@ -62,14 +68,22 @@ function Rectangle(diagStart, diagEnd) {
     {
       key: 'r',
       forWhat: 'ratio of sides',
+      fixedProperty: 'ratio',
       subtext: '(length:height)',
+      prettify: function() {
+        return String(rectangle.fixedRatioNumerator) + ':' + String(rectangle.fixedRatioDenominator);
+      },
       callback: function(lh) {
         if(lh == 'x') {
           delete this.fixedRatio;
+          delete this.fixedRatioNumerator;
+          delete this.fixedRatioDenominator;
         } else {
           if(this.fixedArea) delete this.fixedArea;
           if(this.fixedPerimeter) delete this.fixedPerimeter;
-          this.fixedRatio = parseInt(lh.split(':')[0])/parseInt(lh.split(':')[1]);
+          this.fixedRatioNumerator = parseInt(lh.split(':')[0]);
+          this.fixedRatioDenominator = parseInt(lh.split(':')[1]);
+          this.fixedRatio = this.fixedRatioNumerator/this.fixedRatioDenominator;
         }
       },
       acceptChars: ['x', ':']

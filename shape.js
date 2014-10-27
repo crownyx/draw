@@ -17,7 +17,6 @@ Shape.prototype.nextStep = function() {
 Shape.prototype.sketch = function(context, params = {}) {
   context.save();
     context.strokeStyle = params.strokeStyle || "blue";
-    //context.lineWidth = 0.5;
     context.setLineDash([5]);
     context.beginPath();
       this.drawPath(context);
@@ -55,10 +54,8 @@ Shape.prototype.translate = function(point) {
 }
 
 Object.defineProperty(Shape.prototype, 'name', {
-  get: function() {
-    return this.constructor.name;
-  }
-}); 
+  get: function() { return this.constructor.name; }
+});
 
 // Shape public interface:
 //   .shiftCommands: array of objects: { key: ..., forWhat: ..., subtext: ..., callback: ... }

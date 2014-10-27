@@ -52,6 +52,19 @@ function design(shape) {
   /*                  */
   /*                  */ infopanel.buttons.add(Button('esc', 'cancel', 'red'));
 
+  shape.shiftCommands.forEach(function(command) {
+    var propertyName = 'fixed' + (command.fixedProperty || command.forWhat).capitalize();
+    command.infobox = function() {
+      return {
+        main: 'fixed ' + command.forWhat + ': ' + command.prettify(),
+        subtext: 'to undo, type "' + command.key.capitalize() + '", then enter "x"',
+        id: propertyName, mainColor: 'yellow'
+      };
+    }
+    var property = shape[propertyName];
+    if(property) infopanel.bottom.add(command.infobox(), propertyName);
+  });
+
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
     if(e.which == charCodes['i']) {
       middle.showText = !middle.showText;
@@ -81,7 +94,17 @@ function design(shape) {
           if(e.shiftKey && e.which == charCodes[command.key]) {
             var helpText = 'enter ' + command.forWhat + ': ';
             if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
-            getInput(helpText, command.callback, command.acceptChars || [], shape);
+            getInput(helpText, function(input) {
+              command.callback.call(shape, input);
+              var propertyName = 'fixed' + (command.fixedProperty || command.forWhat).capitalize();
+              var property = shape[propertyName];
+              if(property) {
+                if(infopanel.bottom.find(propertyName)) infopanel.bottom.find(propertyName).remove();
+                infopanel.bottom.add(command.infobox(), propertyName);
+              } else {
+                infopanel.bottom.find(propertyName).remove();
+              }
+            }, command.acceptChars || [], shape);
           }
         });
       break;

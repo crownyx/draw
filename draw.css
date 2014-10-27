@@ -21,15 +21,16 @@ canvas {
   margin-bottom: 3px;
   font-weight: bold;
   color: white;
+  border: 1px solid white;
 }
 
 #infopanel div.box.top {
-  padding-bottom: 3px;
+  margin-top: 3px;
+  padding: 3px;
 }
 
 #infopanel div.box.bottom {
   margin-top: 3px;
-  border-bottom: 1px solid white;
   padding: 3px;
 }
 
