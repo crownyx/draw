@@ -85,8 +85,8 @@ function deleteOrTransform(group) {
   window.eventListeners.add('keydown', 'selectCommands', function(e) {
     switch(e.which) {
       case charCodes['d']: changeMode(commandMode); break;
-      case charCodes['r']: rotateGroup(group);      break;
-      case charCodes['t']: translateGroup(group);   break;
+      case charCodes['r']: window.eventListeners.remove('selectCommands'); rotateGroup(group);    break;
+      case charCodes['t']: window.eventListeners.remove('selectCommands'); translateGroup(group); break;
     }
   });
 }

@@ -26,7 +26,7 @@ window.onload = function() {
     }
   }, false);
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', choosePoint = function(e) {
     if(!e.shiftKey && e.which == charCodes['g']) {
       getInput(
         { main: 'enter point:', subtext: '(x,y)' },

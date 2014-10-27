@@ -2,6 +2,10 @@ var infopanel = {
   get top() {
     var _infopanel = document.getElementById('infopanel');
     var top = _infopanel.getElementsByClassName('box top')[0];
+    if(!top) {
+      top = _infopanel.insertBefore(document.createElement('div'), this.buttons[0]);
+      top.className = 'top';
+    }
     top.remove = function() { _infopanel.removeChild(top); }
     return top;
   },
@@ -10,20 +14,23 @@ var infopanel = {
     var boxTop = document.createElement('div');
     boxTop.className = 'box top';
     boxTop.textContent = textContent;
-    boxTop.id = 'boxtop';
-    if(document.getElementById('boxtop')) {
-      _infopanel.replaceChild(boxTop, document.getElementById('boxtop'));
-    } else if(this.buttons.length) {
-      _infopanel.insertBefore(boxTop, _infopanel.getElementsByClassName('button')[0]);
-    } else {
-      _infopanel.appendChild(boxTop);
-    }
+    _infopanel.replaceChild(boxTop, this.top);
     this.resizeButtons();
   },
   get bottom() {
     var _infopanel = document.getElementById('infopanel');
     var bottom = _infopanel.getElementsByClassName('box bottom')[0];
-    if(bottom) bottom.remove = function() { _infopanel.removeChild(bottom); }
+    if(!bottom) {
+      bottom = _infopanel.appendChild(document.createElement('div'));
+      bottom.className = 'bottom';
+    }
+    bottom.remove = function() { _infopanel.removeChild(bottom); }
+    bottom.add = function(textContent) {
+      var newDiv = _infopanel.appendChild(document.createElement('div'));
+      newDiv.className = 'box bottom';
+      newDiv.textContent = textContent;
+      infopanel.resizeButtons();
+    }
     return bottom;
   },
   set bottom(textContent) {
@@ -32,7 +39,7 @@ var infopanel = {
     box.className = 'box bottom';
     box.textContent = textContent;
     if(_infopanel.getElementsByClassName('box bottom').length) {
-      _infopanel.replaceChild(box, document.getElementsByClassName('box bottom')[0]);
+      _infopanel.replaceChild(box, document.getElementsByClassName('bottom')[0]);
     } else {
       _infopanel.appendChild(box);
     }
@@ -50,13 +57,18 @@ var infopanel = {
       }
       infopanel.resizeButtons();
     }
+    buttons.remove = function() {
+      this.forEach(function(button) {
+        _infopanel.removeChild(button);
+      });
+    }
     return buttons;
   },
   set buttons(buttonsArray) {
     var _infopanel = document.getElementById('infopanel');
     this.buttons.forEach(function(button) { _infopanel.removeChild(button); });
     buttonsArray.forEach(function(button) {
-      _infopanel.insertBefore(button, _infopanel.getElementsByClassName('box bottom')[0]);
+      _infopanel.insertBefore(button, infopanel.bottom);
     });
     this.resizeButtons();
   },

@@ -16,22 +16,34 @@ function Circle(radStart, radEnd) {
         if(area == 'x') {
           delete circle.radius.fixedLength;
         } else {
-          circle.radius.fixedLength = Math.sqrt(parseInt(area) / Math.PI);
+          circle.radius.fixedLength = Math.sqrt(parseInt(area.replace(',', '')) / Math.PI);
         }
       },
-      acceptChars: ['x']
+      acceptChars: ['x', ',']
     },
     {
       key: 'c',
       forWhat: 'circumference',
-      callback: function(circ) {
-        circle.radius.fixedLength = parseInt(circ) / (2 * Math.PI);
-      }
+      callback: function(circum) {
+        if(circum == 'x') {
+          delete circle.radius.fixedLength;
+        } else {
+          circle.radius.fixedLength = parseInt(circum.replace(',', '')) / (2 * Math.PI);
+        }
+      },
+      acceptChars: ['x', ',']
     },
     {
       key: 'r',
       forWhat: 'radius length',
-      callback: function(length) { circle.radius.fixedLength = parseInt(length); }
+      callback: function(length) {
+        if(length == 'x') {
+          delete circle.radius.fixedLength;
+        } else {
+          circle.radius.fixedLength = parseInt(length.replace(',', ''));
+        }
+      },
+      acceptChars: ['x', ',']
     }
   ];
 }
@@ -54,7 +66,6 @@ Object.defineProperty(Circle.prototype, 'points', {
       new Point(this.center.x, this.center.y + this.radius.length),
       new Point(this.center.x - this.radius.length, this.center.y)
     ].map(function(point) {
-      var point = point.translate(this.origin, this.rotation.rad);
       point.shape = this;
       return point;
     }, this);

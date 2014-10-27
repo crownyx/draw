@@ -1,6 +1,7 @@
 function editMode() {
-  infopanel.top = 'select point';
+  infopanel.top = 'select point to begin editing';
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
+  infopanel.bottom.add('select center point of a shape to delete/translate/rotate');
 
   var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
 
@@ -53,8 +54,9 @@ function editMode() {
 
         if(nearPoint.same(shape.center)) {
           infopanel.buttons = [
-            Button('t',   'translate', 'green'),
+            Button('d',   'delete',    'green'),
             Button('r',   'rotate',    'green'),
+            Button('t',   'translate', 'green'),
             Button('esc', 'cancel',    'red')
           ];
 
@@ -63,8 +65,15 @@ function editMode() {
           shape.center.round().preview();
           window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
             switch(e.which) {
-              case charCodes['t']: translate(new Group([shape.copy()]), nearPoint); break;
-              case charCodes['r']: rotate(new Group([shape.copy()]), nearPoint); break;
+              case charCodes['d']: changeMode(commandMode); break;
+              case charCodes['r']:
+                window.eventListeners.remove('rotateOrTranslate');
+                rotate(new Group([shape.copy()]), nearPoint);
+              break;
+              case charCodes['t']:
+                window.eventListeners.remove('rotateOrTranslate');
+                translate(new Group([shape.copy()]), nearPoint);
+              break;
             }
           });
         } else {

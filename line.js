@@ -110,6 +110,7 @@ Line.prototype.sketchPreview = function() {
   this.start.round().preview(Angle.from(front.startPoint, front.lastPoint), 1);
   this.angle.preview();
   this.sketch(middle.context);
+  if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
 }
 
 Line.prototype.translate = function(point) {

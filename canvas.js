@@ -67,6 +67,10 @@ front.refresh = function() {
   this.showAxes();
   this.eventListeners.clear();
 
+  infopanel.top.remove();
+  infopanel.buttons.remove();
+  infopanel.bottom.remove();
+
   if(this.setPoint) {
     this.showPos(this.setPoint);
     new AxisPair(this.setPoint).sketch(this.context);
