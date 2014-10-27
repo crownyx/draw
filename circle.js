@@ -110,4 +110,8 @@ Circle.prototype.infoText = function() {
   );
 }
 
-Circle.prototype.copy = function() { return new Circle(this.radius.start.copy(), this.radius.end.copy()); }
+Circle.prototype.copy = function() {
+  var circle = new Circle(this.radius.start.copy(), this.radius.end.copy());
+  circle.radius.fixedLength = this.radius.fixedLength;
+  return circle;
+}
