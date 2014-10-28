@@ -1,4 +1,4 @@
-body { background-color: black; margin: 5px; }
+body { background-color: rgb(25,25,50); margin: 5px; }
 
 canvas {
   position: absolute;
@@ -14,6 +14,7 @@ canvas {
   border-right: 0px;
   padding-right: 3px;
   padding-left: 3px;
+  overflow-y: auto;
 }
 
 #infopanel div.box {
@@ -32,6 +33,11 @@ canvas {
 #infopanel div.box.bottom {
   margin-top: 3px;
   padding: 3px;
+}
+
+#infopanel div.box.bottom div:last-child {
+  font-size: x-small;
+  font-weight: normal;
 }
 
 #infopanel div.button {

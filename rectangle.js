@@ -194,9 +194,9 @@ Rectangle.prototype.setEnd = function(point) {
     }
     if(this.fixedPerimeter) {
       if(this.fixedLength && !this.fixedHeight) {
-        height = (this.fixedPerimeter - length) / 2;
+        height = (this.fixedPerimeter - length * 2) / 2;
       } else if(this.fixedHeight && !this.fixedLength) {
-        length = (this.fixedPerimeter - height) / 2;
+        length = (this.fixedPerimeter - height * 2) / 2;
       } else if(!this.fixedHeight && !this.fixedLength) {
         var tan = Math.abs(Math.tan(diagAngle.rad));
         height = this.fixedPerimeter * tan / 2 / (1 + tan);

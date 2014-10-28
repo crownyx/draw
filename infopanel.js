@@ -1,32 +1,54 @@
 var infopanel = {
+  get element() {
+    return document.getElementById('infopanel');
+  },
   get top() {
-    var _infopanel = document.getElementById('infopanel');
-    var top = _infopanel.getElementsByClassName('box top')[0];
-    if(!top) {
-      top = _infopanel.insertBefore(document.createElement('div'), this.buttons[0]);
-      top.className = 'top';
-    }
-    top.remove = function() { _infopanel.removeChild(top); }
+    var top = document.getElementById('infopanel-top');
+    top.clear = function() { this.innerHTML = ""; }
     return top;
   },
   set top(textContent) {
-    var _infopanel = document.getElementById('infopanel');
-    var boxTop = document.createElement('div');
-    boxTop.className = 'box top';
-    boxTop.textContent = textContent;
-    _infopanel.replaceChild(boxTop, this.top);
+    this.top.clear();
+    var infobox = this.top.appendChild(document.createElement('div'));
+    infobox.className = 'box top';
+    infobox.textContent = textContent;
     this.resizeButtons();
   },
-  get bottom() {
-    var _infopanel = document.getElementById('infopanel');
-    var bottom = _infopanel.getElementsByClassName('box bottom')[0];
-    if(!bottom) {
-      bottom = _infopanel.appendChild(document.createElement('div'));
-      bottom.className = 'bottom';
+  get buttons() {
+    var buttons = document.getElementById('infopanel-buttons');
+    buttons.add = function() {
+      for(var i = 0; i < arguments.length; i++) {
+        this.appendChild(arguments[i]);
+      }
+      infopanel.resizeButtons();
     }
-    bottom.remove = function() { _infopanel.removeChild(bottom); }
+    buttons.clear = function() { this.innerHTML = ""; }
+    return buttons;
+  },
+  set buttons(buttonsArray) {
+    this.buttons.clear();
+    buttonsArray.forEach(function(button) { this.buttons.appendChild(button); }, this);
+    this.resizeButtons();
+  },
+  resizeButtons: function() {
+    for(var i = 0; i < this.buttons.childNodes.length; i++) {
+      var button = this.buttons.childNodes[i];
+      var keySegment = button.getElementsByClassName('key_segment')[0];
+      var textSegment = button.getElementsByClassName('text_segment')[0];
+      var clientWidth = document.getElementById('infopanel').clientWidth;
+      button.style.width = clientWidth - 6 + 'px';
+      keySegment.style.width  = clientWidth * 0.15 + 'px';
+      textSegment.style.width = clientWidth - parseFloat(keySegment.style.width) - 18 + 'px';
+      keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 3 + 'px';
+      keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 3 - textSegment.clientHeight + 6) / 2 + 'px';
+      if(document.getElementById('infopanel').clientWidth != clientWidth) this.resizeButtons();
+    }
+  },
+  get bottom() {
+    var bottom = document.getElementById('infopanel-bottom');
+    bottom.clear = function() { this.innerHTML = ""; }
     bottom.add = function(textContent, id) {
-      var newDiv = _infopanel.appendChild(document.createElement('div'));
+      var newDiv = this.appendChild(document.createElement('div'));
       newDiv.className = 'box bottom';
       if(id) newDiv.id = id;
       var mainDiv = newDiv.appendChild(document.createElement('div'));
@@ -40,61 +62,21 @@ var infopanel = {
     }
     bottom.find = function(id) {
       var infobox = document.getElementById(id);
-      if(infobox) infobox.remove = function() { _infopanel.removeChild(infobox); }
+      if(infobox) infobox.remove = function() { infopanel.bottom.removeChild(infobox); }
       return infobox;
     }
     return bottom;
-  },
-  set bottom(textContent) {
-    var _infopanel = document.getElementById('infopanel');
-    var box = document.createElement('div');
-    box.className = 'box bottom';
-    box.textContent = textContent;
-    if(_infopanel.getElementsByClassName('box bottom').length) {
-      _infopanel.replaceChild(box, document.getElementsByClassName('bottom')[0]);
-    } else {
-      _infopanel.appendChild(box);
-    }
-    this.resizeButtons();
-  },
-  get buttons() {
-    var buttons = [];
-    var _infopanel = document.getElementById('infopanel');
-    for(var i = 0; i < _infopanel.childNodes.length; i++) {
-      if(_infopanel.childNodes[i].button) buttons.push(_infopanel.childNodes[i]);
-    }
-    buttons.add = function() {
-      for(var i = 0; i < arguments.length; i++) {
-        _infopanel.insertBefore(arguments[i], _infopanel.getElementsByClassName('box bottom')[0]);
-      }
-      infopanel.resizeButtons();
-    }
-    buttons.remove = function() {
-      this.forEach(function(button) {
-        _infopanel.removeChild(button);
-      });
-    }
-    return buttons;
-  },
-  set buttons(buttonsArray) {
-    var _infopanel = document.getElementById('infopanel');
-    this.buttons.forEach(function(button) { _infopanel.removeChild(button); });
-    buttonsArray.forEach(function(button) {
-      _infopanel.insertBefore(button, infopanel.bottom);
-    });
-    this.resizeButtons();
-  },
-  resizeButtons: function() {
-    this.buttons.forEach(function(button) {
-      var keySegment = button.getElementsByClassName('key_segment')[0];
-      var textSegment = button.getElementsByClassName('text_segment')[0];
-      var clientWidth = document.getElementById('infopanel').clientWidth;
-      button.style.width = clientWidth + 'px';
-      keySegment.style.width  = clientWidth * 0.15 + 'px';
-      textSegment.style.width = clientWidth - parseFloat(keySegment.style.width) - 18 + 'px';
-      keySegment.style.paddingTop = (textSegment.clientHeight - keySegment.getElementsByTagName('span')[0].offsetHeight) - 3 + 'px';
-      keySegment.getElementsByTagName('span')[0].style.top = (keySegment.clientHeight - parseInt(keySegment.style.paddingTop) - 3 - textSegment.clientHeight + 6) / 2 + 'px';
-      if(document.getElementById('infopanel').clientWidth != clientWidth) this.resizeButtons();
-    }, this);
-  }
+  }//,
+  //set bottom(textContent) {
+  //  var _infopanel = document.getElementById('infopanel');
+  //  var box = document.createElement('div');
+  //  box.className = 'box bottom';
+  //  box.textContent = textContent;
+  //  if(_infopanel.getElementsByClassName('box bottom').length) {
+  //    _infopanel.replaceChild(box, document.getElementsByClassName('bottom')[0]);
+  //  } else {
+  //    _infopanel.appendChild(box);
+  //  }
+  //  this.resizeButtons();
+  //}
 }
