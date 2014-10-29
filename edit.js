@@ -43,7 +43,7 @@ function editMode() {
       allPoints.forEach(function(point) { point.fill(back.context); });
 
       front.eventListeners.add('click', 'selectPoint', function() {
-        infopanel.top.remove();
+        infopanel.top.clear();
         window.refresh(); front.refresh();
 
         var shape = nearPoint.shape;

@@ -69,7 +69,7 @@ front.refresh = function() {
 
   infopanel.top.clear();
   infopanel.buttons.clear();
-  //infopanel.bottom.remove();
+  infopanel.bottom.clear();
 
   if(this.setPoint) {
     this.showPos(this.setPoint);

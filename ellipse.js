@@ -9,24 +9,48 @@ function Ellipse(radStart, radEnd) {
 
   this.lines = [this.yAxis, this.xAxis];
 
+  var ellipse = this;
+
   this.shiftCommands = [
     {
       key: 'x',
       forWhat: 'x-axis length',
+      propertyName: 'xAxis',
+      prettify: function() { return commaSep(ellipse.fixedXAxis); },
       callback: function(length) {
-        this.xAxis.fixedLength = parseInt(length);
-        this.xAxis.setEnd(front.lastPoint);
-        this.xAxis.fixed = true;
-      }
+        if(length == 'x') {
+          ellipse.deleteFixedProperty('fixedXAxis');
+          delete ellipse.xAxis.fixedLength;
+          delete ellipse.xAxis.fixed;
+        } else {
+          ellipse.fixedXAxis = parseInt(length.replace(',', ''));
+          ellipse.xAxis.fixedLength = ellipse.fixedXAxis;
+          ellipse.xAxis.fixed = false;
+          ellipse.setEnd(front.setPoint || front.lastPoint);
+          ellipse.xAxis.fixed = true; // why do we need this?
+        }
+      },
+      acceptChars: ['x', ',']
     },
     {
       key: 'y',
       forWhat: 'y-axis length',
+      propertyName: 'yAxis',
+      prettify: function() { return commaSep(ellipse.fixedYAxis); },
       callback: function(length) {
-        this.yAxis.fixedLength = parseInt(length);
-        this.yAxis.setEnd(front.lastPoint);
-        this.yAxis.fixed = true;
-      }
+        if(length == 'x') {
+          ellipse.deleteFixedProperty('fixedYAxis');
+          delete ellipse.yAxis.fixedLength;
+          delete ellipse.yAxis.fixed;
+        } else {
+          ellipse.fixedYAxis = parseInt(length.replace(',', ''));
+          ellipse.yAxis.fixedLength = ellipse.fixedYAxis;
+          ellipse.yAxis.fixed = false;
+          ellipse.setEnd(front.setPoint || front.lastPoint);
+          ellipse.yAxis.fixed = true; // why do we need this?
+        }
+      },
+      acceptChars: ['x', ',']
     }
   ];
 }

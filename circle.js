@@ -12,11 +12,15 @@ function Circle(radStart, radEnd) {
     {
       key: 'a',
       forWhat: 'area',
+      prettify: function() { return commaSep(circle.fixedArea); },
       callback: function(area) {
         if(area == 'x') {
           delete circle.radius.fixedLength;
+          circle.deleteFixedProperty('fixedArea');
         } else {
-          circle.radius.fixedLength = Math.sqrt(parseInt(area.replace(',', '')) / Math.PI);
+          circle.deleteFixedProperty('fixedCircumference', 'fixedRadius');
+          circle.fixedArea = parseInt(area.replace(',', ''));
+          circle.radius.fixedLength = Math.sqrt(circle.fixedArea / Math.PI);
         }
       },
       acceptChars: ['x', ',']
@@ -24,11 +28,15 @@ function Circle(radStart, radEnd) {
     {
       key: 'c',
       forWhat: 'circumference',
+      prettify: function() { return commaSep(circle.fixedCircumference); },
       callback: function(circum) {
         if(circum == 'x') {
           delete circle.radius.fixedLength;
+          circle.deleteFixedProperty('fixedCircumference');
         } else {
-          circle.radius.fixedLength = parseInt(circum.replace(',', '')) / (2 * Math.PI);
+          circle.deleteFixedProperty('fixedArea', 'fixedRadius');
+          circle.fixedCircumference = parseInt(circum.replace(',', ''));
+          circle.radius.fixedLength = circle.fixedCircumference / (2 * Math.PI);
         }
       },
       acceptChars: ['x', ',']
@@ -36,11 +44,16 @@ function Circle(radStart, radEnd) {
     {
       key: 'r',
       forWhat: 'radius length',
+      propertyName: 'radius',
+      prettify: function() { return commaSep(circle.fixedRadius); },
       callback: function(length) {
         if(length == 'x') {
           delete circle.radius.fixedLength;
+          circle.deleteFixedProperty('fixedRadius');
         } else {
-          circle.radius.fixedLength = parseInt(length.replace(',', ''));
+          circle.deleteFixedProperty('fixedArea', 'fixedCircumference');
+          circle.fixedRadius = parseInt(length.replace(',', ''));
+          circle.radius.fixedLength = circle.fixedRadius;
         }
       },
       acceptChars: ['x', ',']

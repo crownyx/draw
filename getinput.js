@@ -3,14 +3,15 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
 
   var oldTop = infopanel.top.textContent;
   infopanel.top = mainText;
+  var newTop = infopanel.top.getElementsByClassName('box top')[0];
 
   var inputfield = document.createElement('div');
-  infopanel.top.appendChild(inputfield);
+  newTop.appendChild(inputfield);
 
   if(promptText.subtext) {
     var subtext = document.createElement('div');
     subtext.textContent = promptText.subtext;
-    infopanel.top.appendChild(subtext);
+    newTop.appendChild(subtext);
   }
 
   window.eventListeners.suspendAll();

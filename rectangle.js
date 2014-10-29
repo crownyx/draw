@@ -15,11 +15,12 @@ function Rectangle(diagStart, diagEnd) {
       prettify: function() { return commaSep(rectangle.fixedArea); },
       callback: function(area) {
         if(area == 'x') {
-          delete this.fixedArea;
+          rectangle.deleteFixedProperty('fixedArea');
         } else {
-          if(this.fixedPerimeter) delete this.fixedPerimeter;
-          if(this.fixedRatio) delete this.fixedRatio;
-          this.fixedArea = parseInt(area.replace(',', ''));
+          rectangle.deleteFixedProperty('fixedPerimeter', 'fixedRatio');
+          if(rectangle.fixedLength && rectangle.fixedHeight)
+            rectangle.deleteFixedProperty('fixedLength', 'fixedHeight');
+          rectangle.fixedArea = parseInt(area.replace(',', ''));
         }
       },
       acceptChars: ['x', ',']
@@ -30,9 +31,11 @@ function Rectangle(diagStart, diagEnd) {
       prettify: function() { return commaSep(rectangle.fixedHeight); },
       callback: function(height) {
         if(height == 'x') {
-          delete this.fixedHeight;
+          rectangle.deleteFixedProperty('fixedHeight');
         } else {
-          this.fixedHeight = parseInt(height.replace(',', ''));
+          if(rectangle.fixedLength)
+            rectangle.deleteFixedProperty('fixedArea', 'fixedPerimeter', 'fixedRatio');
+          rectangle.fixedHeight = parseInt(height.replace(',', ''));
         }
       },
       acceptChars: ['x', ',']
@@ -43,9 +46,11 @@ function Rectangle(diagStart, diagEnd) {
       prettify: function() { return commaSep(rectangle.fixedLength); },
       callback: function(length) {
         if(length == 'x') {
-          delete this.fixedLength;
+          rectangle.deleteFixedProperty('fixedLength');
         } else {
-          this.fixedLength = parseInt(length.replace(',', ''));
+          if(rectangle.fixedHeight)
+            rectangle.deleteFixedProperty('fixedArea', 'fixedPerimeter', 'fixedRatio');
+          rectangle.fixedLength = parseInt(length.replace(',', ''));
         }
       },
       acceptChars: ['x', ',']
@@ -56,11 +61,13 @@ function Rectangle(diagStart, diagEnd) {
       prettify: function() { return commaSep(rectangle.fixedPerimeter); },
       callback: function(measure) {
         if(measure == 'x') {
-          delete this.fixedPerimeter;
+          rectangle.deleteFixedProperty('fixedPerimeter');
         } else {
-          if(this.fixedArea) delete this.fixedArea;
-          if(this.fixedRatio) delete this.fixedRatio;
-          this.fixedPerimeter = parseInt(measure.replace(',', ''));
+          rectangle.deleteFixedProperty('fixedArea', 'fixedRatio');
+          if(rectangle.fixedLength && rectangle.fixedHeight) {
+            rectangle.deleteFixedProperty('fixedLength', 'fixedHeight');
+          }
+          rectangle.fixedPerimeter = parseInt(measure.replace(',', ''));
         }
       },
       acceptChars: ['x', ',']
@@ -68,22 +75,22 @@ function Rectangle(diagStart, diagEnd) {
     {
       key: 'r',
       forWhat: 'ratio of sides',
-      fixedProperty: 'ratio',
+      propertyName: 'ratio',
       subtext: '(length:height)',
       prettify: function() {
         return String(rectangle.fixedRatioNumerator) + ':' + String(rectangle.fixedRatioDenominator);
       },
       callback: function(lh) {
         if(lh == 'x') {
-          delete this.fixedRatio;
-          delete this.fixedRatioNumerator;
-          delete this.fixedRatioDenominator;
+          rectangle.deleteFixedProperty('fixedRatio', 'fixedRatioNumerator', 'fixedRatioDenominator');
         } else {
-          if(this.fixedArea) delete this.fixedArea;
-          if(this.fixedPerimeter) delete this.fixedPerimeter;
-          this.fixedRatioNumerator = parseInt(lh.split(':')[0]);
-          this.fixedRatioDenominator = parseInt(lh.split(':')[1]);
-          this.fixedRatio = this.fixedRatioNumerator/this.fixedRatioDenominator;
+          rectangle.deleteFixedProperty('fixedArea', 'fixedPerimeter');
+          if(rectangle.fixedLength && rectangle.fixedHeight) {
+            rectangle.deleteFixedProperty('fixedLength', 'fixedHeight');
+          }
+          rectangle.fixedRatioNumerator = parseInt(lh.split(':')[0]);
+          rectangle.fixedRatioDenominator = parseInt(lh.split(':')[1]);
+          rectangle.fixedRatio = rectangle.fixedRatioNumerator/rectangle.fixedRatioDenominator;
         }
       },
       acceptChars: ['x', ':']

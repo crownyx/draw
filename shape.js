@@ -53,6 +53,15 @@ Shape.prototype.translate = function(point) {
   this.lines.forEach(function(line) { line.translate(point); });
 }
 
+Shape.prototype.deleteFixedProperty = function() {
+  for(var i = 0; i < arguments.length; i++) {
+    if(this[arguments[i]]) {
+      delete this[arguments[i]];
+      infopanel.bottom.find(arguments[i]).remove();
+    }
+  }
+}
+
 Object.defineProperty(Shape.prototype, 'name', {
   get: function() { return this.constructor.name; }
 });

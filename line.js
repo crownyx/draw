@@ -13,9 +13,10 @@ function Line(start, end) {
       key: 'a',
       forWhat: 'angle',
       subtext: '(degrees)',
+      prettify: function() { return line.fixedAngle.deg + unescape("\xB0"); },
       callback: function(deg) {
         if(deg == 'x') {
-          delete line.fixedAngle;
+          line.deleteFixedProperty('fixedAngle');
         } else {
           line.fixedAngle = new Angle(parseInt(deg) / 180 * Math.PI);
         }
@@ -25,9 +26,10 @@ function Line(start, end) {
     {
       key: 'l',
       forWhat: 'length',
+      prettify: function() { return commaSep(line.fixedLength); },
       callback: function(length) {
         if(length == 'x') {
-          delete line.fixedLength;
+          line.deleteFixedProperty('fixedLength');
         } else {
           line.fixedLength = parseInt(length.replace(',', ''));
         }

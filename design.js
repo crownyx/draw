@@ -53,7 +53,7 @@ function design(shape) {
   /*                  */ infopanel.buttons.add(Button('esc', 'cancel', 'red'));
 
   shape.shiftCommands.forEach(function(command) {
-    var propertyName = 'fixed' + (command.fixedProperty || command.forWhat).capitalize();
+    var propertyName = 'fixed' + (command.propertyName || command.forWhat).capitalize();
     command.infobox = function() {
       return {
         main: 'fixed ' + command.forWhat + ': ' + command.prettify(),
@@ -96,13 +96,11 @@ function design(shape) {
             if(command.subtext) helpText = { main: helpText, subtext: command.subtext };
             getInput(helpText, function(input) {
               command.callback.call(shape, input);
-              var propertyName = 'fixed' + (command.fixedProperty || command.forWhat).capitalize();
+              var propertyName = 'fixed' + (command.propertyName || command.forWhat).capitalize();
               var property = shape[propertyName];
               if(property) {
                 if(infopanel.bottom.find(propertyName)) infopanel.bottom.find(propertyName).remove();
                 infopanel.bottom.add(command.infobox(), propertyName);
-              } else {
-                infopanel.bottom.find(propertyName).remove();
               }
             }, command.acceptChars || [], shape);
           }

@@ -74,7 +74,7 @@ function selectMode() {
 }
 
 function deleteOrTransform(group) {
-  infopanel.top.remove();
+  infopanel.top.clear();
   infopanel.buttons = [
     Button('d',   'delete',    'green'),
     Button('r',   'rotate',    'green'),
