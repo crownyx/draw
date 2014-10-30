@@ -159,7 +159,7 @@ function rotate(group, refPoint) {
             targetPoint = front.lastPoint;
           } else {
             delete front.setPoint;
-            if(infopanel.bottom) infopanel.bottom.remove();
+            infopanel.bottom.clear();
             front.redraw();
             middle.group.fixedRotation = true;
             targetPoint = refPoint.plus(

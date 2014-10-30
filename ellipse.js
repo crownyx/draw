@@ -13,6 +13,21 @@ function Ellipse(radStart, radEnd) {
 
   this.shiftCommands = [
     {
+      key: 'r',
+      forWhat: 'rotation',
+      prettify: function() { return Math.round(ellipse.fixedRotation.deg) + unescape("\xB0"); },
+      callback: function(deg) {
+        if(deg == 'x') {
+          ellipse.deleteFixedProperty('fixedRotation');
+          ellipse.rotation = new Angle(0);
+        } else {
+          ellipse.fixedRotation = Angle.fromDeg(parseInt(deg));
+          ellipse.rotation = ellipse.fixedRotation;
+        }
+      },
+      acceptChars: ['x']
+    },
+    {
       key: 'x',
       forWhat: 'x-axis length',
       propertyName: 'xAxis',
@@ -96,12 +111,16 @@ Ellipse.prototype.drawPath = function(context) {
 }
 
 Ellipse.prototype.preview = function() {
-  var refLine = new Line(this.origin, front.setPoint || front.lastPoint);
-  refLine.sketchPreview();
   this.draw(middle.context);
+  this.center.preview(0, 2);
   if(this.rotation.deg % 90) {
     this.yAxis.sketch(middle.context);
     this.xAxis.sketch(middle.context);
+    this.yAxis.end.round().preview(0, 2, { strokeStyle: 'green' });
+    this.xAxis.end.round().preview(0, 2, { strokeStyle: 'red' });
+  } else {
+    this.yAxis.end.round().showCoords(middle.context, 0, 2);
+    this.xAxis.end.round().showCoords(middle.context, 0, 2);
   }
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }

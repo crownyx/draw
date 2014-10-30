@@ -87,7 +87,6 @@ var charCodes = {
   f12: 123,
   num_lock: 144,
   scroll_lock: 145,
-  semicolon: 186,
   equal_sign: 187,
   ',': 188,
   dash: 189,

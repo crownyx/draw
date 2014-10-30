@@ -32,14 +32,14 @@ window.onload = function() {
         { main: 'enter point:', subtext: '(x,y)' },
         function(xy) {
           if(xy == 'x') {
-            if(infopanel.bottom) infopanel.bottom.remove();
+            infopanel.bottom.find('unchoosePoint').remove();
             delete front.setPoint;
           } else {
             var x = parseInt(xy.split(',')[0]);
             var y = parseInt(xy.split(',')[1]);
             if(typeof x === 'number' && !isNaN(x) && typeof y === 'number' && !isNaN(y)) {
               front.setPoint = new Point(x, y);
-              infopanel.bottom = 'To unchoose point, type "g", then enter "x"';
+              infopanel.bottom.add('To unchoose point, type "g", then enter "x"', 'unchoosePoint');
             }
           }
           front.redraw();

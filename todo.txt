@@ -1,7 +1,7 @@
+set rotate for each shape
 re-allow switch from rotate to translate and vice versa
 double check ellipse circumference formula
 turn help/commands into buttons
-turn off settings (eg fixedLength)
 finish bezier curves: preview, shiftCommands
 start triangle
 edit by changing points directly

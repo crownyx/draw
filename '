@@ -64,6 +64,7 @@ Shape.prototype.deleteFixedProperty = function() {
 
 Object.defineProperty(Shape.prototype, 'name', {
   get: function() { return this.constructor.name; },
+  configuragble: true
 });
 
 // Shape public interface:

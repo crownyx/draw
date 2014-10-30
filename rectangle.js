@@ -74,6 +74,22 @@ function Rectangle(diagStart, diagEnd) {
     },
     {
       key: 'r',
+      forWhat: 'rotation',
+      subtext: '(degrees)',
+      prettify: function() { return Math.round(rectangle.fixedRotation.deg) + unescape("\xB0"); },
+      callback: function(deg) {
+        if(deg == 'x') {
+          rectangle.deleteFixedProperty('fixedRotation');
+          rectangle.rotation = new Angle(0);
+        } else {
+          rectangle.fixedRotation = Angle.fromDeg(parseInt(deg));
+          rectangle.rotation = rectangle.fixedRotation;
+        }
+      },
+      acceptChars: ['x']
+    },
+    {
+      key: 's',
       forWhat: 'ratio of sides',
       propertyName: 'ratio',
       subtext: '(length:height)',
@@ -104,7 +120,7 @@ Rectangle.prototype.constructor = Rectangle;
 Object.defineProperty(Rectangle.prototype, 'length', {
   get: function() {
     if(this.fixedLength) {
-      switch(new Angle(this.diagonal.angle.rad - this.rotation.rad).quadrant) {
+      switch(this.diagonal.angle.minus(this.rotation).quadrant) {
         case 1:
         case 4: return this.fixedLength; break;
         case 2:
@@ -120,15 +136,15 @@ Object.defineProperty(Rectangle.prototype, 'length', {
 Object.defineProperty(Rectangle.prototype, 'height', {
   get: function() {
     if(this.fixedHeight) {
-      switch(new Angle(this.diagonal.angle.rad - this.rotation.rad).quadrant) {
+      switch(this.diagonal.angle.minus(this.rotation).quadrant) {
         case 1:
         case 2: return this.fixedHeight; break;
         case 3:
         case 4: return -this.fixedHeight; break;
       }
     } else {
-      var diagAngle = this.diagonal.angle.rad - this.rotation.rad;
-      return Math.sin(diagAngle) * this.diagonal.length;
+      var diagAngle = this.diagonal.angle.minus(this.rotation);
+      return Math.sin(diagAngle.rad) * this.diagonal.length;
     }
   }
 });
@@ -230,7 +246,7 @@ Rectangle.prototype.setEnd = function(point) {
     var x = this.diagonal.start.x + length;
     var y = this.diagonal.start.y + height;
     this.diagonal.setEnd(new Point(x, y));
-    this.diagonal.rotate(this.rotation);
+    this.diagonal.rotate(this.fixedRotation || this.rotation);
   } else {
     this.diagonal.setEnd(point);
   }
@@ -251,7 +267,7 @@ Rectangle.prototype.translate = function(point) {
 
 Rectangle.prototype.rotate = function(rotation) {
   this.diagonal.rotate(rotation);
-  this.rotation = new Angle(this.rotation.rad + rotation.rad);
+  this.rotation = this.rotation.plus(rotation);
 }
 
 Rectangle.prototype.preview = function() {
@@ -268,6 +284,7 @@ Rectangle.prototype.copy = function() {
   newRect.origin = this.origin.copy();
   newRect.diagonal = this.diagonal.copy();
   newRect.rotation = this.rotation.copy();
+  newRect.fixedRotation = this.fixedRotation;
   newRect.fixedHeight = this.fixedHeight;
   newRect.fixedLength = this.fixedLength;
   newRect.fixedArea = this.fixedArea;

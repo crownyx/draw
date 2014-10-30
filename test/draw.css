@@ -1,0 +1,78 @@
+body { background-color: rgb(25,25,50); margin: 5px; }
+
+canvas {
+  position: absolute;
+  right: 5px;
+}
+
+#backlayer { background-color: white; }
+
+#infopanel {
+  position: absolute;
+  font-size: small;
+  border: 1px solid white;
+  border-right: 0px;
+  padding-right: 3px;
+  padding-left: 3px;
+  overflow-y: auto;
+}
+
+#infopanel div.box {
+  text-align: center;
+  margin-bottom: 3px;
+  font-weight: bold;
+  color: white;
+  border: 1px solid white;
+}
+
+#infopanel div.box.top {
+  margin-top: 3px;
+  padding: 3px;
+}
+
+#infopanel div.box.bottom {
+  margin-top: 3px;
+  padding: 3px;
+}
+
+#infopanel div.box.bottom div:last-child {
+  font-size: x-small;
+  font-weight: normal;
+}
+
+#infopanel div.button {
+  margin-top: 1px;
+}
+
+#infopanel div.button:last-child { margin-bottom: 3px; }
+
+#infopanel div.button div {
+  padding: 3px;
+  display: inline-block;
+}
+
+#infopanel div.button div.key_segment {
+  text-align: center;
+  font-weight: bold;
+  color: white;
+}
+
+#infopanel div.button.gray div.key_segment { background-color: rgb(100,100,100); }
+#infopanel div.button.gray div.text_segment { background-color: rgb(150,150,150); }
+
+#infopanel div.button.blue div.key_segment { background-color: rgb(100,100,160); }
+#infopanel div.button.blue div.text_segment { background-color: rgb(150,150,240); }
+
+#infopanel div.button.yellow div.key_segment { background-color: rgb(160,160,100); }
+#infopanel div.button.yellow div.text_segment { background-color: rgb(240,240,150); }
+
+#infopanel div.button.red div.key_segment { background-color: rgb(160,100,100); }
+#infopanel div.button.red div.text_segment { background-color: rgb(240,150,150); }
+
+#infopanel div.button.brown div.key_segment { background-color: rgb(120,60,18) }
+#infopanel div.button.brown div.text_segment { background-color: rgb(160,80,24) }
+
+#infopanel div.button.green div.key_segment { background-color: rgb(100,160,100) }
+#infopanel div.button.green div.text_segment { background-color: rgb(150,240,150) }
+
+#infopanel div.button div.key_segment span { position: relative; }
