@@ -8,10 +8,16 @@ function translate(group, refPoint) {
 
   infopanel.top = 'choose translation point, then click';
   infopanel.buttons = [
-    Button('g', 'choose point', 'yellow'),
-    Button('A', 'set angle', 'blue'),
-    Button('D', 'set distance', 'blue'),
-    Button('esc', 'cancel', 'red')
+    Button('c',   'clip',         'green'),
+    Button('d',   'delete',       'green'),
+    Button('m',   'mirror',       'green'),
+    Button('r',   'rotate',       'green'),
+    Button('s',   'style',        'green'),
+    Button('t',   'translate',    'green'),
+    Button('g',   'choose point', 'yellow'),
+    Button('A',   'set angle',    'blue'),
+    Button('D',   'set distance', 'blue'),
+    Button('esc', 'cancel',       'red')
   ];
 
   window.eventListeners.add('keydown', 'setDistance', function(e) {
@@ -127,9 +133,15 @@ function rotate(group, refPoint) {
 
   infopanel.top = 'choose angle of rotation, then click.';
   infopanel.buttons = [
-    Button('g', 'choose point', 'yellow'),
-    Button('A', 'set angle', 'blue'),
-    Button('esc', 'cancel', 'red')
+    Button('c',   'clip',         'green'),
+    Button('d',   'delete',       'green'),
+    Button('m',   'mirror',       'green'),
+    Button('r',   'rotate',       'green'),
+    Button('s',   'style',        'green'),
+    Button('t',   'translate',    'green'),
+    Button('g',   'choose point', 'yellow'),
+    Button('A',   'set angle',    'blue'),
+    Button('esc', 'cancel',       'red')
   ];
 
   group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
@@ -208,38 +220,52 @@ function clip(group) {
 ////////////
 
 function mirror(group) {
-  group.shapes.forEach(function(shape) { back.shapes.push(shape); });
-  back.refresh();
-  window.eventListeners.add('click', 'drawLineOfReflection', function() {
-    var lineOfReflection = new Line(front.lastPoint, front.lastPoint);
-    front.eventListeners.add('mousemove', 'setEnd', function() {
-      lineOfReflection.setEnd(front.lastPoint);
-      middle.clear();
-      lineOfReflection.sketchPreview();
-      group.shapes.forEach(function(shape) {
+  middle.clear();
+  front.eventListeners.clear();
+
+  middle.group = group;
+  middle.group.reflected = [];
+
+  middle.group.setEnd = function(point) {
+    if(front.startPoint && point.distance(front.startPoint) > 5) {
+      middle.group.reflected = this.shapes.map(function(shape) {
+        var lineOfReflection = new Line(front.startPoint, point);
         var reflected = shape.copy();
         var centerToOrigin = new Line(shape.center, shape.origin);
-        var startToCenter = new Line(lineOfReflection.start, shape.center);
+        var startToCenter = new Line(front.startPoint, shape.center);
         var triAngle = lineOfReflection.angle.minus(startToCenter.angle);
         var newTriAngle = lineOfReflection.angle.plus(triAngle);
         var newCenter = startToCenter.start.plus(startToCenter.length).translate(startToCenter.start, newTriAngle);
 
-        startToCenter.sketch(middle.context);
         var startToNewCenter = new Line(startToCenter.start, newCenter);
-        startToNewCenter.sketch(middle.context);
 
         newOrigin = newCenter.plus(centerToOrigin.length).translate(newCenter, centerToOrigin.angle);
-        var angleOfRotation = startToCenter.angle.quadrant % 2 ?
-                              startToCenter.angle.minus(Math.PI - startToNewCenter.angle.rad) :
-                              startToNewCenter.angle.minus(startToCenter.angle.refAngle);
+        var angleOfRotation = startToCenter.angle.minus(Math.PI - startToNewCenter.angle.rad);
         newOrigin = newOrigin.translate(newCenter, angleOfRotation);
 
         reflected.translate(newOrigin);
         reflected.rotate(angleOfRotation);
-        reflected.draw(middle.context);
+        return reflected;
       });
-    });
+    }
+  }
+
+  middle.group.preview = function() {
+    if(front.startPoint) new Line(front.startPoint, front.lastPoint).sketchPreview();
+    this.reflected.forEach(function(shape) { shape.draw(middle.context); });
+    this.shapes.forEach(function(shape) { shape.draw(middle.context); });
+  }
+
+  middle.group.shapes.forEach(function(shape) { shape.draw(middle.context); });
+
+  window.eventListeners.add('click', 'drawLineOfReflection', function() {
     window.eventListeners.remove('drawLineOfReflection');
+    front.startPoint = front.lastPoint;
+    front.eventListeners.add('mousemove', 'setEnd', function() {
+      middle.clear();
+      middle.group.setEnd(front.lastPoint);
+      middle.group.preview();
+    });
     window.eventListeners.add('click', 'completeLine', function() {
       
     });

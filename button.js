@@ -19,12 +19,7 @@ function Button(key, text, color) {
   })(document.createElement('div')));
 
   button.className = 'button ' + color;
+  button.id = 'button-' + key;
 
   return button;
-}
-
-function escapeButton() {
-  return Button({
-    keySegment: 'esc', textSegment: 'cancel', color: 'red'
-  });
 }

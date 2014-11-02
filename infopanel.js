@@ -23,6 +23,7 @@ var infopanel = {
       infopanel.resizeButtons();
     }
     buttons.clear = function() { this.innerHTML = ""; }
+    buttons.remove = function(id) { this.removeChild(document.getElementById('button-' + id)); }
     return buttons;
   },
   set buttons(buttonsArray) {

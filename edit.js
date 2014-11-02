@@ -67,36 +67,25 @@ function editMode() {
           front.startPoint = shape.center;
           shape.center.round().preview();
           window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
-            switch(e.which) {
-              case charCodes['c']:
-                window.eventListeners.remove('rotateOrTranslate');
-                clip(new Group([shape.copy()]));
-              break;
-              case charCodes['d']: changeMode(commandMode); break;
-              case charCodes['s']:
-                window.eventListeners.remove('rotateOrTranslate');
-                getInput(
-                  'enter color:',
-                  function(color) {
-                    shape.fillStyle = color;
-                    shape.complete();
-                    changeMode(commandMode);
-                  },
-                  ['a-z', '(', ')', ',']
-                );
-              break;
-              case charCodes['m']:
-                window.eventListeners.remove('rotateOrTranslate');
-                mirror(new Group([shape.copy()]));
-              break;
-              case charCodes['r']:
-                window.eventListeners.remove('rotateOrTranslate');
-                rotate(new Group([shape.copy()]), nearPoint);
-              break;
-              case charCodes['t']:
-                window.eventListeners.remove('rotateOrTranslate');
-                translate(new Group([shape.copy()]), nearPoint);
-              break;
+            if(!e.shiftKey) {
+              switch(e.which) {
+                case charCodes['c']:clip(new Group([shape.copy()])); break;
+                case charCodes['d']: changeMode(commandMode); break;
+                case charCodes['s']:
+                  getInput(
+                    'enter color:',
+                    function(color) {
+                      shape.fillStyle = color;
+                      shape.complete();
+                      changeMode(commandMode);
+                    },
+                    ['a-z', '(', ')', ',']
+                  );
+                break;
+                case charCodes['m']: mirror(new Group([shape.copy()])); break;
+                case charCodes['r']: rotate(new Group([shape.copy()]), nearPoint); break;
+                case charCodes['t']: translate(new Group([shape.copy()]), nearPoint); break;
+              }
             }
           });
         } else {
