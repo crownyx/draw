@@ -1,5 +1,14 @@
 function Angle(rad) {
-  this.rad = (rad && !(rad % (2 * Math.PI)) ? rad : ((rad || 0) + 2 * Math.PI) % (2 * Math.PI));
+  if(rad && !(rad % (2 * Math.PI))) {
+    rad = 2 * Math.PI;
+  } else if(rad < 0) {
+    do {
+      rad += 2 * Math.PI;
+    } while(rad < 0);
+  } else {
+    rad = (rad || 0) % (2 * Math.PI);
+  }
+  this.rad = rad;
 }
 
 Object.defineProperty(Angle.prototype, 'quadrant', {
@@ -22,11 +31,11 @@ Object.defineProperty(Angle.prototype, 'perp', {
 
 Object.defineProperty(Angle.prototype, 'refAngle', {
   get: function() {
-    switch(_quad) {
-      case 1: return this.rad; break;
-      case 2: return Math.PI - this.rad; break;
-      case 3: return this.rad - Math.PI; break;
-      case 4: return 2 * Math.PI - this.rad; break;
+    switch(this.quadrant) {
+      case 1: return new Angle(this.rad              ); break;
+      case 2: return new Angle(Math.PI - this.rad    ); break;
+      case 3: return new Angle(this.rad - Math.PI    ); break;
+      case 4: return new Angle(2 * Math.PI - this.rad); break;
     }
   }
 });

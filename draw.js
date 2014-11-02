@@ -17,8 +17,10 @@ window.onload = function() {
 
   front.canvas.addEventListener('mousemove', function()  { front.clear(); }, false);
   front.canvas.addEventListener('mousemove', function(e) { front.lastPoint = Point.from(e); }, false);
+  front.canvas.addEventListener('click',     function(e) { front.lastPoint = Point.from(e); }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showAxes(); }, false);
   front.canvas.addEventListener('mousemove', function()  { front.showPos(); }, false);
+
   front.canvas.addEventListener('mousemove', function()  {
     if(front.setPoint) {
       front.showPos(front.setPoint);
@@ -28,30 +30,7 @@ window.onload = function() {
 
   window.addEventListener('keydown', choosePoint = function(e) {
     if(!e.shiftKey && e.which == charCodes['g']) {
-      getInput(
-        { main: 'enter point:', subtext: '(x,y)' },
-        function(xy) {
-          if(xy == 'x') {
-            infopanel.bottom.find('unchoosePoint').remove();
-            delete front.setPoint;
-          } else {
-            var x = parseInt(xy.split(',')[0]);
-            var y = parseInt(xy.split(',')[1]);
-            if(typeof x === 'number' && !isNaN(x) && typeof y === 'number' && !isNaN(y)) {
-              front.setPoint = new Point(x, y);
-              infopanel.bottom.add('To unchoose point, type "g", then enter "x"', 'unchoosePoint');
-            }
-          }
-          front.redraw();
-          if(middle.shape || middle.group) {
-            if(middle.group) delete middle.group.fixedRotation;
-            (middle.shape || middle.group).setEnd(front.setPoint || front.lastPoint);
-            middle.clear();
-            (middle.shape || middle.group).preview(front.setPoint || front.lastPoint);
-          }
-        },
-        ['x', ',']
-      );
+      getInputForSetPoint();
     }
   }, false);
 
@@ -59,6 +38,45 @@ window.onload = function() {
 
   changeMode(commandMode);
 }
+
+/////////////////
+// choosePoint //
+/////////////////
+
+function getInputForSetPoint() {
+  getInput(
+    { main: 'enter point:', subtext: '(x,y)' },
+    setPoint,
+    ['x', ',']
+  );
+}
+
+function setPoint(xy) {
+  if(xy && typeof xy == "string") {
+    if(xy == 'x') {
+      infopanel.bottom.find('unchoosePoint').remove();
+      delete front.setPoint;
+    } else {
+      var x = parseInt(xy.split(',')[0]);
+      var y = parseInt(xy.split(',')[1]);
+      if(typeof x === 'number' && !isNaN(x) && typeof y === 'number' && !isNaN(y)) {
+        front.setPoint = new Point(x, y);
+        infopanel.bottom.add('To unchoose point, type "g", then enter "x"', 'unchoosePoint');
+      }
+    }
+    front.redraw();
+    if(middle.shape || middle.group) {
+      if(middle.group) delete middle.group.fixedRotation;
+      (middle.shape || middle.group).setEnd(front.setPoint || front.lastPoint);
+      middle.clear();
+      (middle.shape || middle.group).preview(front.setPoint || front.lastPoint);
+    }
+  }
+}
+
+////////////////
+// changeMode //
+////////////////
 
 function changeMode(mode) {
   window.refresh();
@@ -84,7 +102,8 @@ function commandMode() {
   if(back.shapes.length) {
     infopanel.buttons.add(
       Button('s', 'select shape(s)', 'green'),
-      Button('e', 'edit shape(s)', 'green')
+      Button('e', 'edit shape(s)', 'green'),
+      Button('x', 'export image', 'green')
     );
   }
 
@@ -100,6 +119,7 @@ function commandMode() {
     switch(e.which) {
       case charCodes['s']: changeMode(selectMode); break;
       case charCodes['e']: changeMode(editMode); break;
+      case charCodes['x']: exportImage(); break;
     }
   });
 }
@@ -184,4 +204,8 @@ function EventListenerCollection(receiver) {
       return had;
     }
   };
+}
+
+function exportImage() {
+  
 }

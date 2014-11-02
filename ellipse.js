@@ -116,13 +116,16 @@ Ellipse.prototype.preview = function() {
   if(this.rotation.deg % 90) {
     this.yAxis.sketch(middle.context);
     this.xAxis.sketch(middle.context);
-    this.yAxis.end.round().preview(0, 2, { strokeStyle: 'green' });
-    this.xAxis.end.round().preview(0, 2, { strokeStyle: 'red' });
-  } else {
-    this.yAxis.end.round().showCoords(middle.context, 0, 2);
-    this.xAxis.end.round().showCoords(middle.context, 0, 2);
   }
+  this.yAxis.end.round().showCoords(middle.context, 0, 2);
+  this.xAxis.end.round().showCoords(middle.context, 0, 2);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
+}
+
+Ellipse.prototype.translate = function(point) {
+  this.origin = point;
+  this.xAxis.translate(point);
+  this.yAxis.translate(point);
 }
 
 Object.defineProperty(Ellipse.prototype, 'circumference', {

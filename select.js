@@ -76,6 +76,7 @@ function selectMode() {
 function deleteOrTransform(group) {
   infopanel.top.clear();
   infopanel.buttons = [
+    Button('c',   'clip',      'green'),
     Button('d',   'delete',    'green'),
     Button('r',   'rotate',    'green'),
     Button('t',   'translate', 'green'),
@@ -84,6 +85,7 @@ function deleteOrTransform(group) {
 
   window.eventListeners.add('keydown', 'selectCommands', function(e) {
     switch(e.which) {
+      case charCodes['c']: window.eventListeners.remove('selectCommands'); clip(group); break;
       case charCodes['d']: changeMode(commandMode); break;
       case charCodes['r']: window.eventListeners.remove('selectCommands'); rotateGroup(group);    break;
       case charCodes['t']: window.eventListeners.remove('selectCommands'); translateGroup(group); break;

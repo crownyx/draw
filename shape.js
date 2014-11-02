@@ -6,7 +6,7 @@ function Shape() {
 
 Shape.prototype.complete = function() {
   back.shapes.push(this);
-  this.draw(back.context);
+  back.refresh();
 }
 
 Shape.prototype.nextStep = function() {
@@ -26,12 +26,23 @@ Shape.prototype.sketch = function(context, params = {}) {
 
 Shape.prototype.draw = function(context, params = {}) {
   context.save();
+    if(this.clipShape) {
+      context.beginPath();
+        this.clipShape.drawPath(context);
+      context.clip();
+    }
     context.strokeStyle = params.strokeStyle || this.strokeStyle || context.strokeStyle;
     context.lineWidth   = params.lineWidth   || this.lineWidth   || context.lineWidth;
     context.setLineDash(this.lineDash || []);
     context.beginPath();
       this.drawPath(context);
     context.stroke();
+    if(params.fillStyle || this.fillStyle) {
+      context.fillStyle = params.fillStyle || this.fillStyle;
+      context.beginPath();
+        this.drawPath(context);
+      context.fill();
+    }
   context.restore();
 }
 
@@ -60,6 +71,13 @@ Shape.prototype.deleteFixedProperty = function() {
       infopanel.bottom.find(arguments[i]).remove();
     }
   }
+}
+
+Shape.prototype.copy = function() {
+  var newShape = this._copy();
+  newShape.fillStyle = this.fillStyle;
+  if(this.clipShape) newShape.clipShape = this.clipShape.copy();
+  return newShape;
 }
 
 Object.defineProperty(Shape.prototype, 'name', {

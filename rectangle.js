@@ -271,15 +271,15 @@ Rectangle.prototype.rotate = function(rotation) {
 }
 
 Rectangle.prototype.preview = function() {
-  this.diagonal.sketchPreview();
   this.draw(middle.context);
+  this.diagonal.sketchPreview();
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   if(this.fixedLength || this.fixedHeight || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
     this.diagonal.end.round().preview(0, 2, { strokeStyle: 'green' });
   }
 }
 
-Rectangle.prototype.copy = function() {
+Rectangle.prototype._copy = function() {
   var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
   newRect.origin = this.origin.copy();
   newRect.diagonal = this.diagonal.copy();

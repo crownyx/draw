@@ -17,7 +17,7 @@ function design(shape) {
   front.eventListeners.add('click', 'nextStep', function() {
     if(front.setPoint) {
       delete front.setPoint;
-      infopanel.bottom.remove();
+      infopanel.bottom.clear();
     }
     shape.nextStep();
   });
@@ -108,4 +108,6 @@ function design(shape) {
       break;
     }
   });
+
+  return shape;
 }

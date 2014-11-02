@@ -54,8 +54,11 @@ function editMode() {
 
         if(nearPoint.same(shape.center)) {
           infopanel.buttons = [
+            Button('c',   'clip',      'green'),
             Button('d',   'delete',    'green'),
+            Button('m',   'mirror',    'green'),
             Button('r',   'rotate',    'green'),
+            Button('s',   'style',     'green'),
             Button('t',   'translate', 'green'),
             Button('esc', 'cancel',    'red')
           ];
@@ -65,7 +68,27 @@ function editMode() {
           shape.center.round().preview();
           window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
             switch(e.which) {
+              case charCodes['c']:
+                window.eventListeners.remove('rotateOrTranslate');
+                clip(new Group([shape.copy()]));
+              break;
               case charCodes['d']: changeMode(commandMode); break;
+              case charCodes['s']:
+                window.eventListeners.remove('rotateOrTranslate');
+                getInput(
+                  'enter color:',
+                  function(color) {
+                    shape.fillStyle = color;
+                    shape.complete();
+                    changeMode(commandMode);
+                  },
+                  ['a-z', '(', ')', ',']
+                );
+              break;
+              case charCodes['m']:
+                window.eventListeners.remove('rotateOrTranslate');
+                mirror(new Group([shape.copy()]));
+              break;
               case charCodes['r']:
                 window.eventListeners.remove('rotateOrTranslate');
                 rotate(new Group([shape.copy()]), nearPoint);

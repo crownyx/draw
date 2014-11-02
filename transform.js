@@ -121,8 +121,8 @@ function rotate(group, refPoint) {
   var targetPoint = front.setPoint || front.lastPoint;
 
   middle.group.preview = function(point) {
-    new Line(front.startPoint, point).sketchPreview();
     this.draw(middle.context);
+    new Line(front.startPoint, point).sketchPreview();
   }
 
   infopanel.top = 'choose angle of rotation, then click.';
@@ -183,5 +183,65 @@ function rotate(group, refPoint) {
       shape.complete();
     });
     changeMode(commandMode);
+  });
+}
+
+//////////
+// clip //
+//////////
+
+function clip(group) {
+  group.shapes.forEach(function(shape) { back.shapes.push(shape); });
+  back.refresh();
+  window.eventListeners.add('click', 'drawClip', function(e) {
+    var clipShape = design(new Rectangle(Point.from(e), Point.from(e)));
+    clipShape.complete = function() {
+      middle.clear();
+      back.refresh();
+    }
+    group.shapes.forEach(function(shape) { shape.clipShape = clipShape; });
+  }, false);
+}
+
+////////////
+// mirror //
+////////////
+
+function mirror(group) {
+  group.shapes.forEach(function(shape) { back.shapes.push(shape); });
+  back.refresh();
+  window.eventListeners.add('click', 'drawLineOfReflection', function() {
+    var lineOfReflection = new Line(front.lastPoint, front.lastPoint);
+    front.eventListeners.add('mousemove', 'setEnd', function() {
+      lineOfReflection.setEnd(front.lastPoint);
+      middle.clear();
+      lineOfReflection.sketchPreview();
+      group.shapes.forEach(function(shape) {
+        var reflected = shape.copy();
+        var centerToOrigin = new Line(shape.center, shape.origin);
+        var startToCenter = new Line(lineOfReflection.start, shape.center);
+        var triAngle = lineOfReflection.angle.minus(startToCenter.angle);
+        var newTriAngle = lineOfReflection.angle.plus(triAngle);
+        var newCenter = startToCenter.start.plus(startToCenter.length).translate(startToCenter.start, newTriAngle);
+
+        startToCenter.sketch(middle.context);
+        var startToNewCenter = new Line(startToCenter.start, newCenter);
+        startToNewCenter.sketch(middle.context);
+
+        newOrigin = newCenter.plus(centerToOrigin.length).translate(newCenter, centerToOrigin.angle);
+        var angleOfRotation = startToCenter.angle.quadrant % 2 ?
+                              startToCenter.angle.minus(Math.PI - startToNewCenter.angle.rad) :
+                              startToNewCenter.angle.minus(startToCenter.angle.refAngle);
+        newOrigin = newOrigin.translate(newCenter, angleOfRotation);
+
+        reflected.translate(newOrigin);
+        reflected.rotate(angleOfRotation);
+        reflected.draw(middle.context);
+      });
+    });
+    window.eventListeners.remove('drawLineOfReflection');
+    window.eventListeners.add('click', 'completeLine', function() {
+      
+    });
   });
 }

@@ -48,6 +48,7 @@ var infopanel = {
     var bottom = document.getElementById('infopanel-bottom');
     bottom.clear = function() { this.innerHTML = ""; }
     bottom.add = function(textContent, id) {
+      if(document.getElementById(id)) this.removeChild(document.getElementById(id));
       var newDiv = this.appendChild(document.createElement('div'));
       newDiv.className = 'box bottom';
       if(id) newDiv.id = id;

@@ -18,16 +18,22 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
   window.removeEventListener('keydown', choosePoint, false);
 
   var input = [];
+  var alphabetical = !!acceptChars.find(function(charSet) { return charSet == 'a-z' });
   var acceptedChar;
 
   window.eventListeners.add('keydown', 'getInput', function(e) {
-    if(e.which >= charCodes.zero && e.which <= charCodes.nine) {
+    if(e.which >= charCodes.zero && e.which <= charCodes.nine && !e.shiftKey) {
       inputfield.textContent += (e.which - charCodes.zero);
       input.push(e.which - charCodes.zero);
     } else if((function() {
         acceptedChar = acceptChars.find(function(acceptChar) {
-          return e.which == charCodes[acceptChar];
+          return(
+            e.which == (charCodes[acceptChar] && charCodes[acceptChar].code ? charCodes[acceptChar].code : charCodes[acceptChar]) &&
+            e.shiftKey == !!(charCodes[acceptChar]).shiftKey
+          );
         });
+        if(!acceptedChar && alphabetical && e.which >= charCodes['a'] && e.which <= charCodes['z'])
+          acceptedChar = charCodes.find(function(character, code) { return code == e.which; })[0];
         return acceptedChar;
       })())
     {

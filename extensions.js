@@ -162,6 +162,27 @@ Object.defineProperty(Object.prototype, 'map', {
   }
 });
 
+Object.defineProperty(Object.prototype, 'find', {
+  enumerable: false,
+  configurable: true,
+  writable: true,
+  value: function(callback) {
+    if (this == null) {
+      throw new TypeError('Object.prototype.map called on null or undefined');
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function');
+    }
+    var keys = Object.keys(this);
+    var thisArg = arguments[1];
+
+    for(var i = 0; i < keys.length; i++) {
+      if(callback.call(thisArg, keys[i], this[keys[i]]))
+        return [keys[i], this[keys[i]]];
+    };
+  }
+});
+
 ////////////////////
 // Math functions //
 ////////////////////
