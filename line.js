@@ -154,9 +154,9 @@ function AxisPair(origin) {
   return {
     vertical: new Line({ x: origin.x, y: 0 }, { x: origin.x, y: front.canvas.height }),
     horizontal: new Line({ x: 0, y: origin.y }, { x: front.canvas.width, y: origin.y }),
-    draw: function(context) {
-      this.vertical.draw(context);
-      this.horizontal.draw(context);
+    draw: function(context, params) {
+      this.vertical.draw(context, params);
+      this.horizontal.draw(context, params);
     },
     sketch: function(context, params) {
       this.vertical.sketch(context, params);

@@ -35,7 +35,7 @@ function style(group) {
               for(var i = 0; i < keyValues.length; i++) {
                 switch(keyValues[i][0]) {
                   case 'width':
-                    group.shapes.forEach(function(shape) { shape.lineWidth = keyValues[i][1]; });
+                    group.shapes.forEach(function(shape) { shape.lineWidth = parseInt(keyValues[i][1]); });
                   break;
                   case 'color':
                     group.shapes.forEach(function(shape) { shape.strokeStyle = keyValues[i][1]; });

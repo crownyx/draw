@@ -2,6 +2,9 @@ function Shape() {
   this.origin = new Point(0, 0);
   this.rotation = new Angle(0);
   this.shiftCommands = [];
+
+  this.lineWidth   = 1;
+  this.strokeStyle = 'black';
 }
 
 Shape.prototype.complete = function() {
@@ -36,12 +39,14 @@ Shape.prototype.draw = function(context, params = {}) {
         this.clipShape.drawPath(context);
       context.clip();
     }
-    context.strokeStyle = params.strokeStyle || this.strokeStyle || context.strokeStyle;
-    context.lineWidth   = params.lineWidth   || this.lineWidth   || context.lineWidth;
+    context.strokeStyle = params.strokeStyle || this.strokeStyle;
+    context.lineWidth   = params.lineWidth   || this.lineWidth;
     context.setLineDash(this.lineDash || []);
-    context.beginPath();
-      this.drawPath(context);
-    context.stroke();
+    if(this.lineWidth || params.lineWidth) {
+      context.beginPath();
+        this.drawPath(context);
+      context.stroke();
+    }
     if(params.fillStyle || this.fillStyle) {
       context.fillStyle = params.fillStyle || this.fillStyle;
       context.beginPath();

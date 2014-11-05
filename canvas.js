@@ -44,9 +44,7 @@ front.showPos = function(e) {
 };
 
 front.showAxes = function() {
-  this.context.lineWidth = 0.5;
-    new AxisPair(this.lastPoint).draw(this.context);
-  this.context.lineWidth = 1;
+  new AxisPair(this.lastPoint).draw(this.context, { lineWidth: 0.5 });
 }
 
 front.redraw = function() {
