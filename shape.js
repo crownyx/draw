@@ -26,6 +26,11 @@ Shape.prototype.sketch = function(context, params = {}) {
 
 Shape.prototype.draw = function(context, params = {}) {
   context.save();
+    if(this.translateContext) context.translate(this.translateContext.x, this.translateContext.y);
+    if(this.rotateContext) context.rotate(this.rotateContext.rad);
+    if(this.xScale && this.yScale) {
+      context.scale(this.xScale, this.yScale);
+    }
     if(this.clipShape) {
       context.beginPath();
         this.clipShape.drawPath(context);
@@ -76,6 +81,8 @@ Shape.prototype.deleteFixedProperty = function() {
 Shape.prototype.copy = function() {
   var newShape = this._copy();
   newShape.fillStyle = this.fillStyle;
+  newShape.strokeStyle = this.strokeStyle;
+  newShape.lineWidth = this.lineWidth;
   if(this.clipShape) newShape.clipShape = this.clipShape.copy();
   return newShape;
 }

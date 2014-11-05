@@ -11,6 +11,7 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
   if(promptText.subtext) {
     var subtext = document.createElement('div');
     subtext.textContent = promptText.subtext;
+    subtext.className = 'input-subtext'
     newTop.appendChild(subtext);
   }
 

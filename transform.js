@@ -229,29 +229,23 @@ function mirror(group) {
   middle.group.setEnd = function(point) {
     if(front.startPoint && point.distance(front.startPoint) > 5) {
       middle.group.reflected = this.shapes.map(function(shape) {
-        var lineOfReflection = new Line(front.startPoint, point);
         var reflected = shape.copy();
-        var centerToOrigin = new Line(shape.center, shape.origin);
-        var startToCenter = new Line(front.startPoint, shape.center);
-        var triAngle = lineOfReflection.angle.minus(startToCenter.angle);
-        var newTriAngle = lineOfReflection.angle.plus(triAngle);
-        var newCenter = startToCenter.start.plus(startToCenter.length).translate(startToCenter.start, newTriAngle);
+        var lineOfReflection = new Line(front.startPoint, point);
+        var angleOfRotation = new Angle(lineOfReflection.angle.rad * 2);
 
-        var startToNewCenter = new Line(startToCenter.start, newCenter);
+        reflected.translate(shape.origin.x - front.startPoint.x, front.canvas.height - front.startPoint.y + shape.origin.y);
+        reflected.translateContext = front.startPoint.plus(0, front.canvas.height).translate(front.startPoint, angleOfRotation);
+        reflected.rotateContext = angleOfRotation;
+        reflected.xScale = 1; reflected.yScale = -1;
 
-        newOrigin = newCenter.plus(centerToOrigin.length).translate(newCenter, centerToOrigin.angle);
-        var angleOfRotation = startToCenter.angle.minus(Math.PI - startToNewCenter.angle.rad);
-        newOrigin = newOrigin.translate(newCenter, angleOfRotation);
-
-        reflected.translate(newOrigin);
-        reflected.rotate(angleOfRotation);
         return reflected;
       });
     }
   }
 
   middle.group.preview = function() {
-    if(front.startPoint) new Line(front.startPoint, front.lastPoint).sketchPreview();
+    var currLine = new Line(front.startPoint, front.lastPoint);
+    currLine.sketchPreview();
     this.reflected.forEach(function(shape) { shape.draw(middle.context); });
     this.shapes.forEach(function(shape) { shape.draw(middle.context); });
   }

@@ -10,7 +10,7 @@ window.onload = function() {
   back.canvas.height   = window.innerHeight - 10;
 
   document.getElementById('infopanel').style.width  = window.innerWidth - front.canvas.width - 17 + 'px';
-  document.getElementById('infopanel').style.height = front.canvas.height - 2 + 'px';
+  document.getElementById('infopanel').style.height = front.canvas.height - 8 + 'px';
 
   front.startPoint = new Point(0, front.canvas.height);
   front.lastPoint  = new Point(front.canvas.width, 0);
@@ -89,7 +89,7 @@ function changeMode(mode) {
 function commandMode() {
   if(front.setPoint) {
     delete front.setPoint;
-    infopanel.bottom.remove();
+    infopanel.bottom.clear();
   }
 
   front.startPoint = new Point(0, front.canvas.height);

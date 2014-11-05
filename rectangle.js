@@ -257,10 +257,13 @@ Rectangle.prototype.drawPath = function(context) {
   context.lineTo(this.points.corner2.x, this.points.corner2.y);
   context.lineTo(this.points.corner3.x, this.points.corner3.y);
   context.lineTo(this.points.corner4.x, this.points.corner4.y);
-  context.lineTo(this.points.corner1.x, this.points.corner1.y);
+  context.closePath();
 }
 
-Rectangle.prototype.translate = function(point) {
+Rectangle.prototype.translate = function(pointOrX, y) {
+  var point = pointOrX;
+  if(typeof pointOrX == 'number' && typeof y == 'number')
+    point = new Point(pointOrX, y);
   this.diagonal.translate(point);
   this.origin = this.diagonal.start;
 }

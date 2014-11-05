@@ -30,7 +30,7 @@ var charCodes = {
   eight: 56,
   nine: 57,
   '(': { code: 57, shiftKey: true },
-  ':': 59,
+  ':': { code: 59, shiftKey: true },
   a: 65,
   b: 66,
   c: 67,

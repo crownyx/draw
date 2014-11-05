@@ -59,7 +59,15 @@ function Point(x, y) {
     return Math.sqrt(Math.pow(this.x - otherPoint.x, 2) + Math.pow(this.y - otherPoint.y, 2));
   }
 
-  this.plus = function(x, y) { return new Point(this.x + x, this.y + (y || 0)); }
+  this.plus = function(x, y) {
+    if(typeof x == 'number') return new Point(this.x + x, this.y + (y || 0));
+    if(x instanceof Point) return new Point(this.x + x.x, this.y + x.y);
+  }
+
+  this.minus = function(x, y) {
+    if(typeof x == 'number') return new Point(this.x - x, this.y - (y || 0));
+    if(x instanceof Point) return new Point(this.x - x.x, this.y - x.y);
+  }
 
   this.copy = function() { return new Point(this.x, this.y); }
 

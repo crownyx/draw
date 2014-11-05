@@ -12,8 +12,7 @@ canvas {
   font-size: small;
   border: 1px solid white;
   border-right: 0px;
-  padding-right: 3px;
-  padding-left: 3px;
+  padding: 3px;
   overflow-y: auto;
 }
 
@@ -25,9 +24,9 @@ canvas {
   border: 1px solid white;
 }
 
-#infopanel div.box.top {
-  margin-top: 3px;
-  padding: 3px;
+
+#infopanel div.box.top div.input-subtext {
+  font-size: x-small;
 }
 
 #infopanel div.box.bottom {

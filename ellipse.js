@@ -169,7 +169,7 @@ Ellipse.prototype.rotate = function(rotation) {
   this.xAxis.rotate(rotation);
 }
 
-Ellipse.prototype.copy = function() {
+Ellipse.prototype._copy = function() {
   var ellipse = new Ellipse(this.center, this.center);
   ellipse.xAxis = this.xAxis.copy();
   ellipse.yAxis = this.yAxis.copy();

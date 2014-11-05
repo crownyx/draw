@@ -69,19 +69,9 @@ function editMode() {
           window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
             if(!e.shiftKey) {
               switch(e.which) {
-                case charCodes['c']:clip(new Group([shape.copy()])); break;
+                case charCodes['c']: clip(new Group([shape.copy()])); break;
                 case charCodes['d']: changeMode(commandMode); break;
-                case charCodes['s']:
-                  getInput(
-                    'enter color:',
-                    function(color) {
-                      shape.fillStyle = color;
-                      shape.complete();
-                      changeMode(commandMode);
-                    },
-                    ['a-z', '(', ')', ',']
-                  );
-                break;
+                case charCodes['s']: style(new Group([shape.copy()])); break;
                 case charCodes['m']: mirror(new Group([shape.copy()])); break;
                 case charCodes['r']: rotate(new Group([shape.copy()]), nearPoint); break;
                 case charCodes['t']: translate(new Group([shape.copy()]), nearPoint); break;
