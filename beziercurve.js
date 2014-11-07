@@ -8,8 +8,6 @@ function BezierCurve(start, end, control1, control2) {
   this.control1 = control1;
   this.control2 = control2;
 
-  this.lines = [];
-
   this.shiftCommands = [
     {
       key: 'q',
@@ -103,8 +101,11 @@ Object.defineProperty(BezierCurve.prototype, 'origin', {
   get: function() { return this.center; }
 });
 
-BezierCurve.prototype.translate = function(transPoint) {
+BezierCurve.prototype.translate = function(transPointOrX, y) {
   var center = this.center;
+  var transPoint = transPointOrX;
+  if(typeof transPoint == 'number' && typeof y == 'number')
+    transPoint = new Point(transPointOrX, y);
   ['start', 'control1', 'control2', 'end'].forEach(function(point) {
     if(this[point]) {
       var refLine = new Line(center, this[point]);

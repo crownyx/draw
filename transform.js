@@ -203,6 +203,9 @@ function rotate(group, refPoint) {
 //////////
 
 function clip(group) {
+  middle.clear();
+  front.eventListeners.clear();
+
   group.shapes.forEach(function(shape) { back.shapes.push(shape); });
   back.refresh();
   window.eventListeners.add('click', 'drawClip', function(e) {
@@ -228,16 +231,15 @@ function mirror(group) {
 
   middle.group.setEnd = function(point) {
     if(front.startPoint && point.distance(front.startPoint) > 5) {
+      var lineOfReflection = new Line(front.startPoint, point);
+      var angleOfRotation = new Angle(lineOfReflection.angle.rad * 2);
+
       middle.group.reflected = this.shapes.map(function(shape) {
         var reflected = shape.copy();
-        var lineOfReflection = new Line(front.startPoint, point);
-        var angleOfRotation = new Angle(lineOfReflection.angle.rad * 2);
-
         reflected.translate(shape.origin.x - front.startPoint.x, front.canvas.height - front.startPoint.y + shape.origin.y);
         reflected.translateContext = front.startPoint.plus(0, front.canvas.height).translate(front.startPoint, angleOfRotation);
         reflected.rotateContext = angleOfRotation;
         reflected.xScale = 1; reflected.yScale = -1;
-
         return reflected;
       });
     }

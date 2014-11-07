@@ -7,8 +7,6 @@ function Ellipse(radStart, radEnd) {
   this.yAxis = new Line(radStart, new Point(radStart.x, radEnd.y  ));
   this.rotation = new Angle(0);
 
-  this.lines = [this.yAxis, this.xAxis];
-
   var ellipse = this;
 
   this.shiftCommands = [
@@ -73,6 +71,10 @@ function Ellipse(radStart, radEnd) {
 Ellipse.prototype = new Shape;
 Ellipse.prototype.constructor = Ellipse;
 
+Object.defineProperty(Ellipse.prototype, 'lines', {
+  get: function() { return [this.yAxis, this.xAxis] }
+});
+
 Object.defineProperty(Ellipse.prototype, 'center', {
   get: function() { return this.origin; }
 });
@@ -120,12 +122,6 @@ Ellipse.prototype.preview = function() {
   this.yAxis.end.round().showCoords(middle.context, 0, 2);
   this.xAxis.end.round().showCoords(middle.context, 0, 2);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
-}
-
-Ellipse.prototype.translate = function(point) {
-  this.origin = point;
-  this.xAxis.translate(point);
-  this.yAxis.translate(point);
 }
 
 Object.defineProperty(Ellipse.prototype, 'circumference', {

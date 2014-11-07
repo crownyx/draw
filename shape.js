@@ -69,7 +69,10 @@ Shape.prototype.preview = function() { this.draw(front.context); }
 
 Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }
 
-Shape.prototype.translate = function(point) {
+Shape.prototype.translate = function(pointOrX, y) {
+  var point = pointOrX;
+  if(typeof pointOrX == 'number' && typeof y == 'number')
+    point = new Point(pointOrX, y);
   this.origin = point;
   this.lines.forEach(function(line) { line.translate(point); });
 }

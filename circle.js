@@ -4,8 +4,6 @@ function Circle(radStart, radEnd) {
   this.origin = radStart;
   this.radius = new Line(radStart, radEnd);
 
-  this.lines = [this.radius];
-
   var circle = this;
 
   this.shiftCommands = [
@@ -68,6 +66,10 @@ Circle.prototype.setEnd = function(point) { this.radius.setEnd(point); }
 
 Object.defineProperty(Circle.prototype, 'center', {
   get: function() { return this.origin; }
+});
+
+Object.defineProperty(Circle.prototype, 'lines', {
+  get: function() { return [this.radius]; }
 });
 
 Object.defineProperty(Circle.prototype, 'points', {

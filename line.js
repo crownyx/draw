@@ -6,6 +6,8 @@ function Line(start, end) {
 
   this.origin = start;
 
+  this.lines = [];
+
   var line = this;
 
   this.shiftCommands = [
@@ -115,7 +117,10 @@ Line.prototype.sketchPreview = function() {
   if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
 }
 
-Line.prototype.translate = function(point) {
+Line.prototype.translate = function(pointOrX, y) {
+  var point = pointOrX;
+  if(typeof pointOrX == 'number' && typeof y == 'number')
+    point = new Point(pointOrX, y);
   var origDiff = { x: this.end.x - this.start.x, y: this.end.y - this.start.y };
   this.origin = point;
   this.start = point;
