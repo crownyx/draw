@@ -69,6 +69,13 @@ function Point(x, y) {
     if(x instanceof Point) return new Point(this.x - x.x, this.y - x.y);
   }
 
+  this.to = function(endPoint) { return new Line(this, endPoint); }
+
+  this.reflect = function(line) {
+    var lineToThis = line.start.to(this);
+    return this.translate(line.start, line.angle.times(2).plus(lineToThis.angle.refAngle.times(2)));
+  }
+
   this.copy = function() { return new Point(this.x, this.y); }
 
   this.round = function() { return new Point(Math.round(this.x), Math.round(this.y)); }

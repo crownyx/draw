@@ -48,6 +48,10 @@ Angle.prototype.minus = function(otherAngle) {
   return new Angle(this.rad - (otherAngle instanceof Angle ? otherAngle.rad : otherAngle));
 }
 
+Angle.prototype.times = function(multiple) {
+  return new Angle(this.rad * multiple);
+}
+
 Angle.prototype.draw = function(context, params = {}) {
   new Arc(
     this.center,

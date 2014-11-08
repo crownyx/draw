@@ -117,6 +117,12 @@ Circle.prototype.fill = function(context) {
   context.fill();
 }
 
+Circle.prototype.reflect = function(line) {
+  var reflected = this.copy();
+  var lineToCenter = this.center.reflect(line);
+  return reflected.translate(lineToCenter);
+}
+
 Circle.prototype.infoText = function() {
   return(
     'radius length: '    + commaSep(Math.round(this.radius.length)) +

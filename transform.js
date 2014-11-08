@@ -235,12 +235,7 @@ function mirror(group) {
       var angleOfRotation = new Angle(lineOfReflection.angle.rad * 2);
 
       middle.group.reflected = this.shapes.map(function(shape) {
-        var reflected = shape.copy();
-        reflected.translate(shape.origin.x - front.startPoint.x, front.canvas.height - front.startPoint.y + shape.origin.y);
-        reflected.translateContext = front.startPoint.plus(0, front.canvas.height).translate(front.startPoint, angleOfRotation);
-        reflected.rotateContext = angleOfRotation;
-        reflected.xScale = 1; reflected.yScale = -1;
-        return reflected;
+        return shape.reflect(lineOfReflection);
       });
     }
   }
@@ -263,7 +258,7 @@ function mirror(group) {
       middle.group.preview();
     });
     window.eventListeners.add('click', 'completeLine', function() {
-      
+      middle.group.reflected.forEach(function(shape) { shape.complete(); });
     });
   });
 }

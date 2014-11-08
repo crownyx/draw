@@ -264,17 +264,25 @@ Rectangle.prototype.drawPath = function(context) {
   context.closePath();
 }
 
-//Rectangle.prototype.translate = function(pointOrX, y) {
-//  var point = pointOrX;
-//  if(typeof pointOrX == 'number' && typeof y == 'number')
-//    point = new Point(pointOrX, y);
-//  this.diagonal.translate(point);
-//  this.origin = this.diagonal.start;
-//}
-
 Rectangle.prototype.rotate = function(rotation) {
   this.diagonal.rotate(rotation);
   this.rotation = this.rotation.plus(rotation);
+}
+
+Rectangle.prototype.reflect = function(line) {
+  var reflected = this.copy();
+
+  var lineToOrigin = line.start.to(this.origin);
+  lineToOrigin.rotate(lineToOrigin.angle.refAngle.times(2).plus(line.angle.times(2)));
+  reflected.translate(lineToOrigin.end);
+
+  var lineToEnd = line.start.to(this.diagonal.end);
+  lineToEnd.rotate(lineToEnd.angle.refAngle.times(2).plus(line.angle.times(2)));
+  reflected.setEnd(lineToEnd.end);
+
+  reflected.rotation = (this.rotation.refAngle.plus(line.angle.times(2)));
+
+  return reflected;
 }
 
 Rectangle.prototype.preview = function() {

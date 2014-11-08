@@ -165,6 +165,14 @@ Ellipse.prototype.rotate = function(rotation) {
   this.xAxis.rotate(rotation);
 }
 
+Ellipse.prototype.reflect = function(line) {
+  var reflected = this.copy();
+  var newCenter = this.origin.reflect(line);
+  reflected.translate(newCenter);
+  reflected.rotation = (this.rotation.refAngle.plus(line.angle.times(2)));
+  return reflected;
+}
+
 Ellipse.prototype._copy = function() {
   var ellipse = new Ellipse(this.center, this.center);
   ellipse.xAxis = this.xAxis.copy();
