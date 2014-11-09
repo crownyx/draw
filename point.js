@@ -23,11 +23,9 @@ function Point(x, y) {
   }
 
   this.translate = function(refPoint, rotation) {
-    var refLine = new Line(refPoint, this);
-    var origAngle = refLine.angle.rad;
-    var newPoint = new Point(refPoint.x + Math.cos(rotation.rad + origAngle) * refLine.length,
-                             refPoint.y + Math.sin(rotation.rad + origAngle) * refLine.length);
-    return newPoint;
+    var refLine = refPoint.to(this);
+    return new Point(refPoint.x + Math.cos(rotation.plus(refLine.angle).rad) * refLine.length,
+                     refPoint.y + Math.sin(rotation.plus(refLine.angle).rad) * refLine.length);
   }
 
   this.untranslate = function(refPoint, rotation) {

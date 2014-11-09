@@ -3,7 +3,7 @@ function editMode() {
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
   infopanel.bottom.add('select center point of a shape to delete/translate/rotate');
 
-  var allPoints = back.shapes.map(function(shape) { return shape.points.values; }).flatten();
+  var allPoints = back.shapes.map(function(shape) { return shape.points; }).flatten();
 
   allPoints.forEach(function(point) { point.fill(back.context); });
 
@@ -22,9 +22,9 @@ function editMode() {
     var currPoint = Point.from(e);
 
     var nearPoint = allPoints.filter(function(point) {
-      return new Line(currPoint, point).length < 5;
+      return currPoint.distance(point) < 5;
     }).sort(function(point) {
-      return new Line(currPoint, point).length;
+      return currPoint.distance(point);
     })[0];
 
     if(nearPoint) {
@@ -119,13 +119,14 @@ function editMode() {
               })(nearPoint.same(shape.start));
             break;
             case Rectangle:
-              var opposite = nearPoint.same(shape.points.corner1) ? shape.points.corner3 :
-                             nearPoint.same(shape.points.corner2) ? shape.points.corner4 :
-                             nearPoint.same(shape.points.corner3) ? shape.points.corner1 :
-                             shape.points.corner2;
+              var opposite = (function(point) {
+                for(var i = 0; i < shape.points.length; i++) {
+                  if(shape.points[i].same(nearPoint))
+                    return shape.points[(i + 2) % 4];
+                }
+              })();
               if(!shape.fixedEnd) {
                 shape.diagonal.start = opposite;
-                shape.origin = opposite;
                 front.startPoint = opposite;
                 shape.setEnd(nearPoint);
               }

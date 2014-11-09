@@ -2,9 +2,7 @@ function Line(start, end) {
   Shape.call(this);
 
   this.start = start;
-  this.end   = end;
-
-  this.origin = start;
+  this.setEnd(end);
 
   this.lines = [];
 
@@ -59,16 +57,11 @@ Line.prototype.setEnd = function(point, params = {}) {
   } else {
     this.end = point;
   }
+  this.mid = new Point(
+    (this.end.x + this.start.x) / 2,
+    (this.end.y + this.start.y) / 2
+  );
 }
-
-Object.defineProperty(Line.prototype, 'mid', {
-  get: function() {
-    return new Point(
-      (this.end.x + this.start.x) / 2,
-      (this.end.y + this.start.y) / 2
-    );
-  }
-});
 
 Object.defineProperty(Line.prototype, 'center', {
   get: function() { return this.mid; }
@@ -117,18 +110,16 @@ Line.prototype.sketchPreview = function() {
   if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
 }
 
-Line.prototype.translate = function(pointOrX, y) {
-  var point = pointOrX;
-  if(typeof pointOrX == 'number' && typeof y == 'number')
-    point = new Point(pointOrX, y);
-  var origDiff = { x: this.end.x - this.start.x, y: this.end.y - this.start.y };
-  this.origin = point;
-  this.start = point;
-  this.end = new Point(this.start.x + origDiff.x, this.start.y + origDiff.y);
+Line.prototype._translate = function(point) {
+  (function(start, mid, end) {
+    this.start = point.minus(mid.x - start.x, mid.y - start.y);
+    this.setEnd(point.minus(mid.x - end.x,   mid.y - end.y));
+  }).call(this, this.start, this.mid, this.end);
 }
 
 Line.prototype.rotate = function(rotation) {
-  this.end = this.end.translate(this.start, rotation);
+  this.start = this.start.translate(this.mid, rotation);
+  this.setEnd(this.end.translate(this.mid, rotation));
   if(this.fixedAngle)
     this.fixedAngle = this.fixedAngle.rad.plus(rotation);
 }

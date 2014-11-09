@@ -1,8 +1,8 @@
 function Rectangle(diagStart, diagEnd) {
   Shape.call(this);
 
-  this.diagonal = new Line(diagStart, diagEnd);
-  this.origin = diagStart;
+  this.diagonal = diagStart.to(diagEnd);
+  this.setPoints();
 
   var rectangle = this;
 
@@ -115,12 +115,6 @@ function Rectangle(diagStart, diagEnd) {
 Rectangle.prototype = new Shape;
 Rectangle.prototype.constructor = Rectangle;
 
-Object.defineProperty(Rectangle.prototype, 'lines', {
-  get: function() {
-    return [this.diagonal];
-  }
-});
-
 Object.defineProperty(Rectangle.prototype, 'length', {
   get: function() {
     if(this.fixedLength) {
@@ -175,33 +169,7 @@ Rectangle.prototype.infoText = function() {
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {
-  get: function() { return this.points.center; }
-});
-
-Object.defineProperty(Rectangle.prototype, 'points', {
-  get: function() {
-    var corner1 = this.diagonal.start;
-    var corner2 = new Point(
-      corner1.x + Math.cos(this.rotation.rad) * this.length,
-      corner1.y + Math.sin(this.rotation.rad) * this.length
-    );
-    var corner3 = this.diagonal.end;
-    var corner4 = new Point(
-      corner1.x + Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
-      corner1.y + Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
-    );
-    var center  = new Line(corner1, corner3).mid;
-    return {
-      corner1: corner1,
-      corner2: corner2,
-      corner3: corner3,
-      corner4: corner4,
-      center: center
-    }.map(function(name, point) {
-      point.shape = this;
-      return point;
-    }, this);
-  }
+  get: function() { return this.diagonal.mid; }
 });
 
 Rectangle.prototype.setEnd = function(point) {
@@ -249,24 +217,46 @@ Rectangle.prototype.setEnd = function(point) {
     }
     var x = this.diagonal.start.x + length;
     var y = this.diagonal.start.y + height;
-    this.diagonal.setEnd(new Point(x, y));
-    this.diagonal.rotate(this.fixedRotation || this.rotation);
+    this.diagonal.setEnd(
+      new Point(x, y).translate(this.diagonal.start, this.fixedRotation || this.rotation)
+    );
   } else {
     this.diagonal.setEnd(point);
   }
+  this.setPoints();
+}
+
+Rectangle.prototype.setPoints = function() {
+  this.points = [
+    this.diagonal.start,
+    this.diagonal.start.plus(
+      Math.cos(this.rotation.rad) * this.length,
+      Math.sin(this.rotation.rad) * this.length
+    ),
+    this.diagonal.end,
+    this.diagonal.start.plus(
+      Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
+      Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
+    ),
+    this.center
+  ].map(function(point) {
+    point.shape = this;
+    return point;
+  }, this);
 }
 
 Rectangle.prototype.drawPath = function(context) {
-  context.moveTo(this.points.corner1.x, this.points.corner1.y);
-  context.lineTo(this.points.corner2.x, this.points.corner2.y);
-  context.lineTo(this.points.corner3.x, this.points.corner3.y);
-  context.lineTo(this.points.corner4.x, this.points.corner4.y);
+  context.moveTo(this.points[0].x, this.points[0].y);
+  context.lineTo(this.points[1].x, this.points[1].y);
+  context.lineTo(this.points[2].x, this.points[2].y);
+  context.lineTo(this.points[3].x, this.points[3].y);
   context.closePath();
 }
 
 Rectangle.prototype.rotate = function(rotation) {
   this.diagonal.rotate(rotation);
   this.rotation = this.rotation.plus(rotation);
+  this.setPoints();
 }
 
 Rectangle.prototype.reflect = function(line) {
@@ -285,6 +275,11 @@ Rectangle.prototype.reflect = function(line) {
   return reflected;
 }
 
+Rectangle.prototype._translate = function(point) {
+  this.diagonal.translate(point);
+  this.setPoints();
+}
+
 Rectangle.prototype.preview = function() {
   this.draw(middle.context);
   this.diagonal.sketchPreview();
@@ -296,8 +291,6 @@ Rectangle.prototype.preview = function() {
 
 Rectangle.prototype._copy = function() {
   var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
-  newRect.origin = this.origin.copy();
-  newRect.diagonal = this.diagonal.copy();
   newRect.rotation = this.rotation.copy();
   newRect.fixedRotation = this.fixedRotation;
   newRect.fixedHeight = this.fixedHeight;
@@ -306,5 +299,6 @@ Rectangle.prototype._copy = function() {
   newRect.fixedPerimeter = this.fixedPerimeter;
   newRect.fixedEnd = this.fixedEnd;
   newRect.fixedRatio = this.fixedRatio;
+  newRect.setPoints();
   return newRect;
 }

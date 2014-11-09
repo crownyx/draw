@@ -58,7 +58,9 @@ function translate(group, refPoint) {
     }
   });
 
-  group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
+  group.shapes.forEach(function(shape) {
+    shape.refLine = new Line(refPoint, shape.center);
+  });
 
   middle.group.setEnd = function(point) {
     if(middle.group.fixedDistance || middle.group.fixedAngle) {
@@ -144,9 +146,9 @@ function rotate(group, refPoint) {
     Button('esc', 'cancel',       'red')
   ];
 
-  group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.origin); });
+  group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.center); });
 
-  group.rotation = new Angle(0);
+  middle.group.rotation = new Angle(0);
 
   middle.group.setEnd(front.setPoint || front.lastPoint);
   middle.clear();
@@ -154,10 +156,9 @@ function rotate(group, refPoint) {
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
     if(!group.fixedRotation) {
-      targetPoint = front.setPoint || front.lastPoint;
-      middle.group.setEnd(targetPoint);
+      middle.group.setEnd(front.setPoint || front.lastPoint);
       middle.clear();
-      middle.group.preview(targetPoint);
+      middle.group.preview(front.setPoint || front.lastPoint);
     }
   });
 
