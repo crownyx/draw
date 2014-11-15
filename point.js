@@ -15,8 +15,8 @@ function Point(x, y) {
 
   this.label = function(context) {
     this.fill(context);
-    var xText = 'x: ' + this.x;
-    var yText = 'y: ' + this.y;
+    var xText = 'x: ' + Math.round(this.x);
+    var yText = 'y: ' + Math.round(this.y);
     context.textBaseline = 'middle';
     context.textAlign = 'right';
       context.fillText(xText, this.x - 7, this.y);
@@ -24,7 +24,7 @@ function Point(x, y) {
       context.fillText(yText, this.x + 7, this.y);
     var xWidth = context.measureText(xText).width;
     var yWidth = context.measureText(yText).width;
-    var height = parseInt(context.font.match(/[0-9]+(?=px)/)[0]);
+    var height = parseInt(context.font.match(/[^p]+/)[0]);
     context.strokeRect(this.x - xWidth - 8, this.y - 2 - height / 2, xWidth + yWidth + 16, height + 4);
   }
 

@@ -127,6 +127,7 @@ BezierCurve.prototype.edit = function(pickedPoint) {
   } else if(!this.quadratic && pickedPoint.same(this.control2)) {
     this.setEnd = function(point) { this.control2 = point; }
   }
+  this.nextStep = Shape.prototype.nextStep;
   this.setEnd(pickedPoint);
   front.startPoint = this.start;
   changeMode();

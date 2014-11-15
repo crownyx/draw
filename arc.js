@@ -64,7 +64,9 @@ Object.defineProperty(Arc.prototype, 'points', {
       this.startRadius.end,
       this.startRadius.end.translate(
         this.center,
-        this.endRadius.angle.minus(this.startRadius.angle).times(1/2)
+        this.endRadius.angle.minus(this.startRadius.angle).times(1/2).plus(
+          this.clockwise ? 0 : Math.PI
+        )
       ),
       this.endRadius.end
     ].map(function(point) {

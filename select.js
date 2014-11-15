@@ -10,7 +10,7 @@ function selectMode() {
 
   allPoints.eachDo('fill', middle.context);
   allCenters.eachDo('fill', middle.context);
-  allCenters.eachDo('draw', middle.context, { strokeStyle: 'red' });
+  allCenters.eachDo('circle', middle.context, { strokeStyle: 'red' });
 
   front.eventListeners.add('click', 'beginSelection', function(e) {
     front.eventListeners.clear();
@@ -36,7 +36,7 @@ function selectMode() {
         point.fill(middle.context, { fillStyle: point.shape.selected ? 'blue' : 'black' });
       });
       allCenters.forEach(function(center) {
-        if(!center.shape.selected) center.draw(middle.context, { strokeStyle: 'red' });
+        if(!center.shape.selected) center.circle(middle.context, { strokeStyle: 'red' });
       });
       back.shapes.forEach(function(shape) {
         shape.draw(back.context, { strokeStyle: shape.selected ? 'blue' : back.context.strokeStyle });
@@ -139,7 +139,7 @@ function translateGroup(group) {
     })[0];
 
     if(nearPoint) {
-      nearPoint.draw(front.context, { radius: 5, strokeStyle: "blue" });
+      nearPoint.circle(front.context, { radius: 5, strokeStyle: "blue" });
       front.eventListeners.add('click', 'chooseRefPoint', function() { translate(group, nearPoint); });
     } else {
       front.eventListeners.add('click', 'chooseRefPoint', function(e) { translate(group, Point.from(e)); });

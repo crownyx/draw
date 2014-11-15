@@ -79,7 +79,9 @@ BezierCurve.prototype.nextStep = function() {
 
 Object.defineProperty(BezierCurve.prototype, 'center', {
   get: function() {
-    return new Line(this.start, this.end).mid;
+    var center = new Line(this.start, this.end).mid;
+    center.shape = this;
+    return center;
   }
 });
 
@@ -99,19 +101,12 @@ Object.defineProperty(BezierCurve.prototype, 'points', {
   }
 });
 
-Object.defineProperty(BezierCurve.prototype, 'origin', {
-  get: function() { return this.center; }
-});
-
-BezierCurve.prototype.translate = function(transPointOrX, y) {
+BezierCurve.prototype._translate = function(transPoint) {
   var center = this.center;
-  var transPoint = transPointOrX;
-  if(typeof transPoint == 'number' && typeof y == 'number')
-    transPoint = new Point(transPointOrX, y);
   ['start', 'control1', 'control2', 'end'].forEach(function(point) {
     if(this[point]) {
       var refLine = new Line(center, this[point]);
-      refLine.translate(transPoint);
+      refLine.translate(transPoint, { by: 'start' });
       this[point] = refLine.end;
     }
   }, this);
@@ -122,7 +117,7 @@ BezierCurve.prototype.rotate = function(rotation) {
   ['start', 'control1', 'control2', 'end'].forEach(function(point) {
     if(this[point]) {
       var refLine = new Line(center, this[point]);
-      refLine.rotate(rotation);
+      refLine.rotate(rotation, { by: 'start' });
       this[point] = refLine.end;
     }
   }, this);

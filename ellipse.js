@@ -154,7 +154,7 @@ Ellipse.prototype.rotate = function(rotation) {
   this.xAxis.rotate(rotation);
 }
 
-Ellipse.prototype.reflect = function(line) {
+Ellipse.prototype._reflect = function(line) {
   var reflected = this.copy();
   reflected.translate(this.center.reflect(line));
 
