@@ -63,7 +63,10 @@ function Circle(radStart, radEnd) {
 Circle.prototype = new Shape;
 Circle.prototype.constructor = Circle;
 
-Circle.prototype.setEnd = function(point) { this.radius.setEnd(point); }
+Circle.prototype.setEnd = function(point) {
+  this.radius.setEnd(point);
+  this.center.shape = this;
+}
 
 Object.defineProperty(Circle.prototype, 'points', {
   get: function() {

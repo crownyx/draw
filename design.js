@@ -24,35 +24,46 @@ function design(shape) {
     shape.nextStep();
   });
 
-  /* set up infopanel */ infopanel.top = shape.name;
-  /*                  */ 
-  /*                  */ infopanel.buttons = [
-  /*                  */   Button('a', 'arc',          'green'),
-  /*                  */   Button('b', 'bezier curve', 'green'),
-  /*                  */   Button('c', 'circle',       'green'),
-  /*                  */   Button('e', 'ellipse',      'green'),
-  /*                  */   Button('l', 'line',         'green'),
-  /*                  */   Button('r', 'rectangle',    'green'),
-  /*                  */   Button('s', 'square',       'green'),
-  /*                  */   Button('t', 'triangle',     'green')
-  /*                  */ ];
-  /*                  */ 
-  /*                  */ infopanel.buttons.add(
-  /*                  */   Button('i', 'show/hide info', 'yellow'),
-  /*                  */   Button('g', 'choose point',    'yellow')
-  /*                  */ );
-  /*                  */ 
-  /*                  */ shape.shiftCommands.forEach(function(command) {
-  /*                  */   infopanel.buttons.add(Button(
-  /*                  */     command.key.toUpperCase(),
-  /*                  */     (command.type || 'set') + ' ' + command.forWhat,
-  /*                  */     'blue'
-  /*                  */   ));
-  /*                  */ });
-  /*                  */
-  /*                  */ infopanel.buttons.add(Button('esc', 'cancel', 'red'));
+  //////////////////////
+  // set up infopanel //
+  //////////////////////
+  infopanel.top = shape.name;
+  
+  infopanel.buttons = [
+    Button('a', 'arc',          'green'),
+    Button('b', 'bezier curve', 'green'),
+    Button('c', 'circle',       'green'),
+    Button('e', 'ellipse',      'green'),
+    Button('l', 'line',         'green'),
+    Button('r', 'rectangle',    'green'),
+    Button('s', 'square',       'green'),
+    Button('t', 'triangle',     'green'),
 
-  shape.shiftCommands.forEach(function(command) {
+    Button('i', 'show/hide info', 'yellow'),
+    Button('>', 'go to point',    'yellow'),
+    Button('.', 'show points',    'yellow')
+  ];
+
+  var guidelineCommand = {
+    key: 'g',
+    type: 'toggle',
+    forWhat: 'guideline'
+  }
+  
+  shape.shiftCommands.concat(guidelineCommand).sortBy('key').forEach(function(command) {
+    infopanel.buttons.add(Button(
+      command.key.toUpperCase(),
+      (command.type || 'set') + ' ' + command.forWhat,
+      'blue'
+    ));
+  });
+  
+  infopanel.buttons.add(Button('esc', 'cancel', 'red'));
+  //////////////////////
+  //////////////////////
+  //////////////////////
+
+  shape.shiftCommands.concat(guidelineCommand).forEach(function(command) {
     var propertyName = 'fixed' + (command.propertyName || command.forWhat).capitalize();
     command.infobox = function() {
       return {
@@ -72,12 +83,13 @@ function design(shape) {
     }
   });
 
-  shape.shiftCommands.forEach(function(command) {
+  shape.shiftCommands.concat(guidelineCommand).forEach(function(command) {
     switch(command.type) {
       case 'toggle':
         window.eventListeners.add('keydown', 'toggle' + command.forWhat.capitalize(), function(e) {
           if(e.shiftKey && e.which == charCodes[command.key]) {
-            command.callback.call(shape);
+            var propertyName = command.propertyName || command.forWhat;
+            command.callback ? command.callback.call(shape) : shape[propertyName] = !shape[propertyName];
             middle.redraw();
           }
         });

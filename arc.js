@@ -23,8 +23,7 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
     {
       key: 'c',
       forWhat: 'clockwise',
-      type: 'toggle',
-      callback: function() { this.clockwise = !this.clockwise; }
+      type: 'toggle'
     },
     {
       key: 'e',

@@ -94,6 +94,25 @@ Array.prototype.maxBy = function(method) {
   })[this.length - 1];
 }
 
+Array.prototype.sortBy = function(propertyOrCallback) {
+  if(typeof propertyOrCallback === 'string') {
+    var property = propertyOrCallback;
+    return this.sort(function(a, b) {
+      if(a[property] > b[property]) return 1;
+      if(b[property] > a[property]) return -1;
+      return 0;
+    });
+  } else if(typeof propertyOrCallback === 'function') {
+    var callback = propertyOrCallback;
+    var thisArg = arguments[1];
+    return this.sort(function(a, b) {
+      if(callback.call(thisArg, a) > callback.call(thisArg, b)) return 1;
+      if(callback.call(thisArg, b) > callback.call(thisArg, a)) return -1;
+      return 0;
+    });
+  }
+}
+
 Array.prototype.last = function() {
   return this[this.length - 1];
 }

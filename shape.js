@@ -28,27 +28,31 @@ Shape.prototype.sketch = function(context, params = {}) {
 }
 
 Shape.prototype.draw = function(context, params = {}) {
-  context.save();
-    if(this.clipShape) {
-      context.beginPath();
-        this.clipShape.drawPath(context);
-      context.clip();
-    }
-    context.strokeStyle = params.strokeStyle || this.strokeStyle;
-    context.lineWidth   = params.lineWidth   || this.lineWidth;
-    context.setLineDash(this.lineDash || []);
-    if(this.lineWidth || params.lineWidth) {
-      context.beginPath();
-        this.drawPath(context);
-      context.stroke();
-    }
-    if(params.fillStyle || this.fillStyle) {
-      context.fillStyle = params.fillStyle || this.fillStyle;
-      context.beginPath();
-        this.drawPath(context);
-      context.fill();
-    }
-  context.restore();
+  if(this.guideline) {
+    this.sketch(context);
+  } else {
+    context.save();
+      if(this.clipShape) {
+        context.beginPath();
+          this.clipShape.drawPath(context);
+        context.clip();
+      }
+      context.strokeStyle = params.strokeStyle || this.strokeStyle;
+      context.lineWidth   = params.lineWidth   || this.lineWidth;
+      context.setLineDash(this.lineDash || []);
+      if(this.lineWidth || params.lineWidth) {
+        context.beginPath();
+          this.drawPath(context);
+        context.stroke();
+      }
+      if(params.fillStyle || this.fillStyle) {
+        context.fillStyle = params.fillStyle || this.fillStyle;
+        context.beginPath();
+          this.drawPath(context);
+        context.fill();
+      }
+    context.restore();
+  }
 }
 
 Shape.prototype.fill = function(context, params = {}) {

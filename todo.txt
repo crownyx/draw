@@ -1,5 +1,6 @@
 edit by changing points directly
 guidelines/points
+edit only one shape - not change to other
 
 long term:
 

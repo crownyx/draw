@@ -1,16 +1,30 @@
 function selectMode() {
   var selected = [];
   var selectedCopies = [];
+  var selectByAll = false;
 
   infopanel.top = 'select shape(s) by drawing rectangle around point(s)';
-  infopanel.buttons = [Button('esc', 'cancel', 'red')];
+  infopanel.buttons = [
+    Button('a', 'select by all points (currently false)', 'yellow'),
+    Button('esc', 'cancel', 'red')
+  ];
 
   var allPoints = back.shapes.mapProperty('points').flatten();
   var allCenters = back.shapes.mapProperty('center');
 
-  allPoints.eachDo('fill', middle.context);
-  allCenters.eachDo('fill', middle.context);
-  allCenters.eachDo('circle', middle.context, { strokeStyle: 'red' });
+  front.eventListeners.add('mousemove', 'showPoints', function() {
+    allPoints.eachDo('fill', middle.context);
+    allCenters.eachDo('fill', middle.context);
+    allCenters.eachDo('circle', middle.context, { strokeStyle: 'red' });
+  }, true);
+
+  window.eventListeners.add('keydown', 'selectByAllPoints', function(e) {
+    if(!e.shiftKey && e.which === charCodes['a']) {
+      selectByAll = !selectByAll;
+      infopanel.buttons.find('a').text = 'select by all points (currently ' + selectByAll + ')';
+      if(front.eventListeners.find('resizeSelection')) front.eventListeners.find('resizeSelection').callback(); // change to method -- front.eventListeners.resizeSelection()
+    }
+  });
 
   front.eventListeners.add('click', 'beginSelection', function(e) {
     front.eventListeners.clear();
@@ -23,13 +37,33 @@ function selectMode() {
     /*               */   var upperMost = Math.min(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
     /*               */   var lowerMost = Math.max(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
     /*               */
-    /*               */   return allPoints.concat(allCenters).filter(function(point) {
-    /*               */     return(point.x > leftMost && point.x < rightMost && point.y > upperMost && point.y < lowerMost);
-    /*               */   });
+    /*               */   var inRect = function(point) {
+    /*               */     return point.x > leftMost && point.x < rightMost && point.y > upperMost && point.y < lowerMost;
+    /*               */   }
+    /*               */
+    /*               */   var selected;
+    /*               */
+    /*               */   if(selectByAll) {
+    /*               */     selected = back.shapes.filter(function(shape) {
+    /*               */       return(
+    /*               */         shape.points.every(function(point) {
+    /*               */           return inRect(point);
+    /*               */         }) && inRect(shape.center)
+    /*               */       );
+    /*               */     }).flatMap(function(shape) {
+    /*               */       return shape.points.concat(shape.center);
+    /*               */     });
+    /*               */   } else {
+    /*               */     selected = allPoints.concat(allCenters).filter(function(point) {
+    /*               */       return inRect(point);
+    /*               */     });
+    /*               */   }
+    /*               */
+    /*               */   return selected;
     /*               */ }
 
-    front.eventListeners.add('mousemove', 'resizeSelection', function(e) {
-      selectRect.setEnd(Point.from(e));
+    front.eventListeners.add('mousemove', 'resizeSelection', function() {
+      selectRect.setEnd(front.lastPoint);
       back.clear(); middle.clear();
       selectedPoints().forEach(function(point) { point.shape.selected = true; });
       allPoints.concat(allCenters).forEach(function(point) {
@@ -44,7 +78,7 @@ function selectMode() {
       });
       selectRect.draw(middle.context, { strokeStyle: "blue" });
       selectRect.fill(middle.context, { fillStyle: "rgba(173,216,230,0.25)" });
-    });
+    }, true);
 
     front.eventListeners.add('click', 'completeSelection', function(e) {
       front.eventListeners.clear();
