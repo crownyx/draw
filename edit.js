@@ -98,10 +98,18 @@ function editMode() {
 }
 
 Arc.prototype.edit = function(pickedPoint) {
-  var workingRadius = pickedPoint.same(this.endRadius.end) ? this.startRadius : this.endRadius;
-  var otherRadius = pickedPoint.same(this.startRadius.end) ? this.endRadius : this.startRadius;
-  this._workingRadius = function() { return workingRadius; }
-  this._otherRadius = function() { return otherRadius; }
+  if(pickedPoint.same(this.endRadius.end) || pickedPoint.same(this.startRadius.end)) {
+    var workingRadius = pickedPoint.same(this.endRadius.end) ? this.endRadius : this.startRadius;
+    var otherRadius = pickedPoint.same(this.startRadius.end) ? this.endRadius : this.startRadius;
+    this._workingRadius = function() { return workingRadius; }
+    this._otherRadius = function() { return otherRadius; }
+  } else {
+    this.setEnd = function(point) {
+      this.startRadius.setEnd(point, { fixedAngle: this.startRadius.angle });
+      this.endRadius.setEnd(point, { fixedAngle: this.endRadius.angle });
+      this.center.shape = this;
+    }
+  }
   this.nextStep = Shape.prototype.nextStep;
   this.setEnd(pickedPoint);
   front.startPoint = this.center;

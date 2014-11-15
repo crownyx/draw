@@ -2,6 +2,8 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
   Shape.call(this);
 
   this.center = radiusStart;
+  this.center.shape = this;
+
   this.startRadius = new Line(radiusStart, radiusEnd);
 
   if(startAngle) this.startRadius.setEnd(radiusEnd, { fixedAngle: startAngle });
@@ -58,9 +60,13 @@ Arc.prototype.constructor = Arc;
 Object.defineProperty(Arc.prototype, 'points', {
   get: function() {
     return [
+      this.center,
       this.startRadius.end,
-      this.endRadius.end,
-      this.origin
+      this.startRadius.end.translate(
+        this.center,
+        this.endRadius.angle.minus(this.startRadius.angle).times(1/2)
+      ),
+      this.endRadius.end
     ].map(function(point) {
       point.shape = this;
       return point;
@@ -90,6 +96,7 @@ Arc.prototype.drawPath = function(context) {
 Arc.prototype.setEnd = function(point) {
   this._workingRadius().setEnd(point);
   this._otherRadius().setEnd(point, { fixedAngle: this._otherRadius().angle });
+  this.center.shape = this;
 }
 
 Arc.prototype.nextStep = function() {
@@ -116,6 +123,13 @@ Arc.prototype._copy = function() {
   arc.endRadius = this.endRadius.copy();
   arc.clockwise = this.clockwise;
   return arc;
+}
+
+Arc.prototype._translate = function(point) {
+  this.startRadius.translate(point, { by: 'start' });
+  this.endRadius.translate(point, { by: 'start' });
+  this.center = point;
+  this.center.shape = this;
 }
 
 Arc.prototype._reflect = function(line) {

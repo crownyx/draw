@@ -54,9 +54,9 @@ BezierCurve.prototype.preview = function() {
       new Line(this.end, this.control1).sketchPreview();
     }
     if(!this.control1.same(front.usePoint))
-      this.control1.preview(0, -2, { strokeStyle: 'brown' });
+      this.control1.label(middle.context);
     if(this.control2 && !this.control2.same(front.usePoint))
-      this.control2.preview(0, -2, { strokeStyle: 'brown' });
+      this.control2.label(middle.context);
     this.draw(middle.context);
   } else {
     new Line(this.start, this.end).preview();

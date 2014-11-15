@@ -97,18 +97,18 @@ function findNearPoint(e) {
   if(nearPoint) {
     allPoints.forEach(function(point) {
       if(point.same(nearPoint))
-        point.draw(middle.context, { strokeStyle: 'blue' });
+        point.circle(middle.context, { strokeStyle: 'blue' });
     });
 
     allCenters.forEach(function(point) {
-      point.draw(middle.context, {
+      point.circle(middle.context, {
         strokeStyle: point.same(nearPoint) ? 'blue' : 'red'
       });
     });
 
     front.pickedPoint = nearPoint;
   } else {
-    allCenters.eachDo('draw', middle.context, { strokeStyle: 'red' });
+    allCenters.eachDo('circle', middle.context, { strokeStyle: 'red' });
     delete front.pickedPoint;
   }
 }

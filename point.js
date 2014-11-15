@@ -13,7 +13,22 @@ function Point(x, y) {
     context.restore();
   }
 
-  this.draw = function(context, params) {
+  this.label = function(context) {
+    this.fill(context);
+    var xText = 'x: ' + this.x;
+    var yText = 'y: ' + this.y;
+    context.textBaseline = 'middle';
+    context.textAlign = 'right';
+      context.fillText(xText, this.x - 7, this.y);
+    context.textAlign = 'left';
+      context.fillText(yText, this.x + 7, this.y);
+    var xWidth = context.measureText(xText).width;
+    var yWidth = context.measureText(yText).width;
+    var height = parseInt(context.font.match(/[0-9]+(?=px)/)[0]);
+    context.strokeRect(this.x - xWidth - 8, this.y - 2 - height / 2, xWidth + yWidth + 16, height + 4);
+  }
+
+  this.circle = function(context, params) {
     context.save();
       context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
       context.beginPath();

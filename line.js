@@ -100,7 +100,7 @@ Line.prototype.preview = function() {
   this.angle.preview();
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   this.draw(middle.context);
-  if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
+  if(this.fixedLength || this.fixedAngle) this.end.round().label(middle.context);
 }
 
 Line.prototype.sketchPreview = function() {
@@ -111,7 +111,7 @@ Line.prototype.sketchPreview = function() {
   }
   this.angle.preview();
   this.sketch(middle.context);
-  if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
+  if(this.fixedLength || this.fixedAngle) this.end.round().label(middle.context);
 }
 
 Line.prototype._translate = function(point, params = {}) {
