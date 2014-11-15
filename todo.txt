@@ -1,13 +1,3 @@
-Why shape.origin and shape.center?
-edit points directly
-shape.center as separate point
-
-set rotate for each shape
-re-allow switch from rotate to translate and vice versa
-double check ellipse circumference formula
-turn help/commands into buttons
-finish bezier curves: preview, shiftCommands
-start triangle
 edit by changing points directly
 guidelines/points
 

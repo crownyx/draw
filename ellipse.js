@@ -1,15 +1,14 @@
 function Ellipse(radStart, radEnd) {
   Shape.call(this);
 
-  this.origin = radStart;
-
   this.xAxis = new Line(radStart, new Point(radEnd.x,   radStart.y));
   this.yAxis = new Line(radStart, new Point(radStart.x, radEnd.y  ));
-  this.rotation = new Angle(0);
-
-  this.lines = [this.yAxis, this.xAxis];
+  this.center = radStart;
+  this.center.shape = this;
 
   var ellipse = this;
+
+  this.setPoints();
 
   this.shiftCommands = [
     {
@@ -73,10 +72,6 @@ function Ellipse(radStart, radEnd) {
 Ellipse.prototype = new Shape;
 Ellipse.prototype.constructor = Ellipse;
 
-Object.defineProperty(Ellipse.prototype, 'center', {
-  get: function() { return this.origin; }
-});
-
 Object.defineProperty(Ellipse.prototype, 'semiMajor', {
   get: function() { return [this.yAxis, this.xAxis].maxBy('length'); }
 });
@@ -85,21 +80,18 @@ Object.defineProperty(Ellipse.prototype, 'semiMinor', {
   get: function() { return [this.yAxis, this.xAxis].minBy('length'); }
 });
 
-Object.defineProperty(Ellipse.prototype, 'points', {
-  get: function() {
-    return {
-      yTop: new Point(this.center.x, this.center.y - this.yAxis.length),
-      xRight: new Point(this.center.x + this.xAxis.length, this.center.y),
-      yBottom: new Point(this.center.x, this.center.y + this.yAxis.length),
-      xLeft: new Point(this.center.x - this.xAxis.length, this.center.y),
-      center: this.center
-    }.map(function(name, point) {
-      var point = point.translate(this.origin, this.rotation);
-      point.shape = this;
-      return point;
-    }, this);
-  }
-});
+Ellipse.prototype.setPoints = function() {
+  this.center.shape = this;
+  this.points = [
+    this.yAxis.end,
+    this.xAxis.end,
+    this.yAxis.end.translate(this.center, Math.PI),
+    this.xAxis.end.translate(this.center, Math.PI)
+  ].map(function(point) {
+    point.shape = this;
+    return point;
+  }, this);
+}
 
 Ellipse.prototype.drawPath = function(context) {
   context.save();
@@ -117,8 +109,6 @@ Ellipse.prototype.preview = function() {
     this.yAxis.sketch(middle.context);
     this.xAxis.sketch(middle.context);
   }
-  this.yAxis.end.round().showCoords(middle.context, 0, 2);
-  this.xAxis.end.round().showCoords(middle.context, 0, 2);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }
 
@@ -152,9 +142,10 @@ Ellipse.prototype.infoText = function() {
 }
 
 Ellipse.prototype.setEnd = function(point) {
-  var point = point.untranslate(this.origin, this.rotation);
-  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.origin.x, point.y).translate(this.origin, this.rotation));
-  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.origin.y).translate(this.origin, this.rotation));
+  var point = point.untranslate(this.center, this.rotation);
+  if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.center.x, point.y).translate(this.center, this.rotation));
+  if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.center.y).translate(this.center, this.rotation));
+  this.setPoints();
 }
 
 Ellipse.prototype.rotate = function(rotation) {
@@ -165,17 +156,40 @@ Ellipse.prototype.rotate = function(rotation) {
 
 Ellipse.prototype.reflect = function(line) {
   var reflected = this.copy();
-  var newCenter = this.origin.reflect(line);
-  reflected.translate(newCenter);
-  reflected.rotation = (this.rotation.refAngle.plus(line.angle.times(2)));
+  reflected.translate(this.center.reflect(line));
+
+  reflected.rotation = (
+    this.rotation.quadrant == 2 || this.rotation.quadrant == 4 ?
+    new Angle(0) : new Angle(Math.PI)
+  ).minus(this.rotation.refAngle.times(
+    this.rotation.quadrant == 2 || this.rotation.quadrant == 4 ? -1 : 1
+  )).plus(line.angle.times(2));
+
+  var endPoint = new Point(
+    reflected.center.x + reflected.xAxis.length,
+    reflected.center.y + reflected.yAxis.length
+  ).translate(reflected.center, reflected.rotation);
+
+  reflected.setEnd(endPoint);
+
   return reflected;
+}
+
+Ellipse.prototype._translate = function(point) {
+  this.center = point;
+  this.center.shape = this;
+  this.xAxis.translate(point, { by: 'start' });
+  this.yAxis.translate(point, { by: 'start' });
+  this.setPoints();
 }
 
 Ellipse.prototype._copy = function() {
   var ellipse = new Ellipse(this.center, this.center);
   ellipse.xAxis = this.xAxis.copy();
   ellipse.yAxis = this.yAxis.copy();
-  ellipse.origin = this.origin;
+  ellipse.center = this.center.copy();
+  ellipse.center.shape = ellipse;
   ellipse.rotation = this.rotation;
+  ellipse.setPoints();
   return ellipse;
 }

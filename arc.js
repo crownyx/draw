@@ -1,18 +1,18 @@
 function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
   Shape.call(this);
 
+  this.center = radiusStart;
   this.startRadius = new Line(radiusStart, radiusEnd);
+
   if(startAngle) this.startRadius.setEnd(radiusEnd, { fixedAngle: startAngle });
 
   this.endRadius = this.startRadius.copy();
+
   this.endRadius.setEnd(
     this.endRadius.end, { fixedAngle: endAngle || new Angle(2 * Math.PI) }
   );
 
   this.clockwise = true;
-
-  this.lines = [this.startRadius, this.endRadius];
-  this.origin = radiusStart;
 
   this._workingRadius = function() { return this.startRadius; }
   this._otherRadius = function() { return this.endRadius; }
@@ -57,19 +57,15 @@ Arc.prototype.constructor = Arc;
 
 Object.defineProperty(Arc.prototype, 'points', {
   get: function() {
-    return {
-      end1: this.startRadius.end,
-      end2: this.endRadius.end,
-      center: this.origin
-    }.map(function(name, point) {
+    return [
+      this.startRadius.end,
+      this.endRadius.end,
+      this.origin
+    ].map(function(point) {
       point.shape = this;
       return point;
     }, this);
   }
-});
-
-Object.defineProperty(Arc.prototype, 'center', {
-  get: function() { return this.origin; }
 });
 
 Arc.prototype.infoText = function() {
@@ -103,14 +99,13 @@ Arc.prototype.nextStep = function() {
 }
 
 Arc.prototype.rotate = function(rotation) {
-  this.lines.forEach(function(line) {
-    line.rotate(new Angle(rotation.rad - this.rotation.rad));
-  }, this);
+  this.endRadius.rotate(new Angle(rotation.rad - this.rotation.rad));
+  this.startRadius.rotate(new Angle(rotation.rad - this.rotation.rad));
   this.rotation = rotation;
 }
 
 Arc.prototype.preview = function() {
-  this._workingRadius().preview(true);
+  this._workingRadius().sketchPreview();
   this._otherRadius().sketch(middle.context);
   this.draw(middle.context);
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
@@ -121,4 +116,23 @@ Arc.prototype._copy = function() {
   arc.endRadius = this.endRadius.copy();
   arc.clockwise = this.clockwise;
   return arc;
+}
+
+Arc.prototype._reflect = function(line) {
+  //var reflected = this.copy();
+
+  //var lineToStart = line.start.to(this.diagonal.start);
+  //reflected.diagonal.start = lineToStart.end.reflect(line);
+
+  //reflected.rotation = (
+  //  this.rotation.quadrant == 2 || this.rotation.quadrant == 4 ?
+  //  new Angle(0) : new Angle(Math.PI)
+  //).minus(this.rotation.refAngle.times(
+  //  this.rotation.quadrant == 2 || this.rotation.quadrant == 4 ? -1 : 1
+  //)).plus(line.angle.times(2));
+
+  //var lineToEnd = line.start.to(this.diagonal.end);
+  //reflected.setEnd(lineToEnd.end.reflect(line));
+
+  //return reflected;
 }

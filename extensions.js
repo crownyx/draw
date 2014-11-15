@@ -64,7 +64,7 @@ if (!Array.prototype.findIndex) {
 
 Array.prototype.remove = function(obj) {
   var index = this.indexOf(obj);
-  this.splice(index, 1);
+  if(index !== -1) this.splice(index, 1);
 }
 
 Array.prototype.flatten = function() {
@@ -92,6 +92,28 @@ Array.prototype.maxBy = function(method) {
     if(b[method] > a[method]) return -1;
     return 0;
   })[this.length - 1];
+}
+
+Array.prototype.last = function() {
+  return this[this.length - 1];
+}
+
+Array.prototype.mapProperty = function(propertyName) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return this.map(function(element) {
+    if(typeof element[propertyName] === 'function') {
+      return element[propertyName].apply(element, args);
+    } else {
+      return element[propertyName];
+    }
+  });
+}
+
+Array.prototype.eachDo = function(methodName) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  this.forEach(function(element) {
+    element[methodName].apply(element, args);
+  });
 }
 
 ////////////

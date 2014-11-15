@@ -16,7 +16,7 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
   }
 
   window.eventListeners.suspendAll();
-  window.removeEventListener('keydown', choosePoint, false);
+  window.removeEventListener('keydown', setOrPickPoint, false); // why?
 
   var input = [];
   var alphabetical = !!acceptChars.find(function(charSet) { return charSet == 'a-z' });
@@ -42,12 +42,12 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
       input.push(acceptedChar);
     } else if(e.which == charCodes['enter']) {
       window.eventListeners.remove('getInput');
-      window.addEventListener('keydown', choosePoint, false);
+      window.addEventListener('keydown', setOrPickPoint, false); // why?
       window.eventListeners.resumeAll();
       infopanel.top = oldTop;
       middle.clear();
       propToFill(input.join(''));
-      if(shape) shape.setEnd(front.setPoint || front.lastPoint);
+      if(shape) shape.setEnd(front.usePoint);
       if(shape) shape.preview();
     } else if(e.which == charCodes['backspace']) {
       inputfield.textContent = inputfield.textContent.slice(0, -1);

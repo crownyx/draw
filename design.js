@@ -1,28 +1,28 @@
 function design(shape) {
   middle.shape = shape;
+  shape.preview();
+
+  delete front.pickedPoint;
 
   window.eventListeners.add('keydown', 'drawCommands', drawCommands);
 
-  window.eventListeners.add('keydown', 'exitDesignMode', function(e) {
-    if(e.which == charCodes['esc']) changeMode(commandMode);
+  window.eventListeners.add('keydown', 'exitMode', function(e) {
+    if(e.which === charCodes['esc']) changeMode(commandMode);
   });
 
-  front.eventListeners.add('mousemove', 'setEnd', function(e) { shape.setEnd(front.setPoint || front.lastPoint); });
-
-  front.eventListeners.add('mousemove', 'previewShape', refreshMiddle = function()  {
-    middle.clear();
+  front.eventListeners.add('mousemove', 'setEnd', function() {
+    shape.setEnd(front.usePoint);
     shape.preview();
   });
 
   front.eventListeners.add('click', 'nextStep', function() {
+    shape.setEnd(front.usePoint);
     if(front.setPoint) {
       delete front.setPoint;
       infopanel.bottom.clear();
     }
     shape.nextStep();
   });
-
-  shape.preview();
 
   /* set up infopanel */ infopanel.top = shape.name;
   /*                  */ 
@@ -68,7 +68,7 @@ function design(shape) {
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
     if(e.which == charCodes['i']) {
       middle.showText = !middle.showText;
-      refreshMiddle();
+      middle.redraw();
     }
   });
 
@@ -78,7 +78,7 @@ function design(shape) {
         window.eventListeners.add('keydown', 'toggle' + command.forWhat.capitalize(), function(e) {
           if(e.shiftKey && e.which == charCodes[command.key]) {
             command.callback.call(shape);
-            refreshMiddle();
+            middle.redraw();
           }
         });
       break;

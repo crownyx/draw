@@ -1,4 +1,6 @@
-function Canvas(id) { this.id = id; }
+function Canvas(id) {
+  this.id = id;
+}
 
 Object.defineProperty(Canvas.prototype, 'canvas', {
   get: function() { return document.getElementById(this.id); }
@@ -11,6 +13,11 @@ Object.defineProperty(Canvas.prototype, 'context', {
     return ctx;
   }
 });
+
+Canvas.prototype.resize = function() {
+  this.canvas.width   = window.innerWidth  - 202;
+  this.canvas.height  = window.innerHeight - 10;
+}
 
 Canvas.prototype.clear = function() {
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -27,6 +34,16 @@ Canvas.prototype.translate = function(point) {
 var front  = new Canvas('frontlayer');
 var middle = new Canvas('drawlayer');
 var back   = new Canvas('backlayer');
+
+///////////
+// front //
+///////////
+
+Object.defineProperty(front, 'usePoint', {
+  get: function() {
+   return this.pickedPoint || this.setPoint || this.lastPoint;
+  }
+});
 
 front.showPos = function(e) {
   var currPoint = e ? Point.from(e) : this.lastPoint;
@@ -59,20 +76,13 @@ front.redraw = function() {
 }
 
 front.refresh = function() {
-  this.clear();
+  this.redraw();
 
-  this.showPos();
-  this.showAxes();
   this.eventListeners.clear();
 
   infopanel.top.clear();
   infopanel.buttons.clear();
   infopanel.bottom.clear();
-
-  if(this.setPoint) {
-    this.showPos(this.setPoint);
-    new AxisPair(this.setPoint).sketch(this.context);
-  }
 }
 
 front.textAlignments = [
@@ -88,19 +98,38 @@ Object.defineProperty(front, 'infodiv', {
   }
 });
 
+//////////
+// back //
+//////////
+
 back.shapes = [];
 
-back.refresh = function() {
+back.redraw = function() {
   this.clear();
   this.shapes.forEach(function(shape) {
     shape.draw(this.context);
   }, this);
 }
 
+back.refresh = back.redraw;
+
+////////////
+// middle //
+////////////
+
 middle.showText = true;
+middle.showPoints = false;
 
 middle.refresh = function() {
-  this.clear();
   delete this.shape;
   delete this.group;
+
+  this.redraw();
+}
+
+middle.redraw = function() {
+  this.clear();
+  if(this.shape || this.group) {
+    (this.shape || this.group).preview();
+  }
 }

@@ -24,11 +24,6 @@ function BezierCurve(start, end, control1, control2) {
 BezierCurve.prototype = new Shape;
 BezierCurve.prototype.constructor = BezierCurve;
 
-BezierCurve.prototype.preview = function() {
-  new Line(this.start, this.end).sketchPreview();
-  this.draw(middle.context);
-}
-
 BezierCurve.prototype.drawPath = function(context) {
   context.moveTo(this.start.x, this.start.y);
   if(this.quadratic) {
@@ -50,30 +45,43 @@ BezierCurve.prototype.drawPath = function(context) {
   }
 }
 
+BezierCurve.prototype.preview = function() {
+  if(this.control1) {
+    new Line(this.start, this.control1).sketchPreview();
+    if(this.control2) {
+      new Line(this.end, this.control2).sketchPreview();
+    } else {
+      new Line(this.end, this.control1).sketchPreview();
+    }
+    if(!this.control1.same(front.usePoint))
+      this.control1.preview(0, -2, { strokeStyle: 'brown' });
+    if(this.control2 && !this.control2.same(front.usePoint))
+      this.control2.preview(0, -2, { strokeStyle: 'brown' });
+    this.draw(middle.context);
+  } else {
+    new Line(this.start, this.end).preview();
+  }
+}
+
 BezierCurve.prototype.setEnd = function(point) { this.end = point; }
 
 BezierCurve.prototype.nextStep = function() {
   this.setEnd = function(point) { this.control1 = point; }
-  this.preview = function() {
-    new Line(this.start, this.control1).sketchPreview();
-    new Line(this.end, this.control1).sketchPreview();
-    this.draw(middle.context);
-  }
   this.nextStep = function() {
     if(this.quadratic) {
       Shape.prototype.nextStep.call(this);
     } else {
       this.setEnd = function(point) { this.control2 = point; }
-      this.preview = function() {
-        new Line(this.start, this.control1).sketchPreview();
-        new Line(this.end, this.control2).sketchPreview();
-        this.control1.preview();
-        this.draw(middle.context);
-      }
       this.nextStep = Shape.prototype.nextStep;
     }
   }
 }
+
+Object.defineProperty(BezierCurve.prototype, 'center', {
+  get: function() {
+    return new Line(this.start, this.end).mid;
+  }
+});
 
 Object.defineProperty(BezierCurve.prototype, 'points', {
   get: function() {
@@ -88,12 +96,6 @@ Object.defineProperty(BezierCurve.prototype, 'points', {
       point.shape = this;
       return point;
     }, this);
-  }
-});
-
-Object.defineProperty(BezierCurve.prototype, 'center', {
-  get: function() {
-    return new Line(this.start, this.end).mid;
   }
 });
 

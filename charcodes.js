@@ -92,7 +92,7 @@ var charCodes = {
   equal_sign: 187,
   ',': 188,
   dash: 189,
-  period: 190,
+  '.': 190,
   forward_slash: 191,
   grave_accent: 192,
   open_bracket: 219,

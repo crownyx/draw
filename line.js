@@ -96,7 +96,7 @@ Line.prototype.drawPath = function(context) {
 }
 
 Line.prototype.preview = function() {
-  this.start.round().preview(Angle.from(front.startPoint, front.lastPoint), 1);
+  this.start.round().preview(0, 1);
   this.angle.preview();
   if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
   this.draw(middle.context);
@@ -104,24 +104,39 @@ Line.prototype.preview = function() {
 }
 
 Line.prototype.sketchPreview = function() {
-  this.start.round().preview(Angle.from(front.startPoint, front.lastPoint), 1);
+  if(this.start.same(front.usePoint)) {
+    this.start.round().showCoords(middle.context, 0, 1);
+  } else {
+    this.start.round().preview(0, 1);
+  }
   this.angle.preview();
   this.sketch(middle.context);
   if(this.fixedLength || this.fixedAngle) this.end.round().preview(0, 2, { strokeStyle: 'green' });
 }
 
-Line.prototype._translate = function(point) {
-  (function(start, mid, end) {
-    this.start = point.minus(mid.x - start.x, mid.y - start.y);
-    this.setEnd(point.minus(mid.x - end.x,   mid.y - end.y));
-  }).call(this, this.start, this.mid, this.end);
+Line.prototype._translate = function(point, params = {}) {
+  if(params.by == 'start') {
+    (function(start, end) {
+      this.start = point;
+      this.setEnd(point.plus(end.x - start.x, end.y - start.y));
+    }).call(this, this.start, this.end);
+  } else {
+    (function(start, mid, end) {
+      this.start = point.minus(mid.x - start.x, mid.y - start.y);
+      this.setEnd(point.minus(mid.x - end.x,   mid.y - end.y));
+    }).call(this, this.start, this.mid, this.end);
+  }
 }
 
-Line.prototype.rotate = function(rotation) {
-  this.start = this.start.translate(this.mid, rotation);
-  this.setEnd(this.end.translate(this.mid, rotation));
-  if(this.fixedAngle)
-    this.fixedAngle = this.fixedAngle.rad.plus(rotation);
+Line.prototype.rotate = function(rotation, params) {
+  if(params && params.about == 'start') {
+    this.setEnd(this.end.translate(this.start, rotation));
+  } else {
+    this.start = this.start.translate(this.mid, rotation);
+    this.setEnd(this.end.translate(this.mid, rotation));
+    if(this.fixedAngle)
+      this.fixedAngle = this.fixedAngle.rad.plus(rotation);
+  }
 }
 
 Line.prototype.copy = function() {

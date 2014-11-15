@@ -23,6 +23,9 @@ var infopanel = {
       infopanel.resizeButtons();
     }
     buttons.clear = function() { this.innerHTML = ""; }
+    buttons.find = function(id) {
+      return document.getElementById('button-' + id);
+    }
     buttons.remove = function(id) { this.removeChild(document.getElementById('button-' + id)); }
     return buttons;
   },
@@ -68,7 +71,7 @@ var infopanel = {
       return infobox;
     }
     return bottom;
-  }//,
+  },
   //set bottom(textContent) {
   //  var _infopanel = document.getElementById('infopanel');
   //  var box = document.createElement('div');
@@ -80,5 +83,9 @@ var infopanel = {
   //    _infopanel.appendChild(box);
   //  }
   //  this.resizeButtons();
-  //}
+  //},
+  resize: function() {
+    this.element.style.width  = window.innerWidth - front.canvas.width - 17 + 'px';
+    this.element.style.height = front.canvas.height - 8 + 'px';
+  }
 }

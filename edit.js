@@ -1,153 +1,176 @@
 function editMode() {
+  var showPoints = middle.showPoints;
+  middle.showPoints = true;
+  middle.redraw();
+
   infopanel.top = 'select point to begin editing';
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
   infopanel.bottom.add('select center point of a shape to delete/translate/rotate');
 
-  var allPoints = back.shapes.map(function(shape) { return shape.points; }).flatten();
+  var exit = function() {
+    middle.showPoints = showPoints;
+    back.redraw();
+    changeMode(commandMode);
+  }
 
-  allPoints.forEach(function(point) { point.fill(back.context); });
+  window.eventListeners.add('keydown', 'exitMode', function(e) {
+    if(e.which == charCodes['esc']) exit();
+  });
+
+  findNearPoint(front.lastPoint);
 
   var lastHighlighted;
 
-  window.eventListeners.add('keydown', 'exitEditMode', function(e) {
-    if(e.which == charCodes['esc']) {
-      back.refresh();
-      changeMode(commandMode);
+  front.eventListeners.add('mousemove', 'findPoint', function() {
+    if(front.pickedPoint) {
+      lastHighlighted = front.pickedPoint.shape;
+      back.shapes.remove(lastHighlighted);
+      back.redraw();
+      lastHighlighted.draw(middle.context, { strokeStyle: 'blue' });
+      back.shapes.push(lastHighlighted);
+    } else if(lastHighlighted) {
+      lastHighlighted = null;
+      back.redraw();
     }
-  });
+  }, true);
 
-  front.eventListeners.add('mousemove', 'findPoint', function(e) {
-    if(front.eventListeners.find('selectPoint')) front.eventListeners.remove('selectPoint');
+  front.eventListeners.add('click', 'choosePoint', function() {
+    if(front.pickedPoint) {
+      infopanel.top.clear();
+      window.refresh();
+      front.refresh();
 
-    var currPoint = Point.from(e);
+      var shape = front.pickedPoint.shape;
+      var origShape = shape.copy();
+      var pickedPoint = front.pickedPoint;
 
-    var nearPoint = allPoints.filter(function(point) {
-      return currPoint.distance(point) < 5;
-    }).sort(function(point) {
-      return currPoint.distance(point);
-    })[0];
+      back.shapes.remove(shape);
+      back.redraw();
+      middle.clear();
 
-    if(nearPoint) {
-      nearPoint.draw(front.context, { radius: 5, strokeStyle: "blue" });
+      front.eventListeners.add('mousemove', 'showShape', function() {
+        shape.draw(middle.context, { strokeStyle: 'blue' });
+        shape.center.round().preview(0, 2);
+      }, true);
 
-      lastHighlighted = nearPoint.shape;
+      if(pickedPoint.same(shape.center)) {
+        infopanel.buttons = [
+          Button('c',   'clip',      'green'),
+          Button('d',   'delete',    'green'),
+          Button('m',   'mirror',    'green'),
+          Button('r',   'rotate',    'green'),
+          Button('s',   'style',     'green'),
+          Button('t',   'translate', 'green'),
+          Button('esc', 'cancel',    'red')
+        ];
 
-      back.clear();
-
-      back.shapes.forEach(function(shape) {
-        shape === nearPoint.shape ?
-        shape.draw(back.context, { strokeStyle: "blue" }) :
-        shape.draw(back.context);
-      });
-
-      allPoints.forEach(function(point) { point.fill(back.context); });
-
-      front.eventListeners.add('click', 'selectPoint', function() {
-        infopanel.top.clear();
-        window.refresh(); front.refresh();
-
-        var shape = nearPoint.shape;
-        var origShape = shape.copy();
-
-        back.shapes.remove(shape);
-        back.refresh();
-
-        if(nearPoint.same(shape.center)) {
-          infopanel.buttons = [
-            Button('c',   'clip',      'green'),
-            Button('d',   'delete',    'green'),
-            Button('m',   'mirror',    'green'),
-            Button('r',   'rotate',    'green'),
-            Button('s',   'style',     'green'),
-            Button('t',   'translate', 'green'),
-            Button('esc', 'cancel',    'red')
-          ];
-
-          shape.draw(middle.context, { strokeStyle: 'blue' });
-          front.startPoint = shape.center;
-          shape.center.round().preview();
-          window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
-            if(!e.shiftKey) {
+        window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
+          if(!e.shiftKey) {
+            if(['c', 's', 'm', 'r', 't'].find(function(letter) {
+                return charCodes[letter] === e.which;
+              }))
+            {
+              middle.showPoints = showPoints;
               switch(e.which) {
                 case charCodes['c']: clip(new Group([shape.copy()])); break;
-                case charCodes['d']: changeMode(commandMode); break;
                 case charCodes['s']: style(new Group([shape.copy()])); break;
                 case charCodes['m']: mirror(new Group([shape.copy()])); break;
-                case charCodes['r']: rotate(new Group([shape.copy()]), nearPoint); break;
-                case charCodes['t']: translate(new Group([shape.copy()]), nearPoint); break;
+                case charCodes['r']: rotate(new Group([shape.copy()]), pickedPoint); break;
+                case charCodes['t']: translate(new Group([shape.copy()]), pickedPoint); break;
               }
+            } else if(e.which === charCodes['d']) {
+              changeMode(commandMode);
             }
-          });
-        } else {
-          switch(shape.constructor) {
-            case Arc:
-              var workingRadius = nearPoint.same(shape.points.end1) ? shape.startRadius : shape.endRadius;
-              var otherRadius = nearPoint.same(shape.points.end1) ? shape.endRadius : shape.startRadius;
-              shape._workingRadius = function() { return workingRadius; }
-              shape._otherRadius = function() { return otherRadius; }
-              shape.nextStep = Shape.prototype.nextStep;
-              shape.setEnd(nearPoint);
-              front.startPoint = shape.center;
-              design(shape);
-            break;
-            case Circle:
-              shape.setEnd(nearPoint);
-              front.startPoint = shape.center;
-              design(shape);
-            break;
-            case Ellipse:
-              if(nearPoint.same(shape.points.yTop) || nearPoint.same(shape.points.yBottom)) {
-                shape.yAxis.fixed = false;
-                shape.xAxis.fixed = true;
-                shape.setEnd(nearPoint);
-              } else if(nearPoint.same(shape.points.xLeft) || nearPoint.same(shape.points.xRight)) {
-                shape.xAxis.fixed = false;
-                shape.yAxis.fixed = true;
-                shape.setEnd(nearPoint);
-              }
-              front.startPoint = shape.center;
-              design(shape);
-            break;
-            case Line:
-              (function(backwards) {
-                var start = backwards ? shape.end : shape.start;
-                var end   = backwards ? shape.start : shape.end;
-                front.startPoint = start;
-                shape.start = start;
-                shape.end = end;
-                design(shape);
-              })(nearPoint.same(shape.start));
-            break;
-            case Rectangle:
-              var opposite = (function(point) {
-                for(var i = 0; i < shape.points.length; i++) {
-                  if(shape.points[i].same(nearPoint))
-                    return shape.points[(i + 2) % 4];
-                }
-              })();
-              if(!shape.fixedEnd) {
-                shape.diagonal.start = opposite;
-                front.startPoint = opposite;
-                shape.setEnd(nearPoint);
-              }
-              design(shape);
-            break;
-          }
-          window.eventListeners.remove('exitDesignMode');
-        }
-        window.eventListeners.add('keydown', 'exitEditMode', function(e) {
-          if(e.which == charCodes['esc']) {
-            back.shapes.push(origShape);
-            back.refresh();
-            changeMode(commandMode);
           }
         });
+      } else {
+        middle.showPoints = showPoints;
+        shape.edit(pickedPoint);
+      }
+      window.eventListeners.add('keydown', 'exitMode', function(e) {
+        if(e.which === charCodes['esc']) {
+          back.shapes.push(origShape);
+          exit();
+        }
       });
-    } else if(lastHighlighted) {
-      back.clear();
-      back.shapes.forEach(function(shape) { shape.draw(back.context); });
-      allPoints.forEach(function(point) { point.fill(back.context); });
-      lastHighlighted = null;
     }
   });
+}
+
+Arc.prototype.edit = function(pickedPoint) {
+  var workingRadius = pickedPoint.same(this.endRadius.end) ? this.startRadius : this.endRadius;
+  var otherRadius = pickedPoint.same(this.startRadius.end) ? this.endRadius : this.startRadius;
+  this._workingRadius = function() { return workingRadius; }
+  this._otherRadius = function() { return otherRadius; }
+  this.nextStep = Shape.prototype.nextStep;
+  this.setEnd(pickedPoint);
+  front.startPoint = this.center;
+  changeMode();
+  design(this);
+}
+
+BezierCurve.prototype.edit = function(pickedPoint) {
+  if(pickedPoint.same(this.start)) {
+    this.setEnd = function(point) { this.start = point; }
+  } else if(pickedPoint.same(this.end)) {
+    this.setEnd = function(point) { this.end = point; }
+  } else if(pickedPoint.same(this.control1)) {
+    this.setEnd = function(point) { this.control1 = point; }
+  } else if(!this.quadratic && pickedPoint.same(this.control2)) {
+    this.setEnd = function(point) { this.control2 = point; }
+  }
+  this.setEnd(pickedPoint);
+  front.startPoint = this.start;
+  changeMode();
+  design(this);
+}
+
+Circle.prototype.edit = function(pickedPoint) {
+  this.setEnd(pickedPoint);
+  front.startPoint = this.center;
+  changeMode();
+  design(this);
+}
+
+Ellipse.prototype.edit = function(pickedPoint) {
+  front.startPoint = this.center;
+  if(pickedPoint.same(this.yAxis.end) || pickedPoint.same(this.yAxis.end.translate(this.center, Math.PI))) {
+    this.yAxis.fixed = false;
+    this.xAxis.fixed = true;
+    this.setEnd(pickedPoint);
+  } else if(pickedPoint.same(this.xAxis.end) || pickedPoint.same(this.xAxis.end.translate(this.center, Math.PI))) {
+    this.xAxis.fixed = false;
+    this.yAxis.fixed = true;
+    this.setEnd(pickedPoint);
+  }
+  changeMode();
+  design(this);
+}
+
+Line.prototype.edit = function(pickedPoint) {
+  (function(backwards) {
+    var start = backwards ? this.end : this.start;
+    var end   = backwards ? this.start : this.end;
+    this.start = start;
+    this.end = end;
+    front.startPoint = start;
+    changeMode();
+    design(this);
+  }).call(this, pickedPoint.same(this.start));
+}
+
+Rectangle.prototype.edit = function(pickedPoint) {
+  var opposite = (function() {
+    for(var i = 0; i < this.points.length; i++) {
+      if(this.points[i].same(pickedPoint))
+        return this.points[(i + 2) % 4];
+    }
+  }).call(this);
+  if(!this.fixedEnd) {
+    this.diagonal.start = opposite;
+    front.startPoint = opposite;
+    this.setEnd(pickedPoint);
+  }
+  changeMode();
+  design(this);
 }

@@ -13,17 +13,18 @@ function Point(x, y) {
     context.restore();
   }
 
-  this.draw = function(context, params = { radius: 2 }) {
+  this.draw = function(context, params) {
     context.save();
       context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
       context.beginPath();
-        context.arc(this.x, this.y, params.radius, 0, 2 * Math.PI);
+        context.arc(this.x, this.y, params.radius || 5, 0, 2 * Math.PI);
       context.stroke();
     context.restore();
   }
 
   this.translate = function(refPoint, rotation) {
     var refLine = refPoint.to(this);
+    rotation = rotation instanceof Angle ? rotation : new Angle(rotation);
     return new Point(refPoint.x + Math.cos(rotation.plus(refLine.angle).rad) * refLine.length,
                      refPoint.y + Math.sin(rotation.plus(refLine.angle).rad) * refLine.length);
   }
@@ -71,7 +72,16 @@ function Point(x, y) {
 
   this.reflect = function(line) {
     var lineToThis = line.start.to(this);
-    return this.translate(line.start, line.angle.times(2).plus(lineToThis.angle.refAngle.times(2)));
+    switch(lineToThis.angle.quadrant) {
+      case 1:
+        return this.translate(line.start, line.angle.times(2).minus(lineToThis.angle.refAngle.times(2)));
+      case 2:
+        return this.translate(line.start, line.angle.times(2).plus(lineToThis.angle.refAngle.times(2)));
+      case 3:
+        return this.translate(line.start, line.angle.times(2).minus(lineToThis.angle.refAngle.times(2)));
+      case 4:
+        return this.translate(line.start, line.angle.times(2).plus(lineToThis.angle.refAngle.times(2)));
+    }
   }
 
   this.copy = function() { return new Point(this.x, this.y); }
@@ -88,7 +98,7 @@ function Point(x, y) {
 
   this.preview = function(angle, quadAdd = -1, params = {}) {
     new AxisPair(this).sketch(middle.context, params);
-    this.showCoords(middle.context, angle, quadAdd + 2 ? quadAdd : -1);
+    this.round().showCoords(middle.context, angle, quadAdd + 2 ? quadAdd : -1);
   }
 
   this.showCoords = function(context, angle, quadAdd = -1) {

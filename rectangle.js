@@ -120,9 +120,9 @@ Object.defineProperty(Rectangle.prototype, 'length', {
     if(this.fixedLength) {
       switch(this.diagonal.angle.minus(this.rotation).quadrant) {
         case 1:
-        case 4: return this.fixedLength; break;
+        case 4: return this.fixedLength;
         case 2:
-        case 3: return -this.fixedLength; break;
+        case 3: return -this.fixedLength;
       }
     } else {
       var diagAngle = this.diagonal.angle.minus(this.rotation);
@@ -136,9 +136,9 @@ Object.defineProperty(Rectangle.prototype, 'height', {
     if(this.fixedHeight) {
       switch(this.diagonal.angle.minus(this.rotation).quadrant) {
         case 1:
-        case 2: return this.fixedHeight; break;
+        case 2: return this.fixedHeight;
         case 3:
-        case 4: return -this.fixedHeight; break;
+        case 4: return -this.fixedHeight;
       }
     } else {
       var diagAngle = this.diagonal.angle.minus(this.rotation);
@@ -148,15 +148,11 @@ Object.defineProperty(Rectangle.prototype, 'height', {
 });
 
 Object.defineProperty(Rectangle.prototype, 'area', {
-  get: function() {
-    return this.height * this.length;
-  }
+  get: function() { return this.height * this.length; }
 });
 
 Object.defineProperty(Rectangle.prototype, 'perimeter', {
-  get: function() {
-    return 2 * (Math.abs(this.height) + Math.abs(this.length));
-  }
+  get: function() { return 2 * (Math.abs(this.height) + Math.abs(this.length)); }
 });
 
 Rectangle.prototype.infoText = function() {
@@ -169,7 +165,10 @@ Rectangle.prototype.infoText = function() {
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {
-  get: function() { return this.diagonal.mid; }
+  get: function() {
+    this.diagonal.mid.shape = this;
+    return this.diagonal.mid;
+  }
 });
 
 Rectangle.prototype.setEnd = function(point) {
@@ -227,50 +226,51 @@ Rectangle.prototype.setEnd = function(point) {
 }
 
 Rectangle.prototype.setPoints = function() {
-  this.points = [
-    this.diagonal.start,
-    this.diagonal.start.plus(
-      Math.cos(this.rotation.rad) * this.length,
-      Math.sin(this.rotation.rad) * this.length
-    ),
-    this.diagonal.end,
-    this.diagonal.start.plus(
-      Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
-      Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
-    ),
-    this.center
-  ].map(function(point) {
-    point.shape = this;
-    return point;
-  }, this);
+  this.corner1 = this.diagonal.start;
+  this.corner2 = this.diagonal.start.plus(
+    Math.cos(this.rotation.rad) * this.length,
+    Math.sin(this.rotation.rad) * this.length
+  );
+  this.corner3 = this.diagonal.end;
+  this.corner4 = this.diagonal.start.plus(
+    Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
+    Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
+  );
+  this.center = this.diagonal.mid;
+  this.points = [this.corner1, this.corner2, this.corner3, this.corner4];
+  this.points.forEach(function(point) { point.shape = this; }, this);
+  this.center.shape = this;
 }
 
 Rectangle.prototype.drawPath = function(context) {
-  context.moveTo(this.points[0].x, this.points[0].y);
-  context.lineTo(this.points[1].x, this.points[1].y);
-  context.lineTo(this.points[2].x, this.points[2].y);
-  context.lineTo(this.points[3].x, this.points[3].y);
+  context.moveTo(this.corner1.x, this.corner1.y);
+  context.lineTo(this.corner2.x, this.corner2.y);
+  context.lineTo(this.corner3.x, this.corner3.y);
+  context.lineTo(this.corner4.x, this.corner4.y);
   context.closePath();
 }
 
-Rectangle.prototype.rotate = function(rotation) {
-  this.diagonal.rotate(rotation);
+Rectangle.prototype.rotate = function(rotation, params = {}) {
+  this.diagonal.rotate(rotation, { about: params.about });
   this.rotation = this.rotation.plus(rotation);
   this.setPoints();
 }
 
-Rectangle.prototype.reflect = function(line) {
+Rectangle.prototype._reflect = function(line) {
   var reflected = this.copy();
 
-  var lineToOrigin = line.start.to(this.origin);
-  lineToOrigin.rotate(lineToOrigin.angle.refAngle.times(2).plus(line.angle.times(2)));
-  reflected.translate(lineToOrigin.end);
+  var lineToStart = line.start.to(this.diagonal.start);
+  reflected.diagonal.start = lineToStart.end.reflect(line);
+
+  reflected.rotation = (
+    this.rotation.quadrant == 2 || this.rotation.quadrant == 4 ?
+    new Angle(0) : new Angle(Math.PI)
+  ).minus(this.rotation.refAngle.times(
+    this.rotation.quadrant == 2 || this.rotation.quadrant == 4 ? -1 : 1
+  )).plus(line.angle.times(2));
 
   var lineToEnd = line.start.to(this.diagonal.end);
-  lineToEnd.rotate(lineToEnd.angle.refAngle.times(2).plus(line.angle.times(2)));
-  reflected.setEnd(lineToEnd.end);
-
-  reflected.rotation = (this.rotation.refAngle.plus(line.angle.times(2)));
+  reflected.setEnd(lineToEnd.end.reflect(line));
 
   return reflected;
 }

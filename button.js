@@ -18,6 +18,13 @@ function Button(key, text, color) {
     return textSegment;
   })(document.createElement('div')));
 
+  Object.defineProperty(button, 'text', {
+    set: function(text) {
+      var textSegment = this.getElementsByClassName('text_segment')[0];
+      textSegment.textContent = text;
+    }
+  });
+
   button.className = 'button ' + color;
   button.id = 'button-' + key;
 

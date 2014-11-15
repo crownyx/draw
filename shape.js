@@ -64,11 +64,16 @@ Shape.prototype.preview = function() { this.draw(front.context); }
 
 Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }
 
-Shape.prototype.translate = function(pointOrX, y) {
+Shape.prototype.translate = function(pointOrX, yOrParams) {
   var point = pointOrX;
-  if(typeof pointOrX == 'number' && typeof y == 'number')
-    point = new Point(pointOrX, y);
-  this._translate(point);
+  var params;
+  if(typeof pointOrX == 'number' && typeof yOrParams == 'number') {
+    point = new Point(pointOrX, yOrParams);
+  } else if(typeof yOrParams == 'object') {
+    params = yOrParams;
+  }
+  this._translate(point, params);
+  //if(this.clipShape) this.clipShape._translate(point.minus(point.minus(this.clipShape.center)), params);
   return this;
 }
 
@@ -88,6 +93,12 @@ Shape.prototype.copy = function() {
   newShape.lineWidth = this.lineWidth;
   if(this.clipShape) newShape.clipShape = this.clipShape.copy();
   return newShape;
+}
+
+Shape.prototype.reflect = function(line) {
+  var reflected = this._reflect(line);
+  if(this.clipShape) reflected.clipShape = this.clipShape.reflect(line);
+  return reflected;
 }
 
 Object.defineProperty(Shape.prototype, 'name', {

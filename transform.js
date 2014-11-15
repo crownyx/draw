@@ -1,5 +1,4 @@
 function translate(group, refPoint) {
-  middle.clear();
   front.eventListeners.clear();
   front.startPoint = refPoint;
 
@@ -60,6 +59,7 @@ function translate(group, refPoint) {
 
   group.shapes.forEach(function(shape) {
     shape.refLine = new Line(refPoint, shape.center);
+    if(shape.clipShape) shape.clipShape.refLine = new Line(refPoint, shape.clipShape.center);
   });
 
   middle.group.setEnd = function(point) {
@@ -72,6 +72,10 @@ function translate(group, refPoint) {
     this.shapes.forEach(function(shape) {
       shape.refLine.translate(point);
       shape.translate(shape.refLine.end);
+      if(shape.clipShape) {
+        shape.clipShape.refLine.translate(point);
+        shape.clipShape.translate(shape.clipShape.refLine.end); // turn off/on moving clipping with shapes
+      }
     });
   }
 
@@ -89,8 +93,7 @@ function translate(group, refPoint) {
   middle.group.preview();
 
   front.eventListeners.add('mousemove', 'moveGroup', function() {
-    middle.group.setEnd(front.setPoint || front.lastPoint);
-    middle.clear();
+    middle.group.setEnd(front.usePoint);
     middle.group.preview();
   });
 
@@ -114,11 +117,15 @@ function rotate(group, refPoint) {
 
   middle.group = group;
 
+  middle.group.shapes.forEach(function(shape) {
+    shape.refLine = new Line(refPoint, shape.center);
+  });
+
   middle.group.setEnd = function(point) {
     if(point.distance(front.startPoint) > 5) {
       var angle = Angle.from(front.startPoint, point);
       this.shapes.forEach(function(shape) {
-        shape.refLine.rotate(angle.minus(this.rotation));
+        shape.refLine.rotate(angle.minus(this.rotation), { about: 'start' });
         shape.translate(shape.refLine.end);
         shape.rotate(angle.minus(this.rotation));
       }, this);
@@ -126,11 +133,11 @@ function rotate(group, refPoint) {
     }
   }
 
-  var targetPoint = front.setPoint || front.lastPoint;
+  var targetPoint = front.usePoint;
 
-  middle.group.preview = function(point) {
+  middle.group.preview = function() {
     this.draw(middle.context);
-    new Line(front.startPoint, point).sketchPreview();
+    new Line(front.startPoint, front.usePoint).sketchPreview();
   }
 
   infopanel.top = 'choose angle of rotation, then click.';
@@ -146,19 +153,17 @@ function rotate(group, refPoint) {
     Button('esc', 'cancel',       'red')
   ];
 
-  group.shapes.forEach(function(shape) { shape.refLine = new Line(refPoint, shape.center); });
-
   middle.group.rotation = new Angle(0);
 
-  middle.group.setEnd(front.setPoint || front.lastPoint);
+  middle.group.setEnd(front.usePoint);
   middle.clear();
   middle.group.preview(targetPoint);
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
     if(!group.fixedRotation) {
-      middle.group.setEnd(front.setPoint || front.lastPoint);
+      middle.group.setEnd(front.usePoint);
       middle.clear();
-      middle.group.preview(front.setPoint || front.lastPoint);
+      middle.group.preview(front.usePoint);
     }
   });
 
@@ -231,13 +236,9 @@ function mirror(group) {
   middle.group.reflected = [];
 
   middle.group.setEnd = function(point) {
-    if(front.startPoint && point.distance(front.startPoint) > 5) {
+    if(point.distance(front.startPoint) > 5) {
       var lineOfReflection = new Line(front.startPoint, point);
-      var angleOfRotation = new Angle(lineOfReflection.angle.rad * 2);
-
-      middle.group.reflected = this.shapes.map(function(shape) {
-        return shape.reflect(lineOfReflection);
-      });
+      middle.group.reflected = this.shapes.mapProperty('reflect', lineOfReflection);
     }
   }
 

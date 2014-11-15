@@ -5,14 +5,17 @@ function selectMode() {
   infopanel.top = 'select shape(s) by drawing rectangle around point(s)';
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
-  var allPoints = back.shapes.flatMap(function(shape) { return shape.points.values; });
-  allPoints.forEach(function(point) { point.fill(middle.context); });
+  var allPoints = back.shapes.mapProperty('points').flatten();
+  var allCenters = back.shapes.mapProperty('center');
+
+  allPoints.eachDo('fill', middle.context);
+  allCenters.eachDo('fill', middle.context);
+  allCenters.eachDo('draw', middle.context, { strokeStyle: 'red' });
 
   front.eventListeners.add('click', 'beginSelection', function(e) {
     front.eventListeners.clear();
 
     var selectRect = new Rectangle(Point.from(e), front.lastPoint);
-
 
     /*selectedPoints:*/ function selectedPoints() {
     /*               */   var leftMost  = Math.min(selectRect.diagonal.end.x, selectRect.diagonal.start.x);
@@ -20,7 +23,7 @@ function selectMode() {
     /*               */   var upperMost = Math.min(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
     /*               */   var lowerMost = Math.max(selectRect.diagonal.end.y, selectRect.diagonal.start.y);
     /*               */
-    /*               */   return allPoints.filter(function(point) {
+    /*               */   return allPoints.concat(allCenters).filter(function(point) {
     /*               */     return(point.x > leftMost && point.x < rightMost && point.y > upperMost && point.y < lowerMost);
     /*               */   });
     /*               */ }
@@ -29,8 +32,11 @@ function selectMode() {
       selectRect.setEnd(Point.from(e));
       back.clear(); middle.clear();
       selectedPoints().forEach(function(point) { point.shape.selected = true; });
-      allPoints.forEach(function(point) {
+      allPoints.concat(allCenters).forEach(function(point) {
         point.fill(middle.context, { fillStyle: point.shape.selected ? 'blue' : 'black' });
+      });
+      allCenters.forEach(function(center) {
+        if(!center.shape.selected) center.draw(middle.context, { strokeStyle: 'red' });
       });
       back.shapes.forEach(function(shape) {
         shape.draw(back.context, { strokeStyle: shape.selected ? 'blue' : back.context.strokeStyle });
@@ -149,7 +155,8 @@ function rotateGroup(group) {
   infopanel.top = 'click to choose center of rotation';
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
 
-  var allPoints = group.shapes.flatMap(function(shape) { return shape.points.values; });
+  var allPoints = group.shapes.mapProperty('points').flatten();
+  var allCenters = group.shapes.mapProperty('center');
 
   allPoints.forEach(function(point) { point.fill(middle.context); });
 
@@ -158,7 +165,7 @@ function rotateGroup(group) {
   front.eventListeners.add('mousemove', 'drawGroup', function(e) {
     var currPoint = Point.from(e);
 
-    var nearPoint = allPoints.filter(function(point) {
+    var nearPoint = allPoints.concat(allCenters).filter(function(point) {
       return point.distance(currPoint) < 5;
     }).sort(function(point) {
       return point.distance(currPoint);

@@ -1,12 +1,11 @@
 function Circle(radStart, radEnd) {
   Shape.call(this);
 
-  this.origin = radStart;
   this.radius = new Line(radStart, radEnd);
+  this.center = radStart;
+  this.center.shape = this;
 
   var circle = this;
-
-  this.lines = [this.radius];
 
   this.shiftCommands = [
     {
@@ -66,18 +65,9 @@ Circle.prototype.constructor = Circle;
 
 Circle.prototype.setEnd = function(point) { this.radius.setEnd(point); }
 
-Object.defineProperty(Circle.prototype, 'center', {
-  get: function() { return this.origin; }
-});
-
-//Object.defineProperty(Circle.prototype, 'lines', {
-//  get: function() { return [this.radius]; }
-//});
-
 Object.defineProperty(Circle.prototype, 'points', {
   get: function() {
     return [
-      this.center,
       new Point(this.center.x, this.center.y - this.radius.length),
       new Point(this.center.x + this.radius.length, this.center.y),
       new Point(this.center.x, this.center.y + this.radius.length),
@@ -102,9 +92,7 @@ Object.defineProperty(Circle.prototype, 'area', {
 });
 
 Circle.prototype.drawPath = function(context) {
-  context.save();
-    context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
-  context.restore();
+  context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
 }
 
 Circle.prototype.preview = function() {
@@ -119,7 +107,12 @@ Circle.prototype.fill = function(context) {
   context.fill();
 }
 
-Circle.prototype.reflect = function(line) {
+Circle.prototype._translate = function(point) {
+  this.center = point;
+  this.center.shape = this;
+}
+
+Circle.prototype._reflect = function(line) {
   var reflected = this.copy();
   var lineToCenter = this.center.reflect(line);
   return reflected.translate(lineToCenter);
