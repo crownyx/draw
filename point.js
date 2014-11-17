@@ -28,7 +28,7 @@ function Point(x, y) {
     context.strokeRect(this.x - xWidth - 8, this.y - 2 - height / 2, xWidth + yWidth + 16, height + 4);
   }
 
-  this.circle = function(context, params) {
+  this.circle = function(context, params = {}) {
     context.save();
       context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
       context.beginPath();

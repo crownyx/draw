@@ -171,6 +171,14 @@ Object.defineProperty(Rectangle.prototype, 'center', {
   }
 });
 
+Object.defineProperty(Rectangle.prototype, 'sides', {
+  get: function() {
+    return this.points.map(function(point, i, points) {
+      return point.to(points[i + 1] || points[0]);
+    });
+  }
+});
+
 Rectangle.prototype.setEnd = function(point) {
   if(this.fixedHeight || this.fixedLength || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
     var diagAngle = Angle.from(this.diagonal.start, point).minus(this.rotation);
@@ -278,6 +286,27 @@ Rectangle.prototype._reflect = function(line) {
 Rectangle.prototype._translate = function(point) {
   this.diagonal.translate(point);
   this.setPoints();
+}
+
+Rectangle.prototype.clip = function(clipShape) {
+  var intersections = this.intersections(clipShape);
+}
+
+Rectangle.prototype.intersections = function(otherShape) {
+  var points = [];
+  switch(otherShape.constructor) {
+    case Rectangle:
+      return(
+        otherShape.sides.filterMap(function(otherSide) {
+          var intersections = this.sides.filterMap(function(ownSide) {
+            if(ownSide.intersections(otherSide).length)
+              return ownSide.intersections(otherSide);
+          });
+          if(intersections.flatten().length) return intersections.flatten();
+        }, this).flatten()
+      );
+    break;
+  }
 }
 
 Rectangle.prototype.preview = function() {

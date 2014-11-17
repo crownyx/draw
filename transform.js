@@ -214,13 +214,15 @@ function clip(group) {
 
   group.shapes.forEach(function(shape) { back.shapes.push(shape); });
   back.refresh();
+
   window.eventListeners.add('click', 'drawClip', function(e) {
-    var clipShape = design(new Rectangle(Point.from(e), Point.from(e)));
+    var clipShape = design(new Rectangle(front.usePoint, front.usePoint));
+    clipShape.guideline = true;
     clipShape.complete = function() {
       middle.clear();
       back.refresh();
     }
-    group.shapes.forEach(function(shape) { shape.clipShape = clipShape; });
+    group.shapes.forEach(function(shape) { shape.clip(shape); });//shape.clipShape = clipShape; });
   }, false);
 }
 
@@ -229,7 +231,7 @@ function clip(group) {
 ////////////
 
 function mirror(group) {
-  middle.clear();
+  middle.redraw();
   front.eventListeners.clear();
 
   middle.group = group;

@@ -1,5 +1,4 @@
 function Shape() {
-  this.origin = new Point(0, 0);
   this.rotation = new Angle(0);
   this.shiftCommands = [];
 
@@ -8,8 +7,13 @@ function Shape() {
 }
 
 Shape.prototype.complete = function() {
-  back.shapes.push(this);
-  back.refresh();
+  if(this.guideline) {
+    front.guideShapes.push(this);
+    front.refresh();
+  } else {
+    back.shapes.push(this);
+    back.refresh();
+  }
 }
 
 Shape.prototype.nextStep = function() {

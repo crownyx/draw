@@ -128,6 +128,48 @@ Line.prototype._translate = function(point, params = {}) {
   }
 }
 
+Line.prototype.getPoint = function(xy) {
+  var x = xy.x, y = xy.y;
+  if(isNum(x) && !isNum(y)) {
+    y = this.start.y + Math.tan(this.angle.rad) * (x - this.start.x);
+  } else if(!isNum(x) && isNum(y)) {
+    x = this.start.x + (y - this.start.y) / Math.tan(this.angle.rad);
+  }
+  var xBetween = isNum(x) &&
+                 (this.start.x < this.end.x && x >= this.start.x && x <= this.end.x) ||
+                 (this.start.x > this.end.x && x <= this.start.x && x >= this.end.x) ||
+                 (this.start.x == this.end.x && x == this.start.x);
+  var yBetween = isNum(y) &&
+                 (this.start.y < this.end.y && y >= this.start.y && y <= this.end.y) ||
+                 (this.start.y > this.end.y && y <= this.start.y && y >= this.end.y) ||
+                 (this.start.y == this.end.y && y == this.start.y);
+  if(xBetween && yBetween) return new Point(x, y);
+}
+
+Line.prototype.intersection = function(otherLine) {
+  var x, xFinal;
+  var thisStart = [this.start, this.end].minBy(function(point) { return point.x; });
+  var otherStart = [otherLine.start, otherLine.end].minBy(function(point) { return point.x; });
+  var converging = true;
+  var thisyGreater = thisStart.y > otherStart.y;
+  var lastyDiff = front.canvas.height;
+  for(x = 1; converging && x < Math.abs(this.end.x - this.start.x); x++) {
+    thisPoint = this.getPoint({ x: thisStart.x + x });
+    otherPoint = otherLine.getPoint({ x: thisStart.x + x });
+    converging = thisyGreater === (thisPoint.y > otherPoint.y);
+    lastyDiff = Math.abs(thisPoint.y - otherPoint.y);
+    if(!converging) {
+      for(var xBack = 0; !xFinal; xBack += 0.01) {
+        var backPoint = this.getPoint({ x: thisPoint.x - xBack });
+        otherPoint = otherLine.getPoint({ x: backPoint.x });
+        if(backPoint.y.toFixed(2) == otherPoint.y.toFixed(2))
+          xFinal = backPoint.x;
+      }
+    }
+  }
+  return this.getPoint({ x: xFinal });
+}
+
 Line.prototype.rotate = function(rotation, params) {
   if(params && params.about == 'start') {
     this.setEnd(this.end.translate(this.start, rotation));

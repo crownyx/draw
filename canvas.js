@@ -39,9 +39,12 @@ var back   = new Canvas('backlayer');
 // front //
 ///////////
 
+front.guideShapes = [];
+front.showGuideShapes = true;
+
 Object.defineProperty(front, 'usePoint', {
   get: function() {
-   return this.pickedPoint || this.setPoint || this.lastPoint;
+   return this.setPoint || this.pickedPoint || this.lastPoint;
   }
 });
 
@@ -68,6 +71,10 @@ front.redraw = function() {
   this.clear();
   this.showPos();
   this.showAxes();
+
+  if(this.guideShapes.length && this.showGuideShapes) {
+    this.guideShapes.eachDo('draw', this.context);
+  }
 
   if(this.setPoint) {
     this.showPos(this.setPoint);

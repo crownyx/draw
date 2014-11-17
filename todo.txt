@@ -1,6 +1,8 @@
-edit by changing points directly
-guidelines/points
+clip shapes - actually cut off, not use context.clip()
+when more than one point is near, browse through shapes
 edit only one shape - not change to other
+undo
+group shapes
 
 long term:
 

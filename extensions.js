@@ -1,3 +1,11 @@
+/////////////
+// general //
+/////////////
+
+var isNum = function(num) {
+  return typeof num === 'number' && !isNaN(num);
+}
+
 ///////////
 // Array //
 ///////////
@@ -132,6 +140,15 @@ Array.prototype.eachDo = function(methodName) {
   var args = Array.prototype.slice.call(arguments, 1);
   this.forEach(function(element) {
     element[methodName].apply(element, args);
+  });
+}
+
+Array.prototype.filterMap = function(callback) {
+  var thisArg = arguments[1];
+  return this.filter(function(element) {
+    return callback.call(thisArg, element);
+  }).map(function(element) {
+    return callback.call(thisArg, element);
   });
 }
 

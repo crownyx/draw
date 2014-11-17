@@ -29,14 +29,12 @@ window.onload = function() {
           ['x', ',']
         );
       } else {
+        middle.showPoints = !middle.showPoints;
+        infopanel.buttons.find('.').text = ['show', 'hide'][middle.showPoints * 1] + ' points';
         if(middle.showPoints) {
-          middle.showPoints = false;
-          infopanel.buttons.find('.').text = 'show points';
-          middle.redraw();
-        } else {
-          middle.showPoints = true;
-          infopanel.buttons.find('.').text = 'hide points';
           findNearPoint(front.lastPoint);
+        } else {
+          middle.redraw();
         }
       }
     }
@@ -60,7 +58,7 @@ function setPoint(xy) {
     } else {
       var x = parseInt(xy.split(',')[0]);
       var y = parseInt(xy.split(',')[1]);
-      if(typeof x === 'number' && !isNaN(x) && typeof y === 'number' && !isNaN(y)) {
+      if(isNum(x) && isNum(y)) {
         front.setPoint = new Point(x, y);
         front.usePoint = front.setPoint;
         infopanel.bottom.add('To cancel "go to point," type ">", then enter "x"', 'unSetPoint');
@@ -80,8 +78,12 @@ function setPoint(xy) {
 ///////////////////
 
 function findNearPoint(e) {
-  allPoints  = back.shapes.mapProperty('points').flatten();
-  allCenters = back.shapes.mapProperty('center');
+  allPoints  = back.shapes.concat(
+    front.showGuideShapes ? front.guideShapes : []
+  ).mapProperty('points').flatten();
+  allCenters = back.shapes.concat(
+    front.showGuideShapes ? front.guideShapes : []
+  ).mapProperty('center');
 
   var currPoint = Point.from(e);
 
@@ -142,9 +144,25 @@ function commandMode() {
   infopanel.top = 'click on canvas to begin drawing';
   infopanel.buttons = [Button('>', 'go to point', 'yellow')];
 
+  if(front.guideShapes.length) {
+    infopanel.buttons.add(Button('-', (front.showGuideShapes ? 'hide' : 'show') + ' guide shapes', 'yellow'));
+    window.eventListeners.add('keydown', 'hideGuideShapes', function(e) {
+      if(e.which === charCodes['-']) {
+        front.showGuideShapes = !front.showGuideShapes;
+        infopanel.buttons.find('-').text = ['show', 'hide'][front.showGuideShapes * 1] + ' guide shapes';
+        front.redraw();
+      }
+    });
+  }
+
+  if(front.guideShapes.length || back.shapes.length) {
+    infopanel.buttons.add(
+      Button('.', ['show', 'hide'][middle.showPoints * 1] + ' points', 'yellow')
+    );
+  }
+
   if(back.shapes.length) {
     infopanel.buttons.add(
-      Button('.', middle.showPoints ? 'hide points' : 'show points', 'yellow'),
       Button('e', 'edit shape(s)', 'green'),
       Button('s', 'select shape(s)', 'green'),
       Button('x', 'export image', 'green')
@@ -161,8 +179,8 @@ function commandMode() {
 
   window.eventListeners.add('keydown', 'switchMode', function(e) {
     switch(e.which) {
-      case charCodes['s']: changeMode(selectMode); break;
       case charCodes['e']: changeMode(editMode); break;
+      case charCodes['s']: changeMode(selectMode); break;
       case charCodes['x']: exportImage(); break;
     }
   });
@@ -173,17 +191,17 @@ function drawCommands(e) {
     var shape = (function() {
       switch(e.which) {
         case charCodes['a']:
-          return new Arc(front.startPoint, front.setPoint || front.lastPoint);
+          return new Arc(front.startPoint, front.usePoint);
         case charCodes['b']:
-          return new BezierCurve(front.startPoint, front.setPoint || front.lastPoint);
+          return new BezierCurve(front.startPoint, front.usePoint);
         case charCodes['c']:
-          return new Circle(front.startPoint, front.setPoint || front.lastPoint);
+          return new Circle(front.startPoint, front.usePoint);
         case charCodes['e']:
-          return new Ellipse(front.startPoint, front.setPoint || front.lastPoint);
+          return new Ellipse(front.startPoint, front.usePoint);
         case charCodes['l']:
-          return new Line(front.startPoint, front.setPoint || front.lastPoint);
+          return new Line(front.startPoint, front.usePoint);
         case charCodes['r']:
-          return new Rectangle(front.startPoint, front.setPoint || front.lastPoint);
+          return new Rectangle(front.startPoint, front.usePoint);
       }
     })();
     if(shape) { window.designShape(shape); }
