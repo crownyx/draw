@@ -4,8 +4,6 @@ function Line(start, end) {
   this.start = start;
   this.setEnd(end);
 
-  this.lines = [];
-
   var line = this;
 
   this.shiftCommands = [

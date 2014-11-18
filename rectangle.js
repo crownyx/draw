@@ -293,16 +293,14 @@ Rectangle.prototype.clip = function(clipShape) {
 }
 
 Rectangle.prototype.intersections = function(otherShape) {
-  var points = [];
   switch(otherShape.constructor) {
     case Rectangle:
       return(
         otherShape.sides.filterMap(function(otherSide) {
           var intersections = this.sides.filterMap(function(ownSide) {
-            if(ownSide.intersections(otherSide).length)
-              return ownSide.intersections(otherSide);
+            return ownSide.intersection(otherSide);
           });
-          if(intersections.flatten().length) return intersections.flatten();
+          if(intersections.length) return intersections;
         }, this).flatten()
       );
     break;
