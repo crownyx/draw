@@ -146,28 +146,30 @@ Line.prototype.getPoint = function(xy) {
   if(xBetween && yBetween) return new Point(x, y);
 }
 
+Object.defineProperty(Line.prototype, 'slope', {
+  get: function() { return((this.end.y - this.start.y) / (this.end.x - this.start.x)); }
+});
+
+Object.defineProperty(Line.prototype, 'horizontal', {
+  get: function() { return this.end.y.toFixed(5) === this.start.y.toFixed(5); }
+});
+
+Object.defineProperty(Line.prototype, 'vertical', {
+  get: function() { return this.end.x.toFixed(5) === this.start.x.toFixed(5); }
+});
+
+Object.defineProperty(Line.prototype, 'yIntercept', {
+  get: function() { return -this.slope * this.start.x + this.start.y; }
+});
+
 Line.prototype.intersection = function(otherLine) {
-  var x, xFinal;
-  var thisStart = [this.start, this.end].minBy(function(point) { return point.x; });
-  var otherStart = [otherLine.start, otherLine.end].minBy(function(point) { return point.x; });
-  var converging = true;
-  var thisyGreater = thisStart.y > otherStart.y;
-  var lastyDiff = front.canvas.height;
-  for(x = 1; converging && x < Math.abs(this.end.x - this.start.x); x++) {
-    thisPoint = this.getPoint({ x: thisStart.x + x });
-    otherPoint = otherLine.getPoint({ x: thisStart.x + x });
-    converging = thisyGreater === (thisPoint.y > otherPoint.y);
-    lastyDiff = Math.abs(thisPoint.y - otherPoint.y);
-    if(!converging) {
-      for(var xBack = 0; !xFinal; xBack += 0.01) {
-        var backPoint = this.getPoint({ x: thisPoint.x - xBack });
-        otherPoint = otherLine.getPoint({ x: backPoint.x });
-        if(backPoint.y.toFixed(2) == otherPoint.y.toFixed(2))
-          xFinal = backPoint.x;
-      }
-    }
+  var x = this.vertical ? this.start.x : otherLine.vertical ? otherLine.start.x :
+          (otherLine.yIntercept - this.yIntercept) / (this.slope - otherLine.slope);
+  var y = this.horizontal ? this.start.y : otherLine.horizontal ? otherLine.start.y :
+          (this.slope * x + this.yIntercept);
+  if(this.getPoint({ x: x, y: y }) && otherLine.getPoint({ x: x, y: y })) {
+    return new Point(x, y);
   }
-  return this.getPoint({ x: xFinal });
 }
 
 Line.prototype.rotate = function(rotation, params) {
