@@ -55,6 +55,7 @@ Line.prototype.setEnd = function(point, params = {}) {
   } else {
     this.end = point;
   }
+  if(!this.end) { console.log(new Error('').stack); return; }
   this.mid = new Point(
     (this.end.x + this.start.x) / 2,
     (this.end.y + this.start.y) / 2
@@ -128,20 +129,22 @@ Line.prototype._translate = function(point, params = {}) {
 
 Line.prototype.getPoint = function(xy) {
   var x = xy.x, y = xy.y;
+
   if(isNum(x) && !isNum(y)) {
-    y = this.start.y + Math.tan(this.angle.rad) * (x - this.start.x);
+    y = this.horizontal ? this.start.y : this.slope * x + this.yIntercept;
   } else if(!isNum(x) && isNum(y)) {
-    x = this.start.x + (y - this.start.y) / Math.tan(this.angle.rad);
+    x = this.vertical ? this.start.x : (y - this.yIntercept) / this.slope;
   }
-  var xBetween = isNum(x) &&
-                 (this.start.x < this.end.x && x >= this.start.x && x <= this.end.x) ||
-                 (this.start.x > this.end.x && x <= this.start.x && x >= this.end.x) ||
-                 (this.start.x == this.end.x && x == this.start.x);
-  var yBetween = isNum(y) &&
-                 (this.start.y < this.end.y && y >= this.start.y && y <= this.end.y) ||
-                 (this.start.y > this.end.y && y <= this.start.y && y >= this.end.y) ||
-                 (this.start.y == this.end.y && y == this.start.y);
-  if(xBetween && yBetween) return new Point(x, y);
+
+  var rounded = function(num) { return Math.round(num * 1000) / 1000; }
+
+  var onLine  = (this.vertical && rounded(x) === rounded(this.start.x)) ||
+                (this.horizontal && rounded(y) === rounded(this.start.y)) ||
+                rounded(this.slope * x + this.yIntercept) === rounded(y);
+  var xBetween = rounded(x) >= rounded(Math.min(this.start.x, this.end.x)) && rounded(x) <= rounded(Math.max(this.start.x, this.end.x));
+  var yBetween = rounded(y) >= rounded(Math.min(this.start.y, this.end.y)) && rounded(y) <= rounded(Math.max(this.start.y, this.end.y));
+
+  if(onLine && xBetween && yBetween) return new Point(x, y);
 }
 
 Object.defineProperty(Line.prototype, 'slope', {
@@ -149,11 +152,11 @@ Object.defineProperty(Line.prototype, 'slope', {
 });
 
 Object.defineProperty(Line.prototype, 'horizontal', {
-  get: function() { return this.end.y.toFixed(5) === this.start.y.toFixed(5); }
+  get: function() { return Math.round(this.end.y * 1000) === Math.round(this.start.y * 1000); }
 });
 
 Object.defineProperty(Line.prototype, 'vertical', {
-  get: function() { return this.end.x.toFixed(5) === this.start.x.toFixed(5); }
+  get: function() { return Math.round(this.end.x * 1000) === Math.round(this.start.x * 1000); }
 });
 
 Object.defineProperty(Line.prototype, 'yIntercept', {
@@ -161,9 +164,11 @@ Object.defineProperty(Line.prototype, 'yIntercept', {
 });
 
 Line.prototype.intersection = function(otherLine) {
+  if(this.vertical && otherLine.vertical) return;
   var x = this.vertical ? this.start.x : otherLine.vertical ? otherLine.start.x :
           (otherLine.yIntercept - this.yIntercept) / (this.slope - otherLine.slope);
   var y = this.horizontal ? this.start.y : otherLine.horizontal ? otherLine.start.y :
+          this.vertical ? (otherLine.slope * x + otherLine.yIntercept) :
           (this.slope * x + this.yIntercept);
   if(this.getPoint({ x: x, y: y }) && otherLine.getPoint({ x: x, y: y })) {
     return new Point(x, y);
@@ -177,7 +182,7 @@ Line.prototype.rotate = function(rotation, params) {
     this.start = this.start.translate(this.mid, rotation);
     this.setEnd(this.end.translate(this.mid, rotation));
     if(this.fixedAngle)
-      this.fixedAngle = this.fixedAngle.rad.plus(rotation);
+      this.fixedAngle = this.fixedAngle.plus(rotation);
   }
 }
 

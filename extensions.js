@@ -145,10 +145,10 @@ Array.prototype.eachDo = function(methodName) {
 
 Array.prototype.filterMap = function(callback) {
   var thisArg = arguments[1];
-  return this.filter(function(element) {
-    return callback.call(thisArg, element);
-  }).map(function(element) {
-    return callback.call(thisArg, element);
+  return this.filter(function(element, i, arr) {
+    return callback.call(thisArg, element, i, arr);
+  }).map(function(element, i, arr) {
+    return callback.call(thisArg, element, i, arr);
   });
 }
 

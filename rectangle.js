@@ -296,13 +296,46 @@ Rectangle.prototype.intersections = function(otherShape) {
   switch(otherShape.constructor) {
     case Rectangle:
       return(
-        otherShape.sides.filterMap(function(otherSide) {
-          var intersections = this.sides.filterMap(function(ownSide) {
+        this.sides.filterMap(function(ownSide) {
+          var intersections = otherShape.sides.filterMap(function(otherSide) {
             return ownSide.intersection(otherSide);
           });
           if(intersections.length) return intersections;
-        }, this).flatten()
+        }).flatten()
       );
+    break;
+  }
+}
+
+Rectangle.prototype.overlap = function(otherShape) {
+  switch(otherShape.constructor) {
+    case Rectangle:
+      var intersections = this.intersections(otherShape);
+      var allPoints = intersections.concat(this.points.filter(function(point) {
+        return(!otherShape.sides.find(function(side) {
+          return point.to(otherShape.center).intersection(side);
+        }));
+      })).concat(otherShape.points.filter(function(point) {
+        return(!this.sides.find(function(side) {
+          return point.to(this.center).intersection(side);
+        }, this));
+      }, this));
+      var allSides  = this.sides.concat(otherShape.sides);
+      var lines = [];
+      var first = allPoints.shift();
+      var last = first;
+      for(;allPoints.length;) {
+        var next = allPoints.find(function(point) {
+          return allSides.find(function(side) {
+            return side.getPoint(last) && side.getPoint(point);
+          });
+        });
+        lines.push(last.to(next));
+        allPoints.remove(next);
+        last = next;
+      }
+      lines.push(last.to(first));
+      return lines;
     break;
   }
 }
