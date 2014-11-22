@@ -55,7 +55,6 @@ Line.prototype.setEnd = function(point, params = {}) {
   } else {
     this.end = point;
   }
-  if(!this.end) { console.log(new Error('').stack); return; }
   this.mid = new Point(
     (this.end.x + this.start.x) / 2,
     (this.end.y + this.start.y) / 2
@@ -164,14 +163,65 @@ Object.defineProperty(Line.prototype, 'yIntercept', {
 });
 
 Line.prototype.intersection = function(otherLine) {
-  if(this.vertical && otherLine.vertical) return;
-  var x = this.vertical ? this.start.x : otherLine.vertical ? otherLine.start.x :
-          (otherLine.yIntercept - this.yIntercept) / (this.slope - otherLine.slope);
-  var y = this.horizontal ? this.start.y : otherLine.horizontal ? otherLine.start.y :
-          this.vertical ? (otherLine.slope * x + otherLine.yIntercept) :
-          (this.slope * x + this.yIntercept);
-  if(this.getPoint({ x: x, y: y }) && otherLine.getPoint({ x: x, y: y })) {
-    return new Point(x, y);
+  if(!(otherLine instanceof Line))
+    throw new TypeError(
+      'Line.prototype.intersection requires another line, was given ' + otherLine.constructor.name
+    );
+  return this.intersections(otherLine)[0];
+}
+
+Line.prototype.intersections = function(otherShape) {
+  switch(otherShape.constructor) {
+    case Line:
+      if(this.vertical && otherShape.vertical) return [];
+      var x = this.vertical ? this.start.x : otherShape.vertical ? otherShape.start.x :
+              (otherShape.yIntercept - this.yIntercept) / (this.slope - otherShape.slope);
+      var y = this.horizontal ? this.start.y : otherShape.horizontal ? otherShape.start.y :
+              this.vertical ? (otherShape.slope * x + otherShape.yIntercept) :
+              (this.slope * x + this.yIntercept);
+      if(this.getPoint({ x: x, y: y }) && otherShape.getPoint({ x: x, y: y })) {
+        return [new Point(x, y)];
+      } else {
+        return [];
+      }
+    break;
+    case Rectangle:
+      return(otherShape.sides.filterMap(function(side) {
+        return this.intersection(side);
+      }, this));
+    break;
+    case Circle:
+      var p = otherShape.center;
+      var r = otherShape.radius.length;
+      if(this.getPoint(otherShape.center)) {
+        return(
+          [this.angle, this.angle.plus(Math.PI)].filterMap(function(angle) {
+            var intersection = p.plus(r).translate(p, angle);
+            if(this.getPoint(intersection)) return intersection;
+          }, this)
+        );
+      }
+      if(this.vertical) {
+        var angle = Math.acos((this.start.x - p.x) / r);
+        return([
+          angle, new Angle(2 * Math.PI).minus(angle)
+        ].filterMap(function(angle) {
+          var intersection = p.plus(r).translate(p, angle);
+          if(this.getPoint(intersection)) return intersection;
+        }, this));
+      }
+      var a = this.slope, b = -1, c = this.yIntercept;
+      var x = (b * (b * p.x - a * p.y) - a*c) / (Math.pow(a, 2) + Math.pow(b, 2));
+      var y = (a * (a * p.y - b * p.x) - b*c) / (Math.pow(a, 2) + Math.pow(b, 2));
+      var perpendicular = p.to(new Point(x, y));
+      var innerAngle = Math.acos(perpendicular.length / r);
+      return([
+        perpendicular.angle.minus(innerAngle), perpendicular.angle.plus(innerAngle)
+      ].filterMap(function(angle) {
+        var intersection = p.plus(r).translate(p, angle);
+        if(this.getPoint(intersection)) return intersection;
+      }, this));
+    break;
   }
 }
 

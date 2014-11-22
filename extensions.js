@@ -86,10 +86,20 @@ Array.prototype.flatMap = function(callback) {
   return mapped.flatten();
 }
 
-Array.prototype.minBy = function(method) {
+Array.prototype.minBy = function() {
+  var method = arguments[0];
+  var args   = Array.prototype.slice.call(arguments, 1);
   return this.sort(function(a, b) {
-    if(a[method] > b[method]) return 1;
-    if(b[method] > a[method]) return -1;
+    var aVal, bVal;
+    if(typeof a[method] === 'function') {
+      aVal = a[method].apply(a, args);
+      bVal = b[method].apply(b, args);
+    } else {
+      aVal = a[method];
+      bVal = b[method];
+    }
+    if(aVal > bVal) return 1;
+    if(bVal > aVal) return -1;
     return 0;
   })[0];
 }

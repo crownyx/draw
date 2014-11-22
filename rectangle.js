@@ -293,18 +293,9 @@ Rectangle.prototype.clip = function(clipShape) {
 }
 
 Rectangle.prototype.intersections = function(otherShape) {
-  switch(otherShape.constructor) {
-    case Rectangle:
-      return(
-        this.sides.filterMap(function(ownSide) {
-          var intersections = otherShape.sides.filterMap(function(otherSide) {
-            return ownSide.intersection(otherSide);
-          });
-          if(intersections.length) return intersections;
-        }).flatten()
-      );
-    break;
-  }
+  return(this.sides.filterMap(function(side) {
+    if(side.intersections(otherShape).length) return side.intersections(otherShape);
+  }).flatten());
 }
 
 Rectangle.prototype.overlap = function(otherShape) {
@@ -335,6 +326,67 @@ Rectangle.prototype.overlap = function(otherShape) {
         last = next;
       }
       lines.push(last.to(first));
+      return lines;
+    break;
+    case Circle:
+      var intersections = this.intersections(otherShape);
+      var allPoints = intersections.concat(this.points.filter(function(point) {
+        return(!(point.to(otherShape.center).intersections(otherShape).length));
+      }));
+      var allSides = this.sides;
+      var lines = [];
+      var first = allPoints.shift();
+      var last = first;
+      var allPointsLength = allPoints.length;
+      var mustArc = false;
+      //var centerInside = !allPoints.find(function(point) {
+      //  otherShape.center.
+      //});
+      for(var i = 1; allPoints.length; i++) {
+        var next = allPoints.find(function(point) {
+          return(allSides.find(function(side) {
+            return side.getPoint(last) && side.getPoint(point);
+          }));
+        });
+        if(next && !mustArc) {
+          lines.push(last.to(next));
+        } else {
+          next = next || allPoints.filter(function(point) {
+            return(
+              Math.round(otherShape.center.distance(point) * 100000) ===
+              Math.round(otherShape.radius.length * 100000)
+            );
+          }).minBy('distance', last);
+          var angleToLast = Angle.from(otherShape.center, last);
+          var angleToNext = Angle.from(otherShape.center, next);
+          var startAngle, endAngle;
+          if(
+           (angleToLast.quadrant == 4 && angleToNext.quadrant == 1) ||
+           (angleToLast.rad < angleToNext.rad)
+          ) {
+            startAngle = angleToLast;
+            endAngle   = angleToNext;
+          } else {
+            startAngle = angleToNext;
+            endAngle   = angleToLast;
+          }
+          var radEnd = otherShape.center.plus(otherShape.radius.length);
+          var arc = new Arc(otherShape.center, radEnd, startAngle, endAngle);
+          arc.clockwise = (function(rect) {
+            var lesserAngle = startAngle.minus(Math.PI / 190);
+            var endOfLesserAngle = otherShape.center.plus(otherShape.radius.length).translate(otherShape.center, lesserAngle);
+            var lineToEnd = rect.center.to(endOfLesserAngle);
+            return lineToEnd.intersections(rect).length;
+          })(this);
+          lines.push(arc);
+        }
+        allPoints.remove(next);
+        last = next;
+        if(i === allPointsLength) {
+          if(i === 1) mustArc = true;
+          allPoints.push(first);
+        }
+      }
       return lines;
     break;
   }

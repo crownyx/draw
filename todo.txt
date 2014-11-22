@@ -3,6 +3,7 @@ when more than one point is near, browse through shapes
 edit only one shape - not change to other
 undo
 group shapes
+find out why translate/rotate sometimes don't work right away
 
 long term:
 

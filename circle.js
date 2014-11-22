@@ -134,3 +134,18 @@ Circle.prototype._copy = function() {
   circle.radius.fixedLength = this.radius.fixedLength;
   return circle;
 }
+
+Circle.prototype.intersections = function(otherShape) {
+  switch(otherShape.constructor) {
+    case Line:
+    case Rectangle:
+      return otherShape.intersections(this);
+    break;
+  }
+}
+
+Circle.prototype.overlap = function(otherShape) {
+  switch(otherShape.constructor) {
+    case Rectangle: return otherShape.overlap(this); break;
+  }
+}

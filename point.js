@@ -13,19 +13,26 @@ function Point(x, y) {
     context.restore();
   }
 
-  this.label = function(context) {
+  this.label = function(context, text) {
     this.fill(context);
-    var xText = 'x: ' + Math.round(this.x);
-    var yText = 'y: ' + Math.round(this.y);
     context.textBaseline = 'middle';
-    context.textAlign = 'right';
-      context.fillText(xText, this.x - 7, this.y);
-    context.textAlign = 'left';
-      context.fillText(yText, this.x + 7, this.y);
-    var xWidth = context.measureText(xText).width;
-    var yWidth = context.measureText(yText).width;
     var height = parseInt(context.font.match(/[^p]+/)[0]);
-    context.strokeRect(this.x - xWidth - 8, this.y - 2 - height / 2, xWidth + yWidth + 16, height + 4);
+    if(text) {
+      context.textAlign = 'right';
+        context.fillText(text, this.x - 7, this.y);
+      var width = context.measureText(text).width;
+      context.strokeRect(this.x - width - 8, this.y - 2 - height / 2, width + 9, height + 4);
+    } else {
+      var xText = 'x: ' + Math.round(this.x);
+      var yText = 'y: ' + Math.round(this.y);
+      context.textAlign = 'right';
+        context.fillText(xText, this.x - 7, this.y);
+      context.textAlign = 'left';
+        context.fillText(yText, this.x + 7, this.y);
+      var xWidth = context.measureText(xText).width;
+      var yWidth = context.measureText(yText).width;
+      context.strokeRect(this.x - xWidth - 8, this.y - 2 - height / 2, xWidth + yWidth + 16, height + 4);
+    }
   }
 
   this.circle = function(context, params = {}) {
