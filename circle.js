@@ -144,8 +144,12 @@ Circle.prototype.intersections = function(otherShape) {
   }
 }
 
-Circle.prototype.overlap = function(otherShape) {
+Circle.prototype.intersection = function(otherShape) {
   switch(otherShape.constructor) {
-    case Rectangle: return otherShape.overlap(this); break;
+    case Rectangle: return otherShape.intersection(this); break;
   }
+}
+Circle.prototype.radiusAt = function(phi) {
+  var end = this.center.plus(this.radius.length).translate(this.center, phi);
+  return this.center.to(end);
 }

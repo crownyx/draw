@@ -193,3 +193,10 @@ Ellipse.prototype._copy = function() {
   ellipse.setPoints();
   return ellipse;
 }
+
+Ellipse.prototype.radiusAt = function(phi) {
+  var center = this.center, semiMajor = this.semiMajor.length, semiMinor = this.semiMinor.length, rotation = this.rotation.rad;
+  var x = center.x + semiMajor * Math.cos(phi.rad) * Math.cos(rotation) - semiMinor * Math.sin(phi.rad) * Math.sin(rotation);
+  var y = center.y + semiMajor * Math.cos(phi.rad) * Math.sin(rotation) + semiMinor * Math.sin(phi.rad) * Math.cos(rotation);
+  return this.center.to(new Point(x, y));
+}

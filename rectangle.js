@@ -298,7 +298,7 @@ Rectangle.prototype.intersections = function(otherShape) {
   }).flatten());
 }
 
-Rectangle.prototype.overlap = function(otherShape) {
+Rectangle.prototype.intersection = function(otherShape) {
   switch(otherShape.constructor) {
     case Rectangle:
       var intersections = this.intersections(otherShape);
@@ -339,9 +339,6 @@ Rectangle.prototype.overlap = function(otherShape) {
       var last = first;
       var allPointsLength = allPoints.length;
       var mustArc = false;
-      //var centerInside = !allPoints.find(function(point) {
-      //  otherShape.center.
-      //});
       for(var i = 1; allPoints.length; i++) {
         var next = allPoints.find(function(point) {
           return(allSides.find(function(side) {
@@ -387,7 +384,7 @@ Rectangle.prototype.overlap = function(otherShape) {
           allPoints.push(first);
         }
       }
-      return lines;
+      return lines.length ? lines : [otherShape];
     break;
   }
 }

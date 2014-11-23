@@ -196,8 +196,8 @@ Line.prototype.intersections = function(otherShape) {
       if(this.getPoint(otherShape.center)) {
         return(
           [this.angle, this.angle.plus(Math.PI)].filterMap(function(angle) {
-            var intersection = p.plus(r).translate(p, angle);
-            if(this.getPoint(intersection)) return intersection;
+            var intersection = otherShape.radiusAt(angle).end;
+            return this.getPoint(intersection);
           }, this)
         );
       }
@@ -207,7 +207,7 @@ Line.prototype.intersections = function(otherShape) {
           angle, new Angle(2 * Math.PI).minus(angle)
         ].filterMap(function(angle) {
           var intersection = p.plus(r).translate(p, angle);
-          if(this.getPoint(intersection)) return intersection;
+          return this.getPoint(intersection);
         }, this));
       }
       var a = this.slope, b = -1, c = this.yIntercept;
@@ -219,7 +219,46 @@ Line.prototype.intersections = function(otherShape) {
         perpendicular.angle.minus(innerAngle), perpendicular.angle.plus(innerAngle)
       ].filterMap(function(angle) {
         var intersection = p.plus(r).translate(p, angle);
-        if(this.getPoint(intersection)) return intersection;
+        return this.getPoint(intersection);
+      }, this));
+    break;
+    case Ellipse:
+// http://quickcalcbasic.com/ellipse%20line%20intersection.pdf;
+      var p = otherShape.center;
+      if(this.getPoint(otherShape.center)) {
+        return(
+          [this.angle, this.angle.plus(Math.PI)].filterMap(function(angle) {
+            var intersection = otherShape.radiusAt(angle).end;
+            return this.getPoint(intersection);
+          }, this)
+        );
+      }
+      var a, b, c;
+      var rotSin = Math.sin(otherShape.rotation.rad);
+      var rotCos = Math.cos(otherShape.rotation.rad);
+      var v = otherShape.yAxis.length;
+      var h = otherShape.xAxis.length;
+      if(this.vertical) {
+        var constX = this.start.x - otherShape.center.x;
+        a = v*v*rotSin*rotSin + h*h*rotCos*rotCos;
+        b = 2*constX*rotCos*rotSin*(v*v-h*h);
+        c = constX*constX*(v*v*rotCos*rotCos + h*h*rotSin*rotSin) - (h*h*v*v);
+        return([1, -1].filterMap(function(negative) {
+          var y = otherShape.center.y + (-b + negative * Math.sqrt(b*b - 4*a*c)) / (2*a);
+          return this.getPoint({ y: y });
+        }, this));
+      }
+      var transb = this.yIntercept + this.slope * otherShape.center.x - otherShape.center.y;
+      var a1 = v*v * (rotCos*rotCos + 2*this.slope*rotCos*rotSin + this.slope*this.slope*rotSin*rotSin);
+      var a2 = h*h * (this.slope*this.slope*rotCos*rotCos - 2*this.slope*rotCos*rotSin + rotSin*rotSin);
+      a = a1 + a2;
+      var b1 = 2 * v*v*transb*(rotCos*rotSin + this.slope*rotSin*rotSin);
+      var b2 = 2 * h*h*transb*(this.slope*rotCos*rotCos - rotCos*rotSin);
+      b = b1 + b2;
+      c = transb*transb*(v*v*rotSin*rotSin + h*h*rotCos*rotCos) - h*h*v*v;
+      return([1, -1].filterMap(function(negative) {
+        var x = otherShape.center.x + (-b + negative * Math.sqrt(b*b - 4*a*c)) / (2*a);
+        return this.getPoint({ x: x });
       }, this));
     break;
   }
