@@ -386,6 +386,62 @@ Rectangle.prototype.intersection = function(otherShape) {
       }
       return lines.length ? lines : [otherShape];
     break;
+    case Ellipse:
+      var intersections = this.intersections(otherShape);
+      var allPoints = intersections.concat(this.points.filter(function(point) {
+        return(!(point.to(otherShape.center).intersections(otherShape).length));
+      }));
+      var allSides = this.sides;
+      var lines = [];
+      var first = allPoints.shift();
+      var last = first;
+      var allPointsLength = allPoints.length;
+      var mustArc = false;
+      for(var i = 1; allPoints.length; i++) {
+        var next = allPoints.find(function(point) {
+          return(allSides.find(function(side) {
+            return side.getPoint(last) && side.getPoint(point);
+          }));
+        });
+        if(next && !mustArc) {
+          lines.push(last.to(next));
+        } else {
+          next = next || allPoints.filter(function(point) {
+            return intersections.find(function(intersection) { return intersection.same(point); });
+          }, this).minBy('distance', last);
+          var angleToLast = Angle.from(otherShape.center, last);
+          var angleToNext = Angle.from(otherShape.center, next);
+          var startAngle, endAngle;
+          if(
+           (angleToLast.quadrant == 4 && angleToNext.quadrant == 1) ||
+           (angleToLast.rad < angleToNext.rad)
+          ) {
+            startAngle = angleToLast;
+            endAngle   = angleToNext;
+          } else {
+            startAngle = angleToNext;
+            endAngle   = angleToLast;
+          }
+          var arc = otherShape.copy();
+          arc.startAngle = startAngle;
+          arc.endAngle   = endAngle;
+          arc.clockwise = (function(rect) {
+            var lesserAngle = startAngle.minus(Math.PI / 18);
+            var endOfLesserAngle = otherShape.radiusAt(lesserAngle).end;
+            var lineToEnd = rect.center.to(endOfLesserAngle);
+            return lineToEnd.intersections(rect).length;
+          })(this);
+          lines.push(arc);
+        }
+        allPoints.remove(next);
+        last = next;
+        if(i === allPointsLength) {
+          if(i === 1) mustArc = true;
+          allPoints.push(first);
+        }
+      }
+      return lines.length ? lines : [otherShape];
+    break;
   }
 }
 

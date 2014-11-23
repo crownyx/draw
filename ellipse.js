@@ -5,6 +5,7 @@ function Ellipse(radStart, radEnd) {
   this.yAxis = new Line(radStart, new Point(radStart.x, radEnd.y  ));
   this.center = radStart;
   this.center.shape = this;
+  this.clockwise = true;
 
   var ellipse = this;
 
@@ -94,12 +95,18 @@ Ellipse.prototype.setPoints = function() {
 }
 
 Ellipse.prototype.drawPath = function(context) {
-  context.save();
-    context.translate(this.center.x, this.center.y);
-    context.rotate(this.rotation.rad);
-    context.scale(this.xAxis.length / this.semiMinor.length, this.yAxis.length / this.semiMinor.length);
-    context.arc(0, 0, this.semiMinor.length, 0, 2 * Math.PI);
-  context.restore();
+  var startAngle = this.startAngle || new Angle(0);
+  var endAngle   = this.endAngle   || new Angle(2 * Math.PI);
+  var distanceToGo = this.clockwise ? endAngle.minus(startAngle).rad : startAngle.minus(endAngle).rad;
+  for(var t = 0; t < distanceToGo + 0.02; t += 0.02) {
+    var currAngle = this.clockwise ? startAngle.plus(t) : startAngle.minus(t);
+    var radiusEnd = this.radiusAt(currAngle).end;
+    if(t === 0) {
+      context.moveTo(radiusEnd.x, radiusEnd.y);
+    } else {
+      context.lineTo(radiusEnd.x, radiusEnd.y);
+    }
+  }
 }
 
 Ellipse.prototype.preview = function() {
@@ -194,9 +201,27 @@ Ellipse.prototype._copy = function() {
   return ellipse;
 }
 
-Ellipse.prototype.radiusAt = function(phi) {
-  var center = this.center, semiMajor = this.semiMajor.length, semiMinor = this.semiMinor.length, rotation = this.rotation.rad;
-  var x = center.x + semiMajor * Math.cos(phi.rad) * Math.cos(rotation) - semiMinor * Math.sin(phi.rad) * Math.sin(rotation);
-  var y = center.y + semiMajor * Math.cos(phi.rad) * Math.sin(rotation) + semiMinor * Math.sin(phi.rad) * Math.cos(rotation);
-  return this.center.to(new Point(x, y));
+Ellipse.prototype.radiusAt = function(theta) {
+  var xAxis = this.xAxis.length;
+  var yAxis = this.yAxis.length;
+  var theta = theta instanceof Angle ? theta.rad : theta;
+  var rot = this.rotation.rad;
+  var pTheta = (yAxis*yAxis - xAxis*xAxis)*Math.cos(theta - 2*rot) + (xAxis*xAxis + yAxis*yAxis)*Math.cos(theta);
+  var rTheta = (yAxis*yAxis - xAxis*xAxis)*Math.cos(2*theta - 2*rot) + xAxis*xAxis + yAxis*yAxis;
+  var qTheta = Math.sqrt(2)*xAxis*yAxis*Math.sqrt(rTheta - Math.pow(Math.sin(theta), 2));
+  var r = (pTheta + qTheta) / rTheta;
+  return(this.center.to(this.center.plus(r).translate(this.center, theta)));
+}
+
+Ellipse.prototype.intersections = function(otherShape) {
+  switch(otherShape.constructor) {
+    case Line:
+    case Rectangle:
+      return otherShape.intersections(this);
+    break;
+  }
+}
+
+Ellipse.prototype.intersection = function(otherShape) {
+  return otherShape.intersection(this);
 }

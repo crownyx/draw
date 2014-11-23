@@ -225,14 +225,6 @@ Line.prototype.intersections = function(otherShape) {
     case Ellipse:
 // http://quickcalcbasic.com/ellipse%20line%20intersection.pdf;
       var p = otherShape.center;
-      if(this.getPoint(otherShape.center)) {
-        return(
-          [this.angle, this.angle.plus(Math.PI)].filterMap(function(angle) {
-            var intersection = otherShape.radiusAt(angle).end;
-            return this.getPoint(intersection);
-          }, this)
-        );
-      }
       var a, b, c;
       var rotSin = Math.sin(otherShape.rotation.rad);
       var rotCos = Math.cos(otherShape.rotation.rad);
