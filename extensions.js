@@ -153,6 +153,12 @@ Array.prototype.eachDo = function(methodName) {
   });
 }
 
+Array.prototype.eachSet = function(property, value) {
+  this.forEach(function(element) {
+    element[property] = value;
+  });
+}
+
 Array.prototype.filterMap = function(callback) {
   var thisArg = arguments[1];
   return this.filter(function(element, i, arr) {

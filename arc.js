@@ -2,7 +2,6 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
   Shape.call(this);
 
   this.center = radiusStart;
-  this.center.shape = this;
 
   this.startRadius = new Line(radiusStart, radiusEnd);
 
@@ -68,10 +67,7 @@ Object.defineProperty(Arc.prototype, 'points', {
         )
       ),
       this.endRadius.end
-    ].map(function(point) {
-      point.shape = this;
-      return point;
-    }, this);
+    ];
   }
 });
 
@@ -97,7 +93,6 @@ Arc.prototype.drawPath = function(context) {
 Arc.prototype.setEnd = function(point) {
   this._workingRadius().setEnd(point);
   this._otherRadius().setEnd(point, { fixedAngle: this._otherRadius().angle });
-  this.center.shape = this;
 }
 
 Arc.prototype.nextStep = function() {
@@ -107,8 +102,8 @@ Arc.prototype.nextStep = function() {
 }
 
 Arc.prototype.rotate = function(rotation) {
-  this.endRadius.rotate(new Angle(rotation.rad - this.rotation.rad));
-  this.startRadius.rotate(new Angle(rotation.rad - this.rotation.rad));
+  this.endRadius.rotate(rotation);
+  this.startRadius.rotate(rotation);
   this.rotation = rotation;
 }
 
@@ -130,7 +125,6 @@ Arc.prototype._translate = function(point) {
   this.startRadius.translate(point, { by: 'start' });
   this.endRadius.translate(point, { by: 'start' });
   this.center = point;
-  this.center.shape = this;
 }
 
 Arc.prototype._reflect = function(line) {

@@ -1,11 +1,12 @@
 function editMode() {
   var showPoints = middle.showPoints;
   middle.showPoints = true;
-  middle.redraw();
+  findNearPoint(front.lastPoint);
 
   infopanel.top = 'select point to begin editing';
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
-  infopanel.bottom.add('select center point of a shape to delete/translate/rotate');
+  infopanel.bottom.add('select outer point of a shape to resize');
+  infopanel.bottom.add('select center point for other actions');
 
   var exit = function() {
     middle.showPoints = showPoints;
@@ -14,35 +15,25 @@ function editMode() {
   }
 
   window.eventListeners.add('keydown', 'exitMode', function(e) {
-    if(e.which == charCodes['esc']) exit();
+    if(e.which === charCodes['esc']) exit();
   });
 
-  findNearPoint(front.lastPoint);
-
-  var lastHighlighted;
-
-  front.eventListeners.add('mousemove', 'findPoint', function() {
-    if(front.pickedPoint) {
-      lastHighlighted = front.pickedPoint.shape;
-      back.shapes.remove(lastHighlighted);
-      back.redraw();
-      lastHighlighted.draw(middle.context, { strokeStyle: 'blue' });
-      back.shapes.push(lastHighlighted);
-    } else if(lastHighlighted) {
-      lastHighlighted = null;
-      back.redraw();
-    }
+  front.eventListeners.add('mousemove', 'highlightShape', function() {
+    if(front.pickedPoint)
+      front.pickedPoint.shape.strokeStyle = 'blue';
+    back.redraw();
+    back.shapes.eachSet('strokeStyle', back.context.strokeStyle);
   }, true);
 
   front.eventListeners.add('click', 'choosePoint', function() {
     if(front.pickedPoint) {
-      infopanel.top.clear();
-      window.refresh();
-      front.refresh();
+      front.eventListeners.remove('highlightShape');
+      front.eventListeners.remove('choosePoint');
 
       var shape = front.pickedPoint.shape;
       var origShape = shape.copy();
       var pickedPoint = front.pickedPoint;
+      delete front.pickedPoint;
 
       back.shapes.remove(shape);
       back.redraw();
@@ -54,30 +45,71 @@ function editMode() {
       }, true);
 
       if(pickedPoint.same(shape.center)) {
+        infopanel.top.clear();
         infopanel.buttons = [
-          Button('c',   'clip',      'green'),
+          Button('c',   'intersect', 'green'),
           Button('d',   'delete',    'green'),
-          Button('m',   'mirror',    'green'),
+          Button('m',   'reflect',   'green'),
           Button('r',   'rotate',    'green'),
           Button('s',   'style',     'green'),
           Button('t',   'translate', 'green'),
+          Button('u',   'unite',     'green'),
           Button('esc', 'cancel',    'red')
         ];
+        infopanel.bottom.clear();
 
-        window.eventListeners.add('keydown', 'rotateOrTranslate', function(e) {
+        middle.showPoints = false;
+
+        window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode = function(e) {
           if(!e.shiftKey) {
-            if(['c', 's', 'm', 'r', 't'].find(function(letter) {
+            if(['c', 's', 'm', 'r', 't', 'u'].find(function(letter) {
                 return charCodes[letter] === e.which;
               }))
             {
+
               middle.showPoints = showPoints;
-              switch(e.which) {
-                case charCodes['c']: clip(new Group([shape.copy()])); break;
-                case charCodes['s']: style(new Group([shape.copy()])); break;
-                case charCodes['m']: mirror(new Group([shape.copy()])); break;
-                case charCodes['r']: rotate(new Group([shape.copy()]), pickedPoint); break;
-                case charCodes['t']: translate(new Group([shape.copy()]), pickedPoint); break;
+              front.eventListeners.remove('showShape');
+
+              var enterEditMode = function(enterMode) {
+                window.eventListeners.clear();
+                front.eventListeners.clear();
+                window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode);
+                infopanel.buttons = [
+                  Button('c',   'clip',         'green'),
+                  Button('d',   'delete',       'green'),
+                  Button('m',   'reflect',      'green'),
+                  Button('r',   'rotate',       'green'),
+                  Button('s',   'style',        'green'),
+                  Button('t',   'translate',    'green'),
+                  Button('g',   'choose point', 'yellow'),
+                ];
+                middle.clear();
+                enterMode();
+                front.redraw();
               }
+
+              switch(e.which) {
+                case charCodes['c']:
+                  enterEditMode(function() { intersect(new Group([shape.copy()])); });
+                break;
+                case charCodes['s']:
+                  enterEditMode(function() { style(new Group([shape.copy()])); });
+                break;
+                case charCodes['m']:
+                  enterEditMode(function() { mirror(new Group([shape.copy()])); });
+                break;
+                case charCodes['r']:
+                  enterEditMode(function() { rotate(new Group([shape.copy()]), pickedPoint); });
+                break;
+                case charCodes['t']:
+                  enterEditMode(function() { translate(new Group([shape.copy()]), pickedPoint); });
+                break;
+                case charCodes['u']:
+                  enterEditMode(function() { unite(new Group([shape.copy()])); });
+                break;
+              }
+
+// control mode switch transition
             } else if(e.which === charCodes['d']) {
               changeMode(commandMode);
             }
@@ -85,7 +117,9 @@ function editMode() {
         });
       } else {
         middle.showPoints = showPoints;
-        shape.edit(pickedPoint);
+        shape.prepareForEdit(pickedPoint);
+        changeMode();
+        design(shape);
       }
       window.eventListeners.add('keydown', 'exitMode', function(e) {
         if(e.which === charCodes['esc']) {
@@ -97,7 +131,45 @@ function editMode() {
   });
 }
 
-Arc.prototype.edit = function(pickedPoint) {
+//////////////////////////////////////
+// shape prototype edit procedures: //
+//////////////////////////////////////
+
+//////////
+// Line //
+//////////
+
+Line.prototype.prepareForEdit = function(pickedPoint) {
+  (function(backwards) {
+    var start        = backwards ? this.end : this.start;
+    var end          = backwards ? this.start : this.end;
+    this.start       = start;
+    front.startPoint = start;
+    this.setEnd(end);
+  }).call(this, pickedPoint.same(this.start));
+}
+
+///////////////
+// Rectangle //
+///////////////
+
+Rectangle.prototype.prepareForEdit = function(pickedPoint) {
+  var opposite = (function() {
+    for(var i = 0; i < this.points.length; i++) {
+      if(this.points[i].same(pickedPoint))
+        return this.points[(i + 2) % 4];
+    }
+  }).call(this);
+  this.diagonal.start = opposite;
+  front.startPoint = opposite;
+  this.setEnd(pickedPoint);
+}
+
+/////////
+// Arc //
+/////////
+
+Arc.prototype.prepareForEdit = function(pickedPoint) {
   if(pickedPoint.same(this.endRadius.end) || pickedPoint.same(this.startRadius.end)) {
     var workingRadius = pickedPoint.same(this.endRadius.end) ? this.endRadius : this.startRadius;
     var otherRadius = pickedPoint.same(this.startRadius.end) ? this.endRadius : this.startRadius;
@@ -113,11 +185,13 @@ Arc.prototype.edit = function(pickedPoint) {
   this.nextStep = Shape.prototype.nextStep;
   this.setEnd(pickedPoint);
   front.startPoint = this.center;
-  changeMode();
-  design(this);
 }
 
-BezierCurve.prototype.edit = function(pickedPoint) {
+/////////////////
+// BezierCurve //
+/////////////////
+
+BezierCurve.prototype.prepareForEdit = function(pickedPoint) {
   if(pickedPoint.same(this.start)) {
     this.setEnd = function(point) { this.start = point; }
   } else if(pickedPoint.same(this.end)) {
@@ -130,18 +204,22 @@ BezierCurve.prototype.edit = function(pickedPoint) {
   this.nextStep = Shape.prototype.nextStep;
   this.setEnd(pickedPoint);
   front.startPoint = this.start;
-  changeMode();
-  design(this);
 }
 
-Circle.prototype.edit = function(pickedPoint) {
+////////////
+// Circle //
+////////////
+
+Circle.prototype.prepareForEdit = function(pickedPoint) {
   this.setEnd(pickedPoint);
   front.startPoint = this.center;
-  changeMode();
-  design(this);
 }
 
-Ellipse.prototype.edit = function(pickedPoint) {
+/////////////
+// Ellipse //
+/////////////
+
+Ellipse.prototype.prepareForEdit = function(pickedPoint) {
   front.startPoint = this.center;
   if(pickedPoint.same(this.yAxis.end) || pickedPoint.same(this.yAxis.end.translate(this.center, Math.PI))) {
     this.yAxis.fixed = false;
@@ -152,34 +230,4 @@ Ellipse.prototype.edit = function(pickedPoint) {
     this.yAxis.fixed = true;
     this.setEnd(pickedPoint);
   }
-  changeMode();
-  design(this);
-}
-
-Line.prototype.edit = function(pickedPoint) {
-  (function(backwards) {
-    var start = backwards ? this.end : this.start;
-    var end   = backwards ? this.start : this.end;
-    this.start = start;
-    this.end = end;
-    front.startPoint = start;
-    changeMode();
-    design(this);
-  }).call(this, pickedPoint.same(this.start));
-}
-
-Rectangle.prototype.edit = function(pickedPoint) {
-  var opposite = (function() {
-    for(var i = 0; i < this.points.length; i++) {
-      if(this.points[i].same(pickedPoint))
-        return this.points[(i + 2) % 4];
-    }
-  }).call(this);
-  if(!this.fixedEnd) {
-    this.diagonal.start = opposite;
-    front.startPoint = opposite;
-    this.setEnd(pickedPoint);
-  }
-  changeMode();
-  design(this);
 }

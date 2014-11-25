@@ -55,11 +55,17 @@ Line.prototype.setEnd = function(point, params = {}) {
   } else {
     this.end = point;
   }
-  this.mid = new Point(
-    (this.end.x + this.start.x) / 2,
-    (this.end.y + this.start.y) / 2
-  );
 }
+
+
+Object.defineProperty(Line.prototype, 'mid', {
+  get: function() {
+    return new Point(
+      (this.end.x + this.start.x) / 2,
+      (this.end.y + this.start.y) / 2
+    );
+  }
+});
 
 Object.defineProperty(Line.prototype, 'center', {
   get: function() { return this.mid; }
@@ -67,10 +73,7 @@ Object.defineProperty(Line.prototype, 'center', {
 
 Object.defineProperty(Line.prototype, "points", {
   get: function() {
-    return [this.start, this.mid, this.end].map(function(point) {
-      point.shape = this;
-      return point;
-    }, this);
+    return [this.start, this.mid, this.end];
   }
 });
 
@@ -260,8 +263,9 @@ Line.prototype.rotate = function(rotation, params) {
   if(params && params.about == 'start') {
     this.setEnd(this.end.translate(this.start, rotation));
   } else {
-    this.start = this.start.translate(this.mid, rotation);
-    this.setEnd(this.end.translate(this.mid, rotation));
+    var mid = this.mid;
+    this.start = this.start.translate(mid, rotation);
+    this.setEnd(this.end.translate(mid, rotation));
     if(this.fixedAngle)
       this.fixedAngle = this.fixedAngle.plus(rotation);
   }

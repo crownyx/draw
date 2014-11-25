@@ -1,6 +1,8 @@
+why does shape resize when rotate?
+clean up transform modes
+get rid of point.shape all the time (did for rectangle)
 clip shapes - actually cut off, not use context.clip()
 when more than one point is near, browse through shapes
-edit only one shape - not change to other
 undo
 group shapes
 find out why translate/rotate sometimes don't work right away

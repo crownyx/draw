@@ -2,7 +2,6 @@ function Rectangle(diagStart, diagEnd) {
   Shape.call(this);
 
   this.diagonal = diagStart.to(diagEnd);
-  this.setPoints();
 
   var rectangle = this;
 
@@ -165,10 +164,7 @@ Rectangle.prototype.infoText = function() {
 }
 
 Object.defineProperty(Rectangle.prototype, 'center', {
-  get: function() {
-    this.diagonal.mid.shape = this;
-    return this.diagonal.mid;
-  }
+  get: function() { return this.diagonal.mid; }
 });
 
 Object.defineProperty(Rectangle.prototype, 'sides', {
@@ -230,38 +226,36 @@ Rectangle.prototype.setEnd = function(point) {
   } else {
     this.diagonal.setEnd(point);
   }
-  this.setPoints();
 }
 
-Rectangle.prototype.setPoints = function() {
-  this.corner1 = this.diagonal.start;
-  this.corner2 = this.diagonal.start.plus(
-    Math.cos(this.rotation.rad) * this.length,
-    Math.sin(this.rotation.rad) * this.length
-  );
-  this.corner3 = this.diagonal.end;
-  this.corner4 = this.diagonal.start.plus(
-    Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
-    Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
-  );
-  this.center = this.diagonal.mid;
-  this.points = [this.corner1, this.corner2, this.corner3, this.corner4];
-  this.points.forEach(function(point) { point.shape = this; }, this);
-  this.center.shape = this;
-}
+Object.defineProperty(Rectangle.prototype, 'points', {
+  get: function() {
+    return([
+      this.diagonal.start,
+      this.diagonal.start.plus(
+        Math.cos(this.rotation.rad) * this.length,
+        Math.sin(this.rotation.rad) * this.length
+      ),
+      this.diagonal.end,
+      this.diagonal.start.plus(
+        Math.cos(this.rotation.rad + (0.5 * Math.PI)) * this.height,
+        Math.sin(this.rotation.rad + (0.5 * Math.PI)) * this.height
+      )
+    ]);
+  }
+});
 
 Rectangle.prototype.drawPath = function(context) {
-  context.moveTo(this.corner1.x, this.corner1.y);
-  context.lineTo(this.corner2.x, this.corner2.y);
-  context.lineTo(this.corner3.x, this.corner3.y);
-  context.lineTo(this.corner4.x, this.corner4.y);
+  context.moveTo(this.points[0].x, this.points[0].y);
+  context.lineTo(this.points[1].x, this.points[1].y);
+  context.lineTo(this.points[2].x, this.points[2].y);
+  context.lineTo(this.points[3].x, this.points[3].y);
   context.closePath();
 }
 
 Rectangle.prototype.rotate = function(rotation, params = {}) {
   this.diagonal.rotate(rotation, { about: params.about });
   this.rotation = this.rotation.plus(rotation);
-  this.setPoints();
 }
 
 Rectangle.prototype._reflect = function(line) {
@@ -285,7 +279,6 @@ Rectangle.prototype._reflect = function(line) {
 
 Rectangle.prototype._translate = function(point) {
   this.diagonal.translate(point);
-  this.setPoints();
 }
 
 Rectangle.prototype.clip = function(clipShape) {
@@ -464,6 +457,5 @@ Rectangle.prototype._copy = function() {
   newRect.fixedPerimeter = this.fixedPerimeter;
   newRect.fixedEnd = this.fixedEnd;
   newRect.fixedRatio = this.fixedRatio;
-  newRect.setPoints();
   return newRect;
 }

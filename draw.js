@@ -16,7 +16,7 @@ window.onload = function() {
 
   front.canvas.addEventListener('click', function(e) {
     front.lastPoint = Point.from(e);
-    middle.redraw();
+    middle.clear();
     if(middle.showPoints) { findNearPoint(front.lastPoint); }
   }, false);
 
@@ -80,10 +80,19 @@ function setPoint(xy) {
 function findNearPoint(e) {
   allPoints  = back.shapes.concat(
     front.showGuideShapes ? front.guideShapes : []
-  ).mapProperty('points').flatten();
+  ).flatMap(function(shape) {
+    var points = shape.points;
+    points.eachSet('shape', shape);
+    return points;
+  });
+
   allCenters = back.shapes.concat(
     front.showGuideShapes ? front.guideShapes : []
-  ).mapProperty('center');
+  ).map(function(shape) {
+    var center = shape.center;
+    center.shape = shape;
+    return center;
+  });
 
   var currPoint = Point.from(e);
 

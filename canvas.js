@@ -44,7 +44,7 @@ front.showGuideShapes = true;
 
 Object.defineProperty(front, 'usePoint', {
   get: function() {
-   return this.setPoint || this.pickedPoint || this.lastPoint;
+    return this.setPoint || this.pickedPoint || this.lastPoint;
   }
 });
 
@@ -113,11 +113,9 @@ back.shapes = [];
 
 back.redraw = function() {
   this.clear();
-  this.shapes.forEach(function(shape) {
-    shape.draw(this.context);
-  }, this);
-  if(this.shapes.length == 2) //this.shapes[0].intersections(this.shapes[1]).eachDo('fill', this.context);
-  this.shapes[0].intersection(this.shapes[1]).eachDo('draw', this.context, { lineWidth: 2, strokeStyle: 'blue' });
+  this.shapes.eachDo('draw', this.context);
+  //if(this.shapes.length == 2) //this.shapes[0].intersections(this.shapes[1]).eachDo('fill', this.context);
+  //this.shapes[0].intersection(this.shapes[1]).eachDo('draw', this.context, { lineWidth: 2, strokeStyle: 'blue' });
 }
 
 back.refresh = back.redraw;
