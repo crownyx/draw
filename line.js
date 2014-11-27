@@ -1,8 +1,15 @@
-function Line(start, end) {
+function Line(start, endOrParams) {
   Shape.call(this);
 
   this.start = start;
-  this.setEnd(end);
+
+  if(endOrParams instanceof Point) {
+    this.setEnd(endOrParams);
+  } else {
+    var refLine = this.start.to(this.start.plus(front.canvas.width));
+    refLine.rotate(endOrParams.angle, { about: 'start' });
+    this.setEnd(refLine.intersections(front.boundingRect)[0]);
+  }
 
   var line = this;
 
@@ -295,8 +302,8 @@ function HorizontalLine(y) {
 
 function AxisPair(origin) {
   return {
-    vertical: new Line({ x: origin.x, y: 0 }, { x: origin.x, y: front.canvas.height }),
-    horizontal: new Line({ x: 0, y: origin.y }, { x: front.canvas.width, y: origin.y }),
+    vertical: new Line(new Point(origin.x, 0), new Point(origin.x, front.canvas.height)),
+    horizontal: new Line(new Point(0, origin.y), new Point(front.canvas.width, origin.y)),
     draw: function(context, params) {
       this.vertical.draw(context, params);
       this.horizontal.draw(context, params);

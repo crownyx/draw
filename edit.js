@@ -77,6 +77,7 @@ function editMode() {
               window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode);
               window.eventListeners.add('keydown', 'exitMode', exitMode);
               front.eventListeners.clear();
+              middle.clear();
               front.eventListeners.add('mousemove', 'showShape', showShape, true);
               infopanel.buttons = [
                 Button('c', 'clip',        'green'),

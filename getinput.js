@@ -16,7 +16,8 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
   }
 
   window.eventListeners.suspendAll();
-  window.removeEventListener('keydown', setOrPickPoint, false); // why?
+  window.removeEventListener('keydown', setOrPickPoint, false);
+  // ^^^ defined in draw.js; need to remove separately because not included in window.eventListeners
 
   var input = [];
   var alphabetical = !!acceptChars.find(function(charSet) { return charSet == 'a-z' });
@@ -42,7 +43,7 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
       input.push(acceptedChar);
     } else if(e.which == charCodes['enter']) {
       window.eventListeners.remove('getInput');
-      window.addEventListener('keydown', setOrPickPoint, false); // why?
+      window.addEventListener('keydown', setOrPickPoint, false);
       window.eventListeners.resumeAll();
       infopanel.top = oldTop;
       middle.clear();
@@ -54,7 +55,6 @@ function getInput(promptText, propToFill, acceptChars = [], shape) {
       input.pop();
     } else if(e.which == charCodes['esc']) {
       window.eventListeners.remove('getInput');
-      window.addEventListener('keydown', choosePoint, false);
       window.eventListeners.resumeAll();
       infopanel.top = oldTop;
     }

@@ -105,6 +105,12 @@ Object.defineProperty(front, 'infodiv', {
   }
 });
 
+Object.defineProperty(front, 'boundingRect', {
+  get: function() {
+    return new Rectangle(new Point(0, 0), new Point(this.canvas.width, this.canvas.height));
+  }
+});
+
 //////////
 // back //
 //////////

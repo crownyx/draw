@@ -67,7 +67,10 @@ var infopanel = {
     }
     bottom.find = function(id) {
       var infobox = document.getElementById(id);
-      if(infobox) infobox.remove = function() { infopanel.bottom.removeChild(infobox); }
+      if(infobox) infobox.remove = function() {
+        infopanel.bottom.removeChild(infobox);
+        infopanel.resizeButtons();
+      }
       return infobox;
     }
     return bottom;
