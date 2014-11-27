@@ -1,5 +1,6 @@
-why does shape resize when rotate?
-clean up transform modes
+don't allow switching to same shape in edit mode (undoes fixedLine) or transfer fixedLine
+link reflected shapes
+clean up/refactor transform modes
 get rid of point.shape all the time (did for rectangle)
 clip shapes - actually cut off, not use context.clip()
 when more than one point is near, browse through shapes

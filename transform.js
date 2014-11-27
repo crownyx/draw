@@ -1,6 +1,5 @@
-function translate(group, refPoint) {
+function translate(refPoint) {
   front.startPoint = refPoint;
-  middle.group = group;
   middle.group.origin = refPoint;
 
   infopanel.top = 'choose translation point, then click';
@@ -10,47 +9,48 @@ function translate(group, refPoint) {
     Button('esc', 'cancel',       'red')
   );
 
-  window.eventListeners.add('keydown', 'setDistance', function(e) {
-    if(e.shiftKey && e.which == charCodes['d']) {
-      getInput(
-        'enter distance: ',
-        function(distance) {
-          if(distance == 'x') {
-            delete middle.group.fixedDistance;
-          } else {
-            middle.group.fixedDistance = parseInt(distance.replace(',', ''));
-            middle.group.setEnd(front.lastPoint);
-            middle.clear();
-            middle.group.preview();
-          }
-        },
-        ['x', ',']
-      )
-    }
-  });
+  /* double check: */ window.eventListeners.add('keydown', 'setDistance', function(e) {
+  /* double check: */   if(e.shiftKey && e.which == charCodes['d']) {
+  /* double check: */     getInput(
+  /* double check: */       'enter distance: ',
+  /* double check: */       function(distance) {
+  /* double check: */         if(distance == 'x') {
+  /* double check: */           delete middle.group.fixedDistance;
+  /* double check: */         } else {
+  /* double check: */           middle.group.fixedDistance = parseInt(distance.replace(',', ''));
+  /* double check: */           middle.group.setEnd(front.lastPoint);
+  /* double check: */           middle.clear();
+  /* double check: */           middle.group.preview();
+  /* double check: */         }
+  /* double check: */       },
+  /* double check: */       ['x', ',']
+  /* double check: */     )
+  /* double check: */   }
+  /* double check: */ });
 
-  window.eventListeners.add('keydown', 'setAngle', function(e) {
-    if(e.shiftKey && e.which == charCodes['a']) {
-      getInput(
-        { main: 'enter angle: ', subtext: '(in degrees)' },
-        function(deg) {
-          if(deg == 'x') {
-            delete middle.group.fixedAngle;
-          } else {
-            middle.group.fixedAngle = Angle.fromDeg(parseInt(deg));
-            middle.group.setEnd(front.lastPoint);
-            middle.clear();
-            middle.group.preview();
-          }
-        },
-        ['x']
-      );
-    }
-  });
+  /* double check: */ window.eventListeners.add('keydown', 'setAngle', function(e) {
+  /* double check: */   if(e.shiftKey && e.which == charCodes['a']) {
+  /* double check: */     getInput(
+  /* double check: */       { main: 'enter angle: ', subtext: '(in degrees)' },
+  /* double check: */       function(deg) {
+  /* double check: */         if(deg == 'x') {
+  /* double check: */           delete middle.group.fixedAngle;
+  /* double check: */         } else {
+  /* double check: */           middle.group.fixedAngle = Angle.fromDeg(parseInt(deg));
+  /* double check: */           middle.group.setEnd(front.lastPoint);
+  /* double check: */           middle.clear();
+  /* double check: */           middle.group.preview();
+  /* double check: */         }
+  /* double check: */       },
+  /* double check: */       ['x']
+  /* double check: */     );
+  /* double check: */   }
+  /* double check: */ });
 
-  group.shapes.forEach(function(shape) {
-    shape.refLine = new Line(refPoint, shape.center);
-    /* change this */ if(shape.clipShape) shape.clipShape.refLine = new Line(refPoint, shape.clipShape.center);
+  var refLines = middle.group.shapes.map(function(shape) {
+    var refLine = new Line(refPoint, shape.center);
+    refLine.shape = shape;
+    return refLine;
   });
 
   middle.group.setEnd = function(point) {
@@ -60,13 +60,9 @@ function translate(group, refPoint) {
       point = refPoint.plus(distance).translate(refPoint, angle);
     }
     this.origin = point;
-    this.shapes.forEach(function(shape) {
-      shape.refLine.translate(point);
-      shape.translate(shape.refLine.end);
-      if(shape.clipShape) {
-        shape.clipShape.refLine.translate(point);
-        shape.clipShape.translate(shape.clipShape.refLine.end); // turn off/on moving clipping with shapes
-      }
+    refLines.forEach(function(refLine) {
+      refLine.translate(point);
+      refLine.shape.translate(refLine.end);
     });
   }
 
@@ -85,10 +81,7 @@ function translate(group, refPoint) {
   }, true);
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    middle.group.shapes.forEach(function(shape) {
-      delete shape.refLine;
-      shape.complete();
-    });
+    middle.group.shapes.eachDo('complete');
     changeMode(commandMode);
   });
 }
@@ -97,28 +90,28 @@ function translate(group, refPoint) {
 // rotate //
 ////////////
 
-function rotate(group, refPoint) {
+function rotate(refPoint) {
   front.startPoint = refPoint;
-  middle.group = group;
 
   infopanel.top = 'choose angle of rotation, then click.';
   infopanel.buttons.add(
-    Button('A',   'set angle',    'blue'),
-    Button('esc', 'cancel',       'red')
+    Button('A',   'set angle', 'blue'),
+    Button('esc', 'cancel',    'red')
   );
 
-  middle.group.shapes.forEach(function(shape) {
-    shape.refLine = new Line(refPoint, shape.center);
+  var refLines = middle.group.shapes.map(function(shape) {
+    var refLine = new Line(refPoint, shape.center);
+    refLine.shape = shape;
+    return refLine
   });
-// create refLines array instead of adding property to shapes
 
   middle.group.setEnd = function(point) {
     if(point.distance(front.startPoint) > 5) {
       var angle = Angle.from(front.startPoint, point);
-      this.shapes.forEach(function(shape) {
-        shape.refLine.rotate(angle.minus(this.rotation), { about: 'start' });
-        shape.translate(shape.refLine.end);
-        shape.rotate(angle.minus(this.rotation));
+      refLines.forEach(function(refLine) {
+        refLine.rotate(angle.minus(this.rotation), { about: 'start' });
+        refLine.shape.translate(refLine.end);
+        refLine.shape.rotate(angle.minus(this.rotation));
       }, this);
       this.rotation = angle;
     }
@@ -132,81 +125,59 @@ function rotate(group, refPoint) {
   middle.group.rotation = new Angle(0);
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
-    if(!group.fixedRotation) {
+    if(!middle.group.fixedRotation) {
       middle.group.setEnd(front.usePoint);
       middle.group.preview();
     }
   }, true);
 
-  window.eventListeners.add('keydown', 'setAngle', function(e) {
-    if(e.shiftKey && e.which == charCodes['a']) {
-      getInput(
-        { main: 'enter angle:', subtext: '(degrees)' },
-        function(deg) {
-          if(deg == 'x') {
-            delete middle.group.fixedRotation;
-            targetPoint = front.lastPoint;
-          } else {
-            delete front.setPoint;
-            infopanel.bottom.clear();
-            front.redraw();
-            middle.group.fixedRotation = true;
-            targetPoint = refPoint.plus(
-              front.canvas.width
-            ).translate(
-              refPoint, Angle.fromDeg(parseInt(deg))
-            );
-          }
-          middle.group.setEnd(targetPoint);
-          middle.clear();
-          middle.group.preview(targetPoint);
-        },
-        ['x']
-      );
-    }
-  });
+  /* double check: */ window.eventListeners.add('keydown', 'setAngle', function(e) {
+  /* double check: */   if(e.shiftKey && e.which == charCodes['a']) {
+  /* double check: */     getInput(
+  /* double check: */       { main: 'enter angle:', subtext: '(degrees)' },
+  /* double check: */       function(deg) {
+  /* double check: */         if(deg == 'x') {
+  /* double check: */           delete middle.group.fixedRotation;
+  /* double check: */           targetPoint = front.lastPoint;
+  /* double check: */         } else {
+  /* double check: */           delete front.setPoint;
+  /* double check: */           infopanel.bottom.clear();
+  /* double check: */           front.redraw();
+  /* double check: */           middle.group.fixedRotation = true;
+  /* double check: */           targetPoint = refPoint.plus(
+  /* double check: */             front.canvas.width
+  /* double check: */           ).translate(
+  /* double check: */             refPoint, Angle.fromDeg(parseInt(deg))
+  /* double check: */           );
+  /* double check: */         }
+  /* double check: */         middle.group.setEnd(targetPoint);
+  /* double check: */         middle.clear();
+  /* double check: */         middle.group.preview(targetPoint);
+  /* double check: */       },
+  /* double check: */       ['x']
+  /* double check: */     );
+  /* double check: */   }
+  /* double check: */ });
 
   front.eventListeners.add('click', 'saveGroup', function() {
-    group.shapes.forEach(function(shape) {
-      delete shape.refLine;
-      shape.complete();
-    });
+    middle.group.shapes.eachDo('complete');
     changeMode(commandMode);
   });
-}
-
-//////////
-// clip //
-//////////
-
-function intersect(group) {
-  middle.clear();
-  front.eventListeners.clear();
-
-  group.shapes.forEach(function(shape) { back.shapes.push(shape); });
-  back.refresh();
-
-  window.eventListeners.add('click', 'drawClip', function(e) {
-    var clipShape = design(new Rectangle(front.usePoint, front.usePoint));
-    clipShape.guideline = true;
-    clipShape.complete = function() {
-      middle.clear();
-      back.refresh();
-    }
-    group.shapes.forEach(function(shape) { shape.clip(shape); });//shape.clipShape = clipShape; });
-  }, false);
 }
 
 /////////////
 // reflect //
 /////////////
 
-function reflect(group) {
-  middle.redraw();
-  front.eventListeners.clear();
-
-  middle.group = group;
+function reflect(pickedPoint) {
+  front.startPoint = pickedPoint;
   middle.group.reflected = [];
+
+  infopanel.top = 'move to choose angle of line of reflection';
+  infopanel.buttons.add(
+    Button('A',   'set angle', 'blue'),
+    Button('esc', 'cancel',    'red')
+  );
 
   middle.group.setEnd = function(point) {
     var lineOfReflection = new Line(front.startPoint, point);
@@ -216,22 +187,34 @@ function reflect(group) {
   middle.group.preview = function() {
     var currLine = new Line(front.startPoint, front.usePoint);
     currLine.sketchPreview();
-    this.reflected.forEach(function(shape) { shape.draw(middle.context); });
-    this.shapes.forEach(function(shape) { shape.draw(middle.context); });
+    this.reflected.eachDo('draw', middle.context);
+    this.shapes.eachDo('draw', middle.context);
   }
 
-  middle.group.shapes.forEach(function(shape) { shape.draw(middle.context); });
+  front.eventListeners.add('mousemove', 'setEnd', function() {
+    middle.group.setEnd(front.usePoint);
+    middle.group.preview();
+  }, true);
 
-  front.eventListeners.add('click', 'drawLineOfReflection', function() {
-    front.eventListeners.remove('drawLineOfReflection');
-    front.startPoint = front.usePoint;
-    front.eventListeners.add('mousemove', 'setEnd', function() {
-      middle.clear();
-      middle.group.setEnd(front.usePoint);
-      middle.group.preview();
-    }, true);
-    front.eventListeners.add('click', 'completeLine', function() {
-      middle.group.reflected.forEach(function(shape) { shape.complete(); });
-    });
+  front.eventListeners.add('click', 'completeLine', function() {
+    back.shapes = back.shapes.concat(middle.group.shapes);
+    middle.group.reflected.eachDo('complete');
+    changeMode(commandMode);
   });
+
+  // create keydown eventListener for set Angle
+}
+
+///////////////
+// intersect //
+///////////////
+
+function intersect() {
+  middle.group.shapes.forEach(function(shape) { back.shapes.push(shape); });
+  back.refresh();
+
+  window.eventListeners.add('click', 'drawClip', function(e) {
+    var clipRect = design(new Rectangle(front.usePoint, front.usePoint));
+    clipRect.guideline = true;
+  }, false);
 }

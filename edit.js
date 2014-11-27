@@ -39,11 +39,6 @@ function editMode() {
       back.redraw();
       middle.clear();
 
-      front.eventListeners.add('mousemove', 'showShape', function() {
-        shape.draw(middle.context, { strokeStyle: 'blue' });
-        shape.center.round().preview(0, 2);
-      }, true);
-
       if(pickedPoint.same(shape.center)) {
         infopanel.top.clear();
         infopanel.buttons = [
@@ -60,6 +55,15 @@ function editMode() {
 
         middle.showPoints = false;
 
+        front.eventListeners.add('mousemove', 'showShape', showShape = function() {
+          shape.draw(middle.context, { strokeStyle: 'blue' });
+          shape.center.round().preview(0, 2);
+        }, true);
+
+        ////////////////////
+        // chooseEditMode //
+        ////////////////////
+
         window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode = function(e) {
           if(!e.shiftKey) {
             if(['c', 's', 'm', 'r', 't', 'u'].find(function(letter) {
@@ -68,60 +72,70 @@ function editMode() {
             {
 
               middle.showPoints = showPoints;
-              front.eventListeners.remove('showShape');
 
-              var enterEditMode = function(enterMode) {
-                window.eventListeners.clear();
+              window.eventListeners.clear();
+              window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode);
+              window.eventListeners.add('keydown', 'exitMode', exitMode);
+              front.eventListeners.clear();
+              front.eventListeners.add('mousemove', 'showShape', showShape, true);
+              infopanel.buttons = [
+                Button('c', 'clip',        'green'),
+                Button('d', 'delete',      'green'),
+                Button('m', 'reflect',     'green'),
+                Button('r', 'rotate',      'green'),
+                Button('s', 'style',       'green'),
+                Button('t', 'translate',   'green'),
+                Button('>', 'go to point', 'yellow'),
+              ];
+              middle.group = new Group([shape.copy()]);
+
+              var setUpEditMode = function(editMode, startPoint) {
                 front.eventListeners.clear();
-                window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode);
-                infopanel.buttons = [
-                  Button('c',   'clip',         'green'),
-                  Button('d',   'delete',       'green'),
-                  Button('m',   'reflect',      'green'),
-                  Button('r',   'rotate',       'green'),
-                  Button('s',   'style',        'green'),
-                  Button('t',   'translate',    'green'),
-                  Button('g',   'choose point', 'yellow'),
-                ];
                 middle.clear();
-                enterMode();
+                editMode(startPoint);
                 front.redraw();
               }
 
               switch(e.which) {
                 case charCodes['c']:
-                  enterEditMode(function() { intersect(new Group([shape.copy()])); });
-                break;
-                case charCodes['s']:
-                  enterEditMode(function() { style(new Group([shape.copy()])); });
+                  intersect();
                 break;
                 case charCodes['m']:
-                  enterEditMode(function() { mirror(new Group([shape.copy()])); });
+                  infopanel.top = 'click to start drawing line of reflection';
+                  front.eventListeners.add('click', 'chooseStartPoint', function() {
+                    setUpEditMode(reflect, front.lastPoint);
+                  });
                 break;
                 case charCodes['r']:
-                  enterEditMode(function() { rotate(new Group([shape.copy()]), pickedPoint); });
+                  setUpEditMode(rotate, pickedPoint);
+                break;
+                case charCodes['s']:
+                  style();
                 break;
                 case charCodes['t']:
-                  enterEditMode(function() { translate(new Group([shape.copy()]), pickedPoint); });
+                  setUpEditMode(translate, pickedPoint);
                 break;
                 case charCodes['u']:
-                  enterEditMode(function() { unite(new Group([shape.copy()])); });
+                  unite();
                 break;
               }
-
-// control mode switch transition
             } else if(e.which === charCodes['d']) {
               changeMode(commandMode);
             }
           }
         });
+
+      ////////////////////////
+      // end chooseEditMode //
+      ////////////////////////
+
       } else {
         middle.showPoints = showPoints;
         shape.prepareForEdit(pickedPoint);
         changeMode();
         design(shape);
       }
-      window.eventListeners.add('keydown', 'exitMode', function(e) {
+      window.eventListeners.add('keydown', 'exitMode', exitMode = function(e) {
         if(e.which === charCodes['esc']) {
           back.shapes.push(origShape);
           exit();
