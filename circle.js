@@ -144,9 +144,22 @@ Circle.prototype.intersections = function(otherShape) {
   }
 }
 
-Circle.prototype.intersection = function(otherShape) {
+Circle.prototype.intersection = function(otherShape, params = { inclusive: true }) {
   switch(otherShape.constructor) {
-    case Rectangle: return otherShape.intersection(this); break;
+    case Rectangle:
+      var intersection = otherShape.intersection(this);
+      if(params.inclusive) {
+        return intersection;
+      } else {
+        return intersection.find(function(arc) {
+          return(
+            arc instanceof Arc &&
+            arc.center == this.center &&
+            arc.radius.length == this.radius.length
+          );
+        }, this);
+      }
+    break;
   }
 }
 Circle.prototype.radiusAt = function(phi) {

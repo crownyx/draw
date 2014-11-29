@@ -19,7 +19,7 @@ function translate(refPoint) {
             if(infopanel.bottom.find('fixedDistance'))
               infopanel.bottom.find('fixedDistance').remove();
           } else {
-            middle.group.fixedDistance = parseInt(distance.replace(',', ''));
+            middle.group.fixedDistance = parseFloat(distance.replace(',', ''));
             infopanel.bottom.add({
               main: 'fixed distance: ' + commaSep(middle.group.fixedDistance),
               subtext: 'To undo, type "D", then "x"'
@@ -29,7 +29,7 @@ function translate(refPoint) {
           middle.clear();
           middle.group.preview();
         },
-        ['x', ',']
+        ['x', ',', '.']
       )
     }
   });
@@ -39,12 +39,12 @@ function translate(refPoint) {
       getInput(
         { main: 'enter angle: ', subtext: '(in degrees)' },
         function(deg) {
-          if(deg == 'x') {
+          if(deg === 'x') {
             delete middle.group.fixedAngle;
             if(infopanel.bottom.find('fixedAngle'))
               infopanel.bottom.find('fixedAngle').remove();
           } else {
-            middle.group.fixedAngle = Angle.fromDeg(parseInt(deg));
+            middle.group.fixedAngle = Angle.fromDeg(parseFloat(deg));
             infopanel.bottom.add({
               main: 'fixed angle: ' + middle.group.fixedAngle.deg + unescape("\xB0"),
               subtext: 'To undo, type "A", then "x"'
@@ -54,7 +54,7 @@ function translate(refPoint) {
           middle.clear();
           middle.group.preview();
         },
-        ['x']
+        ['x', '.']
       );
     }
   });
@@ -71,7 +71,7 @@ function translate(refPoint) {
       var angle = middle.group.fixedAngle || Angle.from(refPoint, front.usePoint);
       point = refPoint.plus(distance).translate(refPoint, angle);
     }
-    this.origin = point;
+    this.origin = front.usePoint;
     refLines.forEach(function(refLine) {
       refLine.translate(front.usePoint);
       refLine.shape.translate(refLine.end);
@@ -153,7 +153,7 @@ function rotate(refPoint) {
             if(infopanel.bottom.find('fixedAngle'))
               infopanel.bottom.find('fixedAngle').remove();
           } else {
-            middle.group.fixedRotation = Angle.fromDeg(parseInt(deg));
+            middle.group.fixedRotation = Angle.fromDeg(parseFloat(deg));
             infopanel.bottom.add({
               main: 'fixed angle: ' + middle.group.fixedRotation.deg + unescape("\xB0"),
               subtext: 'To undo, type "A", then "x"'
@@ -163,7 +163,7 @@ function rotate(refPoint) {
           middle.clear();
           middle.group.preview();
         },
-        ['x']
+        ['x', '.']
       );
     }
   });
@@ -188,20 +188,23 @@ function reflect(pickedPoint) {
     Button('esc', 'cancel',    'red')
   );
 
-  middle.group.setEnd = function(point) {
-    var lineOfReflection = new Line(front.startPoint, point);
-    middle.group.reflected = this.shapes.mapProperty('reflect', lineOfReflection);
+  middle.group.setEnd = function() {
+    if(this.fixedRotation) {
+      this.lineOfReflection = new Line(front.startPoint, { angle: this.fixedRotation });
+    } else {
+      this.lineOfReflection = new Line(front.startPoint, front.usePoint);
+    }
+    this.reflected = this.shapes.mapProperty('reflect', this.lineOfReflection);
   }
 
   middle.group.preview = function() {
-    var currLine = new Line(front.startPoint, front.usePoint);
-    currLine.sketchPreview();
+    this.lineOfReflection.sketchPreview();
     this.reflected.eachDo('draw', middle.context);
     this.shapes.eachDo('draw', middle.context);
   }
 
   front.eventListeners.add('mousemove', 'setEnd', function() {
-    middle.group.setEnd(front.usePoint);
+    middle.group.setEnd();
     middle.group.preview();
   }, true);
 
@@ -211,19 +214,69 @@ function reflect(pickedPoint) {
     changeMode(commandMode);
   });
 
-  // create keydown eventListener for set Angle
+  window.eventListeners.add('keydown', 'setAngle', function(e) {
+    if(e.shiftKey && e.which == charCodes['a']) {
+      getInput(
+        { main: 'enter angle:', subtext: '(degrees)' },
+        function(deg) {
+          if(deg === 'x') {
+            delete middle.group.fixedRotation;
+            if(infopanel.bottom.find('fixedAngle'))
+              infopanel.bottom.find('fixedAngle').remove();
+          } else {
+            middle.group.fixedRotation = Angle.fromDeg(parseFloat(deg));
+            infopanel.bottom.add({
+              main: 'fixed angle: ' + middle.group.fixedRotation.deg + unescape("\xB0"),
+              subtext: 'To undo, type "A", then "x"'
+            }, 'fixedAngle');
+          }
+          middle.group.setEnd();
+          middle.clear();
+          middle.group.preview();
+        },
+        ['x', '.']
+      );
+    }
+  });
 }
 
 ///////////////
 // intersect //
 ///////////////
 
-function intersect() {
-  middle.group.shapes.forEach(function(shape) { back.shapes.push(shape); });
-  back.refresh();
+function intersect(pickedPoint) {
+  middle.group.intersectShapes = [];
 
-  window.eventListeners.add('click', 'drawClip', function(e) {
-    var clipRect = design(new Rectangle(front.usePoint, front.usePoint));
-    clipRect.guideline = true;
-  }, false);
+  front.startPoint = pickedPoint;
+
+  middle.group.intersectShapes.push(new Rectangle(front.startPoint, front.usePoint));
+  middle.group.shapes.forEach(function(shape) {
+    shape.intersectShapes.push(middle.group.intersectShapes.last());
+  });
+  middle.group.intersectShapes.last().guideline = true;
+
+  front.eventListeners.add('mousemove', 'setEnd', function() {
+    middle.group.intersectShapes.last().setEnd(front.usePoint);
+    middle.group.intersectShapes.eachDo('preview');
+    middle.group.draw(middle.context);
+  }, true);
+
+  front.eventListeners.add('click', 'complete', function() {
+    middle.group.shapes.eachDo('complete');
+    changeMode(commandMode);
+  });
+
+  window.eventListeners.add('keydown', 'switchShape', function(e) {
+    switch(e.which) {
+      case charCodes['c']:
+        middle.group.intersectShapes.pop();
+        middle.group.intersectShapes.push(new Circle(front.startPoint, front.usePoint));
+        middle.group.shapes.forEach(function(shape) {
+          shape.intersectShapes.pop();
+          shape.intersectShapes.push(middle.group.intersectShapes.last());
+        });
+        middle.group.intersectShapes.last().guideline = true;
+      break;
+    }
+  });
 }

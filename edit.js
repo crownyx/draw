@@ -42,8 +42,8 @@ function editMode() {
       if(pickedPoint.same(shape.center)) {
         infopanel.top.clear();
         infopanel.buttons = [
-          Button('c',   'intersect', 'green'),
           Button('d',   'delete',    'green'),
+          Button('i',   'intersect', 'green'),
           Button('m',   'reflect',   'green'),
           Button('r',   'rotate',    'green'),
           Button('s',   'style',     'green'),
@@ -66,7 +66,7 @@ function editMode() {
 
         window.eventListeners.add('keydown', 'chooseEditMode', chooseEditMode = function(e) {
           if(!e.shiftKey) {
-            if(['c', 's', 'm', 'r', 't', 'u'].find(function(letter) {
+            if(['i', 's', 'm', 'r', 't', 'u'].find(function(letter) {
                 return charCodes[letter] === e.which;
               }))
             {
@@ -80,13 +80,14 @@ function editMode() {
               middle.clear();
               front.eventListeners.add('mousemove', 'showShape', showShape, true);
               infopanel.buttons = [
-                Button('c', 'clip',        'green'),
                 Button('d', 'delete',      'green'),
+                Button('i', 'intersect',   'green'),
                 Button('m', 'reflect',     'green'),
                 Button('r', 'rotate',      'green'),
                 Button('s', 'style',       'green'),
                 Button('t', 'translate',   'green'),
-                Button('>', 'go to point', 'yellow'),
+                Button('u', 'unite',       'green'),
+                Button('>', 'go to point', 'yellow')
               ];
               middle.group = new Group([shape.copy()]);
 
@@ -98,8 +99,14 @@ function editMode() {
               }
 
               switch(e.which) {
-                case charCodes['c']:
-                  intersect();
+                case charCodes['i']:
+                  infopanel.top = 'click to start drawing shape(s) to intersect';
+                  front.eventListeners.add('mousemove', 'showIntersectionShapes', function() {
+                    shape.intersectShapes.eachDo('sketch', middle.context);
+                  }, true);
+                  front.eventListeners.add('click', 'startDesigning', function() {
+                    setUpEditMode(intersect, front.lastPoint);
+                  });
                 break;
                 case charCodes['m']:
                   infopanel.top = 'click to start drawing line of reflection';

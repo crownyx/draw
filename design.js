@@ -4,7 +4,7 @@ function design(shape) {
 
   delete front.pickedPoint;
 
-  window.eventListeners.add('keydown', 'drawCommands', drawCommands);
+  window.eventListeners.add('keydown', 'drawCommands', drawCommands); // why here and draw.js?
 
   window.eventListeners.add('keydown', 'exitMode', function(e) {
     if(e.which === charCodes['esc']) changeMode(commandMode);
@@ -38,8 +38,7 @@ function design(shape) {
     Button('r', 'rectangle',    'green'),
     Button('s', 'square',       'green'),
     Button('t', 'triangle',     'green'),
-
-    Button('i', 'show/hide info', 'yellow'),
+    Button(':', 'show/hide info', 'yellow'),
     Button('>', 'go to point',    'yellow'),
     Button('.', 'show points',    'yellow')
   ];
@@ -77,7 +76,7 @@ function design(shape) {
   });
 
   window.eventListeners.add('keydown', 'showHideInfo', hideInfo = function(e) {
-    if(e.which == charCodes['i']) {
+    if(e.which === charCodes[':'].code) {
       middle.showText = !middle.showText;
       middle.redraw();
     }

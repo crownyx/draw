@@ -122,6 +122,15 @@ function findNearPoint(e) {
     allCenters.eachDo('circle', middle.context, { strokeStyle: 'red' });
     delete front.pickedPoint;
   }
+
+  back.shapes.forEach(function(shape) {
+    if(shape.intersectShapes.length) {
+      var difference = shape.difference(shape.intersectShapes, { inclusive: false });
+      difference.forEach(function(path) {
+        path.sketch(middle.context);
+      });
+    }
+  });
 }
 
 ////////////////
@@ -182,7 +191,7 @@ function commandMode() {
     front.startPoint = front.usePoint;
     delete front.setPoint;
     changeMode();
-    design(new Line(front.startPoint, front.lastPoint));
+    design(new Line(front.startPoint, front.usePoint));
     window.eventListeners.add('keydown', 'drawCommands', drawCommands);
   });
 

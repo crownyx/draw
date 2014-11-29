@@ -281,161 +281,110 @@ Rectangle.prototype._translate = function(point) {
   this.diagonal.translate(point);
 }
 
-Rectangle.prototype.clip = function(clipShape) {
-  var intersections = this.intersections(clipShape);
-}
-
 Rectangle.prototype.intersections = function(otherShape) {
   return(this.sides.filterMap(function(side) {
     if(side.intersections(otherShape).length) return side.intersections(otherShape);
   }).flatten());
 }
 
-Rectangle.prototype.intersection = function(otherShape) {
-  switch(otherShape.constructor) {
-    case Rectangle:
-      var intersections = this.intersections(otherShape);
-      var allPoints = intersections.concat(this.points.filter(function(point) {
-        return(!otherShape.sides.find(function(side) {
-          return point.to(otherShape.center).intersection(side);
-        }));
-      })).concat(otherShape.points.filter(function(point) {
-        return(!this.sides.find(function(side) {
-          return point.to(this.center).intersection(side);
-        }, this));
-      }, this));
-      var allSides  = this.sides.concat(otherShape.sides);
-      var lines = [];
-      var first = allPoints.shift();
-      var last = first;
-      for(;allPoints.length;) {
-        var next = allPoints.find(function(point) {
-          return allSides.find(function(side) {
-            return side.getPoint(last) && side.getPoint(point);
-          });
-        });
-        lines.push(last.to(next));
-        allPoints.remove(next);
-        last = next;
-      }
-      lines.push(last.to(first));
-      return lines;
-    break;
-    case Circle:
-      var intersections = this.intersections(otherShape);
-      var allPoints = intersections.concat(this.points.filter(function(point) {
-        return(!(point.to(otherShape.center).intersections(otherShape).length));
-      }));
-      var allSides = this.sides;
-      var lines = [];
-      var first = allPoints.shift();
-      var last = first;
-      var allPointsLength = allPoints.length;
-      var mustArc = false;
-      for(var i = 1; allPoints.length; i++) {
-        var next = allPoints.find(function(point) {
-          return(allSides.find(function(side) {
-            return side.getPoint(last) && side.getPoint(point);
-          }));
-        });
-        if(next && !mustArc) {
-          lines.push(last.to(next));
-        } else {
-          next = next || allPoints.filter(function(point) {
-            return(
-              Math.round(otherShape.center.distance(point) * 100000) ===
-              Math.round(otherShape.radius.length * 100000)
-            );
-          }).minBy('distance', last);
-          var angleToLast = Angle.from(otherShape.center, last);
-          var angleToNext = Angle.from(otherShape.center, next);
-          var startAngle, endAngle;
-          if(
-           (angleToLast.quadrant == 4 && angleToNext.quadrant == 1) ||
-           (angleToLast.rad < angleToNext.rad)
-          ) {
-            startAngle = angleToLast;
-            endAngle   = angleToNext;
-          } else {
-            startAngle = angleToNext;
-            endAngle   = angleToLast;
-          }
-          var radEnd = otherShape.center.plus(otherShape.radius.length);
-          var arc = new Arc(otherShape.center, radEnd, startAngle, endAngle);
-          arc.clockwise = (function(rect) {
-            var lesserAngle = startAngle.minus(Math.PI / 190);
-            var endOfLesserAngle = otherShape.center.plus(otherShape.radius.length).translate(otherShape.center, lesserAngle);
-            var lineToEnd = rect.center.to(endOfLesserAngle);
-            return lineToEnd.intersections(rect).length;
-          })(this);
-          lines.push(arc);
-        }
-        allPoints.remove(next);
-        last = next;
-        if(i === allPointsLength) {
-          if(i === 1) mustArc = true;
-          allPoints.push(first);
-        }
-      }
-      return lines.length ? lines : [otherShape];
-    break;
-    case Ellipse:
-      var intersections = this.intersections(otherShape);
-      var allPoints = intersections.concat(this.points.filter(function(point) {
-        return(!(point.to(otherShape.center).intersections(otherShape).length));
-      }));
-      var allSides = this.sides;
-      var lines = [];
-      var first = allPoints.shift();
-      var last = first;
-      var allPointsLength = allPoints.length;
-      var mustArc = false;
-      for(var i = 1; allPoints.length; i++) {
-        var next = allPoints.find(function(point) {
-          return(allSides.find(function(side) {
-            return side.getPoint(last) && side.getPoint(point);
-          }));
-        });
-        if(next && !mustArc) {
-          lines.push(last.to(next));
-        } else {
-          next = next || allPoints.filter(function(point) {
-            return intersections.find(function(intersection) { return intersection.same(point); });
-          }, this).minBy('distance', last);
-          var angleToLast = Angle.from(otherShape.center, last);
-          var angleToNext = Angle.from(otherShape.center, next);
-          var startAngle, endAngle;
-          if(
-           (angleToLast.quadrant == 4 && angleToNext.quadrant == 1) ||
-           (angleToLast.rad < angleToNext.rad)
-          ) {
-            startAngle = angleToLast;
-            endAngle   = angleToNext;
-          } else {
-            startAngle = angleToNext;
-            endAngle   = angleToLast;
-          }
-          var arc = otherShape.copy();
-          arc.startAngle = startAngle;
-          arc.endAngle   = endAngle;
-          arc.clockwise = (function(rect) {
-            var lesserAngle = startAngle.minus(Math.PI / 18);
-            var endOfLesserAngle = otherShape.radiusAt(lesserAngle).end;
-            var lineToEnd = rect.center.to(endOfLesserAngle);
-            return lineToEnd.intersections(rect).length;
-          })(this);
-          lines.push(arc);
-        }
-        allPoints.remove(next);
-        last = next;
-        if(i === allPointsLength) {
-          if(i === 1) mustArc = true;
-          allPoints.push(first);
-        }
-      }
-      return lines.length ? lines : [otherShape];
-    break;
+Rectangle.prototype.difference = function(otherShapes, params = { inclusive: true }) {
+  var intersections = otherShapes.mapProperty('intersections', this).flatten();
+  var allPoints = intersections.concat(this.points.filter(function(point) {
+    return otherShapes.every(function(shape) {
+      return point.to(shape.center).intersections(shape).length;
+    });
+  }));
+  var lines = [];
+  var first = allPoints.shift();
+  var last = first;
+  for(var numLeft = allPoints.length - 1; allPoints.length; numLeft--) {
+    var next = allPoints.find(function(point) {
+      return this.sides.find(function(side) {
+        return side.getPoint(last) && side.getPoint(point);
+      });
+    }, this);
+    if(next) {
+      lines.push(last.to(next));
+      allPoints.remove(next);
+      last = next;
+    } else {
+      last = allPoints.shift();
+    }
+    if(!numLeft) allPoints.push(first);
   }
+  if(params && params.inclusive) {
+    lines = lines.concat(
+      otherShapes.mapProperty('difference', [this], { inclusive: false }).flatten()
+    );
+  }
+  return lines;
+}
+
+Rectangle.prototype.intersection = function(otherShape, params = { inclusive: true }) {
+  var intersections = this.intersections(otherShape);
+  var allPoints = intersections.concat(this.points.filter(function(point) {
+    return !point.to(otherShape.center).intersections(otherShape).length;
+  }));
+  var allSides = this.sides;
+  if(otherShape instanceof Rectangle) {
+    allPoints = allPoints.concat(otherShape.points.filter(function(point) {
+      return !point.to(this.center).intersections(this).length;
+    }, this));
+    allSides = allSides.concat(otherShape.sides);
+  }
+  var lines = [];
+  var first = allPoints.shift();
+  var last = first;
+  var mustArc = false;
+  for(var numLeft = allPoints.length - 1; allPoints.length; numLeft--) {
+    var next = allPoints.find(function(point) {
+      return allSides.find(function(side) {
+        return side.getPoint(last) && side.getPoint(point);
+      });
+    });
+    if(!next) {
+      next = allPoints.filter(function(point) {
+        return intersections.findBy('same', point);
+      }).minBy('distance', last);
+      mustArc = true;
+    }
+    if(!mustArc && (params.inclusive || this.sides.find(function(side) {
+      return side.getPoint(last) && side.getPoint(next);
+    }))) lines.push(last.to(next));
+    if(mustArc && params.inclusive) {
+      var angleToLast = Angle.from(otherShape.center, last);
+      var angleToNext = Angle.from(otherShape.center, next);
+      var startAngle, endAngle;
+      if(
+       (angleToLast.quadrant == 4 && angleToNext.quadrant == 1) ||
+       (angleToLast.rad < angleToNext.rad)
+      ) {
+        startAngle = angleToLast;
+        endAngle   = angleToNext;
+      } else {
+        startAngle = angleToNext;
+        endAngle   = angleToLast;
+      }
+      var arc = otherShape.copy();
+      arc.startAngle = startAngle;
+      arc.endAngle   = endAngle;
+      arc.clockwise = (function(rect) {
+        var lesserAngle = startAngle.minus(Math.PI / 18);
+        var endOfLesserAngle = otherShape.radiusAt(lesserAngle).end;
+        var lineToEnd = rect.center.to(endOfLesserAngle);
+        return lineToEnd.intersections(rect).length;
+      })(this);
+      lines.push(arc);
+      mustArc = false;
+    }
+    allPoints.remove(next);
+    last = next;
+    if(!numLeft) {
+      if(lines.length === 1) mustArc = true;
+      allPoints.push(first);
+    }
+  }
+  return lines;
 }
 
 Rectangle.prototype.preview = function() {
@@ -448,14 +397,5 @@ Rectangle.prototype.preview = function() {
 }
 
 Rectangle.prototype._copy = function() {
-  var newRect = new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
-  newRect.rotation = this.rotation.copy();
-  newRect.fixedRotation = this.fixedRotation;
-  newRect.fixedHeight = this.fixedHeight;
-  newRect.fixedLength = this.fixedLength;
-  newRect.fixedArea = this.fixedArea;
-  newRect.fixedPerimeter = this.fixedPerimeter;
-  newRect.fixedEnd = this.fixedEnd;
-  newRect.fixedRatio = this.fixedRatio;
-  return newRect;
+  return new Rectangle(this.diagonal.start.copy(), this.diagonal.end.copy());
 }

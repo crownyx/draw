@@ -1,6 +1,7 @@
 function Shape() {
   this.rotation = new Angle(0);
   this.shiftCommands = [];
+  this.intersectShapes = [];
 
   this.lineWidth   = 1;
   this.strokeStyle = 'black';
@@ -36,17 +37,19 @@ Shape.prototype.draw = function(context, params = {}) {
     this.sketch(context);
   } else {
     context.save();
-      if(this.clipShape) {
-        context.beginPath();
-          this.clipShape.drawPath(context);
-        context.clip();
-      }
-      context.strokeStyle = params.strokeStyle || this.strokeStyle;
-      context.lineWidth   = params.lineWidth   || this.lineWidth;
-      context.setLineDash(this.lineDash || []);
       if(this.lineWidth || params.lineWidth) {
+        context.strokeStyle = params.strokeStyle || this.strokeStyle;
+        context.lineWidth   = params.lineWidth   || this.lineWidth;
+        context.setLineDash(this.lineDash || []);
         context.beginPath();
-          this.drawPath(context);
+          if(this.intersectShapes.length) {
+            var paths = this.intersectShapes.flatMap(function(shape) {
+              return this.intersection(shape, { inclusive: false });
+            }, this);
+            paths.eachDo('drawPath', context);
+          } else {
+            this.drawPath(context);
+          }
         context.stroke();
       }
       if(params.fillStyle || this.fillStyle) {
@@ -96,10 +99,9 @@ Shape.prototype.deleteFixedProperty = function() {
 
 Shape.prototype.copy = function() {
   var newShape = this._copy();
-  newShape.fillStyle = this.fillStyle;
-  newShape.strokeStyle = this.strokeStyle;
-  newShape.lineWidth = this.lineWidth;
-  if(this.clipShape) newShape.clipShape = this.clipShape.copy();
+  Object.keys(this).forEach(function(key) {
+    newShape[key] = this[key].copy ? this[key].copy() : this[key];
+  }, this);
   return newShape;
 }
 

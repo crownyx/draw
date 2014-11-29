@@ -1,13 +1,13 @@
+move circle.intersection over to circle (and ellipse)
+edit intersection - show previous intersection shapes to re-edit
+intersect with bezier curve: http://students.cs.byu.edu/~tom/557/text/cic.pdf
 don't allow switching to same shape in edit mode (undoes fixedLine) or transfer fixedLine
-link reflected shapes
-clean up/refactor transform modes
 get rid of point.shape all the time (did for rectangle)
 clip shapes - actually cut off, not use context.clip()
-when more than one point is near, browse through shapes
-undo
-group shapes
-find out why translate/rotate sometimes don't work right away
+show points during editing of shape being edited
 
-long term:
-
+v2.0
 mobile compatibility: buttons on sidebar; click once to set startPoint, then press and drag to choose endpoint
+group/link/unlink
+undo
+when more than one point is near, browse through shapes

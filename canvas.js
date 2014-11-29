@@ -120,8 +120,6 @@ back.shapes = [];
 back.redraw = function() {
   this.clear();
   this.shapes.eachDo('draw', this.context);
-  //if(this.shapes.length == 2) //this.shapes[0].intersections(this.shapes[1]).eachDo('fill', this.context);
-  //this.shapes[0].intersection(this.shapes[1]).eachDo('draw', this.context, { lineWidth: 2, strokeStyle: 'blue' });
 }
 
 back.refresh = back.redraw;
@@ -142,7 +140,6 @@ middle.refresh = function() {
 
 middle.redraw = function() {
   this.clear();
-  if(this.shape || this.group) {
-    (this.shape || this.group).preview();
-  }
+  if(this.shape) this.shape.preview();
+  if(this.group) this.group.preview();
 }

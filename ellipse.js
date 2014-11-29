@@ -83,7 +83,7 @@ Object.defineProperty(Ellipse.prototype, 'semiMinor', {
 
 Ellipse.prototype.setPoints = function() {
   this.center.shape = this;
-  this.points = [
+  this._points = [
     this.yAxis.end,
     this.xAxis.end,
     this.yAxis.end.translate(this.center, Math.PI),
@@ -222,6 +222,13 @@ Ellipse.prototype.intersections = function(otherShape) {
   }
 }
 
-Ellipse.prototype.intersection = function(otherShape) {
-  return otherShape.intersection(this);
+Ellipse.prototype.intersection = function(otherShape, params = { inclusive: true }) {
+  var intersection = otherShape.intersection(this);
+  if(params.inclusive) {
+    return intersection;
+  } else {
+    return(intersection.filter(function(lineOrArc) {
+      return(lineOrArc instanceof Ellipse);
+    }));
+  }
 }

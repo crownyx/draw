@@ -70,6 +70,21 @@ if (!Array.prototype.findIndex) {
   });
 }
 
+Object.defineProperty(Array.prototype, 'findBy', {
+  enumerable: false,
+  configurable: true,
+  writable: true,
+  value: function(methodName) {
+    if (this == null) {
+      throw new TypeError('Array.prototype.findBy called on null or undefined');
+    }
+    var args = Array.prototype.slice.call(arguments, 1);
+    return this.find(function(element) {
+      return element[methodName].apply(element, args);
+    });
+  }
+});
+
 Array.prototype.remove = function(obj) {
   var index = this.indexOf(obj);
   if(index !== -1) this.splice(index, 1);
@@ -82,7 +97,7 @@ Array.prototype.flatten = function() {
 }
 
 Array.prototype.flatMap = function(callback) {
-  var mapped = this.map(callback);
+  var mapped = this.map(callback, arguments[1]);
   return mapped.flatten();
 }
 
