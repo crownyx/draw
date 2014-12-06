@@ -220,8 +220,7 @@ Ellipse.prototype._intersection = function(otherShape, params = { inclusive: tru
     var angleToA = Angle.from(ellipse.center, a);
     var angleToB = Angle.from(ellipse.center, b);
     return angleToA.rad - angleToB.rad;
-  })[0];
-//refactor first two conditions into Shape.prototype.intersection
+  });
   intersections.push(intersections[0]);
   for(var i = 0; i < intersections.length - 1 && arcs.length < (intersections.length - 1) / 2; i++) {
     var last = intersections[i];

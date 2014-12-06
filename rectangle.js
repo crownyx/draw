@@ -295,58 +295,47 @@ Rectangle.prototype.difference = function(otherShapes, params = { inclusive: tru
     });
   }));
   var lines = [];
-  var first = allPoints.shift();
-  var last = first;
-  for(var numLeft = allPoints.length - 1; allPoints.length; numLeft--) {
-    var next = allPoints.find(function(point) {
-      return this.sides.find(function(side) {
-        return side.getPoint(last) && side.getPoint(point);
-      });
-    }, this);
-    if(next) {
-      lines.push(last.to(next));
-      allPoints.remove(next);
-      last = next;
+  var rectangle = this;
+  allPoints.sort(function(a, b) {
+    var angleToA = Angle.from(rectangle.center, a);
+    var angleToB = Angle.from(rectangle.center, b);
+    return angleToA.rad - angleToB.rad;
+  });
+  allPoints.push(allPoints[0]);
+  for(var i = 0; i < allPoints.length - 1 && lines.length < allPoints.length - 2;) {
+    var last = allPoints[i];
+    var next = allPoints[i + 1];
+    lines.push(last.to(next));
+    if(this.points.find(function(point) {
+      return point.same(next);
+    })) {
+      i += 1;
     } else {
-      last = allPoints.shift();
+      i += 2;
     }
-    if(!numLeft) allPoints.push(first);
-  }
-  if(params && params.inclusive) {
-    lines = lines.concat(
-      otherShapes.mapProperty('difference', [this], { inclusive: false }).flatten()
-    );
   }
   return lines;
 }
 
-Rectangle.prototype.intersection = function(otherShape, params = { inclusive: true }) {
-  var intersections = otherShape.intersections(this);
+Rectangle.prototype._intersection = function(otherShape) {
+  var intersections = this.intersections(otherShape);
   var allPoints = intersections.concat(this.points.filter(function(point) {
     return !point.to(otherShape.center).intersections(otherShape).length;
   }));
   var lines = [];
-  var first = allPoints.shift();
-  var last = first;
-  for(var numLeft = allPoints.length - 1; allPoints.length; numLeft--) {
-    var next = allPoints.find(function(point) {
-      return this.sides.find(function(side) {
-        return side.getPoint(last) && side.getPoint(point);
-      });
-    }, this);
-    if(next) {
-      lines.push(last.to(next));
-      allPoints.remove(next);
-      last = next;
-    } else {
-      last = allPoints.shift();
-    }
-    if(!numLeft) allPoints.push(first);
-  }
-  if(params && params.inclusive) {
-    lines = lines.concat(
-      otherShape.intersection(this, { inclusive: false })
-    );
+  var rectangle = this;
+  allPoints.sort(function(a, b) {
+    var angleToA = Angle.from(rectangle.center, a);
+    var angleToB = Angle.from(rectangle.center, b);
+    return angleToA.rad - angleToB.rad;
+  });
+  allPoints.push(allPoints[0]);
+  for(var i = 0; i < allPoints.length - 1 && lines.length < allPoints.length - 2; i++) {
+    var last = allPoints[i];
+    var next = allPoints[i + 1];
+    if(this.sides.find(function(side) {
+      return side.getPoint(last) && side.getPoint(next);
+    })) lines.push(last.to(next));
   }
   return lines;
 }

@@ -43,9 +43,9 @@ Shape.prototype.draw = function(context, params = {}) {
         context.setLineDash(this.lineDash || []);
         context.beginPath();
           if(this.intersectShapes.length) {
-            var paths = this.intersectShapes.flatMap(function(shape) {
+            var paths = this.intersectShapes.filterMap(function(shape) {
               return this.intersection(shape, { inclusive: false });
-            }, this);
+            }, this).flatten();
             paths.eachDo('drawPath', context);
           } else {
             this.drawPath(context);
@@ -115,15 +115,17 @@ Object.defineProperty(Shape.prototype, 'name', {
   get: function() { return this.constructor.name; },
 });
 
-Shape.prototype.intersection = function(otherShape) {
+Shape.prototype.intersection = function(otherShape, params = { inclusive: false }) {
   var intersections = this.intersections(otherShape);
+  var intersection;
   if(intersections.length <= 1 || (intersections.length === 2 && intersections[0].same(intersections[1]))) {
     var centerToCenter = this.center.to(otherShape.center);
     if(!centerToCenter.intersections(otherShape).length && this.area < otherShape.area)
-      return [this];
+      intersection = [this];
   } else {
-    return this._intersection(otherShape);
+    intersection = this._intersection(otherShape);
   }
+  return intersection;
 }
 
 // Shape public interface:
