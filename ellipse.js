@@ -9,8 +9,6 @@ function Ellipse(radStart, radEnd) {
 
   var ellipse = this;
 
-  this.setPoints();
-
   this.shiftCommands = [
     {
       key: 'r',
@@ -81,24 +79,22 @@ Object.defineProperty(Ellipse.prototype, 'semiMinor', {
   get: function() { return [this.yAxis, this.xAxis].minBy('length'); }
 });
 
-Ellipse.prototype.setPoints = function() {
-  this.center.shape = this;
-  this._points = [
-    this.yAxis.end,
-    this.xAxis.end,
-    this.yAxis.end.translate(this.center, Math.PI),
-    this.xAxis.end.translate(this.center, Math.PI)
-  ].map(function(point) {
-    point.shape = this;
-    return point;
-  }, this);
-}
+Object.defineProperty(Ellipse.prototype, 'points', {
+  get: function() {
+    return([
+      this.yAxis.end,
+      this.xAxis.end,
+      this.yAxis.end.translate(this.center, Math.PI),
+      this.xAxis.end.translate(this.center, Math.PI)
+    ]);
+  }
+});
 
 Ellipse.prototype.drawPath = function(context) {
   var startAngle = this.startAngle || new Angle(0);
   var endAngle   = this.endAngle   || new Angle(2 * Math.PI);
   var distanceToGo = this.clockwise ? endAngle.minus(startAngle).rad : startAngle.minus(endAngle).rad;
-  for(var t = 0; t < distanceToGo + 0.02; t += 0.02) {
+  for(var t = 0; t <= distanceToGo; t += 0.02) {
     var currAngle = this.clockwise ? startAngle.plus(t) : startAngle.minus(t);
     var radiusEnd = this.radiusAt(currAngle).end;
     if(t === 0) {
@@ -106,6 +102,8 @@ Ellipse.prototype.drawPath = function(context) {
     } else {
       context.lineTo(radiusEnd.x, radiusEnd.y);
     }
+    if(t < distanceToGo && t + 0.02 > distanceToGo)
+      t = distanceToGo - 0.02;
   }
 }
 
@@ -152,7 +150,6 @@ Ellipse.prototype.setEnd = function(point) {
   var point = point.untranslate(this.center, this.rotation);
   if(!this.yAxis.fixed) this.yAxis.setEnd(new Point(this.center.x, point.y).translate(this.center, this.rotation));
   if(!this.xAxis.fixed) this.xAxis.setEnd(new Point(point.x, this.center.y).translate(this.center, this.rotation));
-  this.setPoints();
 }
 
 Ellipse.prototype.rotate = function(rotation) {
@@ -184,33 +181,25 @@ Ellipse.prototype._reflect = function(line) {
 
 Ellipse.prototype._translate = function(point) {
   this.center = point;
-  this.center.shape = this;
   this.xAxis.translate(point, { by: 'start' });
   this.yAxis.translate(point, { by: 'start' });
-  this.setPoints();
 }
 
 Ellipse.prototype._copy = function() {
   var ellipse = new Ellipse(this.center, this.center);
-  ellipse.xAxis = this.xAxis.copy();
-  ellipse.yAxis = this.yAxis.copy();
-  ellipse.center = this.center.copy();
-  ellipse.center.shape = ellipse;
-  ellipse.rotation = this.rotation;
-  ellipse.setPoints();
   return ellipse;
 }
 
 Ellipse.prototype.radiusAt = function(theta) {
-  var xAxis = this.xAxis.length;
-  var yAxis = this.yAxis.length;
-  var theta = theta instanceof Angle ? theta.rad : theta;
-  var rot = this.rotation.rad;
-  var pTheta = (yAxis*yAxis - xAxis*xAxis)*Math.cos(theta - 2*rot) + (xAxis*xAxis + yAxis*yAxis)*Math.cos(theta);
-  var rTheta = (yAxis*yAxis - xAxis*xAxis)*Math.cos(2*theta - 2*rot) + xAxis*xAxis + yAxis*yAxis;
-  var qTheta = Math.sqrt(2)*xAxis*yAxis*Math.sqrt(rTheta - Math.pow(Math.sin(theta), 2));
-  var r = (pTheta + qTheta) / rTheta;
-  return(this.center.to(this.center.plus(r).translate(this.center, theta)));
+  var x = this.xAxis.length;
+  var y = this.yAxis.length;
+  var t = theta instanceof Angle ? theta.rad : theta;
+  var r = this.rotation.rad;
+  var pTheta = (y*y - x*x)*Math.cos(t - 2*r) + (x*x + y*y)*Math.cos(t);
+  var rTheta = (y*y - x*x)*Math.cos(2*t - 2*r) + x*x + y*y;
+  var qTheta = Math.sqrt(2)*x*y*Math.sqrt(rTheta - Math.pow(Math.sin(t), 2));
+  var l = (pTheta + qTheta) / rTheta;
+  return(this.center.to(this.center.plus(l).translate(this.center, t)));
 }
 
 Ellipse.prototype.intersections = function(otherShape) {
@@ -222,13 +211,34 @@ Ellipse.prototype.intersections = function(otherShape) {
   }
 }
 
-Ellipse.prototype.intersection = function(otherShape, params = { inclusive: true }) {
-  var intersection = otherShape.intersection(this);
-  if(params.inclusive) {
-    return intersection;
-  } else {
-    return(intersection.filter(function(lineOrArc) {
-      return(lineOrArc instanceof Ellipse);
-    }));
+Ellipse.prototype._intersection = function(otherShape, params = { inclusive: true }) {
+//why does it save even when i escape?
+  var intersections = this.intersections(otherShape);
+  var arcs = [];
+  var ellipse = this;
+  intersections.sort(function(a, b) {
+    var angleToA = Angle.from(ellipse.center, a);
+    var angleToB = Angle.from(ellipse.center, b);
+    return angleToA.rad - angleToB.rad;
+  })[0];
+//refactor first two conditions into Shape.prototype.intersection
+  intersections.push(intersections[0]);
+  for(var i = 0; i < intersections.length - 1 && arcs.length < (intersections.length - 1) / 2; i++) {
+    var last = intersections[i];
+    var next = intersections[i + 1];
+    if(!otherShape.sides.find(function(side) {
+      return side.getPoint(last) && side.getPoint(next);
+    }) || intersections.length === 3) {
+      var halfAngle = Angle.from(this.center, last).halfway(Angle.from(this.center, next));
+      var halfLine = otherShape.center.to(this.radiusAt(halfAngle).end);
+      var crossOver = halfLine.intersections(otherShape);
+      if(!crossOver.length || crossOver.last().same(halfLine.end)) {
+        var arc = this.copy();
+        arc.startAngle = Angle.from(this.center, last);
+        arc.endAngle = Angle.from(this.center, next);
+        arcs.push(arc);
+      }
+    }
   }
+  return arcs;
 }

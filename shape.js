@@ -115,6 +115,17 @@ Object.defineProperty(Shape.prototype, 'name', {
   get: function() { return this.constructor.name; },
 });
 
+Shape.prototype.intersection = function(otherShape) {
+  var intersections = this.intersections(otherShape);
+  if(intersections.length <= 1 || (intersections.length === 2 && intersections[0].same(intersections[1]))) {
+    var centerToCenter = this.center.to(otherShape.center);
+    if(!centerToCenter.intersections(otherShape).length && this.area < otherShape.area)
+      return [this];
+  } else {
+    return this._intersection(otherShape);
+  }
+}
+
 // Shape public interface:
 //   .shiftCommands: array of objects: { key: ..., forWhat: ..., subtext: ..., callback: ... }
 //   .infoText     : returns text to display in upper lefthand corner

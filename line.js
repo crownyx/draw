@@ -145,7 +145,7 @@ Line.prototype.getPoint = function(xy) {
     x = this.vertical ? this.start.x : (y - this.yIntercept) / this.slope;
   }
 
-  var rounded = function(num) { return Math.round(num * 1000) / 1000; }
+  var rounded = function(num) { return Math.round(num * 1000); }
 
   var onLine  = (this.vertical && rounded(x) === rounded(this.start.x)) ||
                 (this.horizontal && rounded(y) === rounded(this.start.y)) ||
@@ -233,7 +233,7 @@ Line.prototype.intersections = function(otherShape) {
       }, this));
     break;
     case Ellipse:
-// http://quickcalcbasic.com/ellipse%20line%20intersection.pdf;
+// http://quickcalcbasic.com/ellipse%20line%20intersection.pdf
       var p = otherShape.center;
       var a, b, c;
       var rotSin = Math.sin(otherShape.rotation.rad);

@@ -52,6 +52,22 @@ Angle.prototype.times = function(multiple) {
   return new Angle(this.rad * multiple);
 }
 
+Angle.prototype.halfway = function(otherAngle) {
+  var diff;
+  if(this.rad < otherAngle.rad || this.equals(otherAngle)) {
+    diff = otherAngle.rad - this.rad;
+  } else {
+    diff = otherAngle.rad + 2 * Math.PI - this.rad;
+  }
+  return this.plus(diff / 2);
+}
+
+Angle.prototype.equals = function(otherAngle) {
+  var thisRad  = Math.round(this.rad * 1000)       === Math.round(2 * Math.PI * 1000) ? 0 : this.rad;
+  var otherRad = Math.round(otherAngle.rad * 1000) === Math.round(2 * Math.PI * 1000) ? 0 : otherAngle.rad;
+  return Math.round(thisRad * 1000) === Math.round(otherRad * 1000);
+}
+
 Angle.prototype.draw = function(context, params = {}) {
   new Arc(
     this.center,

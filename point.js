@@ -17,7 +17,7 @@ function Point(x, y) {
     this.fill(context);
     context.textBaseline = 'middle';
     var height = parseInt(context.font.match(/[^p]+/)[0]);
-    if(text) {
+    if(typeof text !== 'undefined') {
       context.textAlign = 'right';
         context.fillText(text, this.x - 7, this.y);
       var width = context.measureText(text).width;
@@ -61,18 +61,20 @@ function Point(x, y) {
 
   this.same = function(point) {
     return(
-      (
-        Math.floor(point.x) == Math.floor(this.x) ||
-        Math.ceil(point.x)  == Math.ceil(this.x)  ||
-        Math.floor(point.x) == Math.ceil(this.x)  ||
-        Math.ceil(point.x)  == Math.floor(this.x)
-      ) &&
-      (
-        Math.floor(point.y) == Math.floor(this.y) ||
-        Math.ceil(point.y)  == Math.ceil(this.y)  ||
-        Math.floor(point.y) == Math.ceil(this.y)  ||
-        Math.ceil(point.y)  == Math.floor(this.y)
-      )
+      Math.round(point.x * 1000) === Math.round(this.x * 1000) &&
+      Math.round(point.y * 1000) === Math.round(this.y * 1000)
+      //(
+      //  Math.floor(point.x) == Math.floor(this.x) ||
+      //  Math.ceil(point.x)  == Math.ceil(this.x)  ||
+      //  Math.floor(point.x) == Math.ceil(this.x)  ||
+      //  Math.ceil(point.x)  == Math.floor(this.x)
+      //) &&
+      //(
+      //  Math.floor(point.y) == Math.floor(this.y) ||
+      //  Math.ceil(point.y)  == Math.ceil(this.y)  ||
+      //  Math.floor(point.y) == Math.ceil(this.y)  ||
+      //  Math.ceil(point.y)  == Math.floor(this.y)
+      //)
     );
   }
 

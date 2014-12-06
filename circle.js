@@ -145,23 +145,42 @@ Circle.prototype.intersections = function(otherShape) {
 }
 
 Circle.prototype.intersection = function(otherShape, params = { inclusive: true }) {
-  switch(otherShape.constructor) {
-    case Rectangle:
-      var intersection = otherShape.intersection(this);
-      if(params.inclusive) {
-        return intersection;
-      } else {
-        return intersection.find(function(arc) {
-          return(
-            arc instanceof Arc &&
-            arc.center == this.center &&
-            arc.radius.length == this.radius.length
-          );
-        }, this);
-      }
-    break;
+  var intersections = this.intersections(otherShape);
+  var lines = [];
+  var first = intersections.shift();
+  var last = first;
+  for(var numLeft = intersections.length - 1; intersections.length; numLeft--) {
+    var next = intersections.minBy('distance', last);
+    var angleToLast = Angle.from(this.center, last);
+    var angleToNext = Angle.from(this.center, next);
+    var startAngle, endAngle;
+    if(
+     (angleToLast.quadrant == 4 && angleToNext.quadrant == 1) ||
+     (angleToLast.rad < angleToNext.rad)
+    ) {
+      startAngle = angleToLast;
+      endAngle   = angleToNext;
+    } else {
+      startAngle = angleToNext;
+      endAngle   = angleToLast;
+    }
+    var arc = new Arc(this.center, this.radius.end, startAngle, endAngle);// this.copy();
+    //arc.startAngle = startAngle;
+    //arc.endAngle   = endAngle;
+    arc.clockwise = (function(circle) {
+      var lesserAngle = startAngle.minus(Math.PI / 18);
+      var endOfLesserAngle = circle.radiusAt(lesserAngle).end;
+      var lineToEnd = otherShape.center.to(endOfLesserAngle);
+      return lineToEnd.intersections(otherShape).length;
+    })(this);
+    lines.push(arc);
+    intersections.remove(next);
+    last = next;
+    if(!numLeft) intersections.push(first);
   }
+  return lines;
 }
+
 Circle.prototype.radiusAt = function(phi) {
   var end = this.center.plus(this.radius.length).translate(this.center, phi);
   return this.center.to(end);

@@ -6,6 +6,24 @@ var isNum = function(num) {
   return typeof num === 'number' && !isNaN(num);
 }
 
+////////////
+// Number //
+////////////
+
+if (!Number.prototype.round) {
+  Object.defineProperty(Number.prototype, 'round', {
+    enumerable: false,
+    configurable: true,
+    writable: true,
+    value: function(numDec) {
+      if(this == null)
+        throw new TypeError('Number.prototype.round called on null or undefined');
+      var precision = Math.pow(10, numDec || 0);
+      return Math.round(this * precision) / precision;
+    }
+  });
+}
+
 ///////////
 // Array //
 ///////////

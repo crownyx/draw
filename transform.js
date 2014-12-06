@@ -250,9 +250,11 @@ function intersect(pickedPoint) {
   front.startPoint = pickedPoint;
 
   middle.group.intersectShapes.push(new Rectangle(front.startPoint, front.usePoint));
+
   middle.group.shapes.forEach(function(shape) {
     shape.intersectShapes.push(middle.group.intersectShapes.last());
   });
+
   middle.group.intersectShapes.last().guideline = true;
 
   front.eventListeners.add('mousemove', 'setEnd', function() {
