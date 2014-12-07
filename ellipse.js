@@ -208,11 +208,42 @@ Ellipse.prototype.intersections = function(otherShape) {
     case Rectangle:
       return otherShape.intersections(this);
     break;
+    case Circle:
+    break;
+    case Ellipse:
+    break;
   }
 }
 
+Ellipse.prototype.difference = function(otherShapes) {
+  var intersections = otherShapes.mapProperty('intersections', this).flatten();
+  var arcs = [];
+  var ellipse = this;
+  intersections.sort(function(a, b) {
+    var angleToA = Angle.from(ellipse.center, a);
+    var angleToB = Angle.from(ellipse.center, b);
+    return angleToA.rad - angleToB.rad;
+  });
+  intersections.push(intersections[0]);
+  for(var i = 0; i < intersections.length - 1 && arcs.length < (intersections.length - 1) / 2; i++) {
+    var last = intersections[i];
+    var next = intersections[i + 1];
+      var halfAngle = Angle.from(this.center, last).halfway(Angle.from(this.center, next));
+      otherShapes.forEach(function(shape) {
+        var halfLine = shape.center.to(this.radiusAt(halfAngle).end);
+        var crossOver = halfLine.intersections(shape);
+        if(crossOver.length && !crossOver.last().same(halfLine.end)) {
+          var arc = this.copy();
+          arc.startAngle = Angle.from(this.center, last);
+          arc.endAngle = Angle.from(this.center, next);
+          arcs.push(arc);
+        }
+      }, this);
+    }
+  return arcs;
+}
+
 Ellipse.prototype._intersection = function(otherShape, params = { inclusive: true }) {
-//why does it save even when i escape?
   var intersections = this.intersections(otherShape);
   var arcs = [];
   var ellipse = this;

@@ -305,13 +305,13 @@ Rectangle.prototype.difference = function(otherShapes, params = { inclusive: tru
   for(var i = 0; i < allPoints.length - 1 && lines.length < allPoints.length - 2;) {
     var last = allPoints[i];
     var next = allPoints[i + 1];
-    lines.push(last.to(next));
-    if(this.points.find(function(point) {
-      return point.same(next);
+    if(this.sides.find(function(side) {
+      return side.getPoint(last) && side.getPoint(next);
     })) {
-      i += 1;
+      lines.push(last.to(next));
+      i += this.points.findBy('same', next) ? 1 : 2;
     } else {
-      i += 2;
+      i += 1;
     }
   }
   return lines;

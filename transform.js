@@ -269,16 +269,28 @@ function intersect(pickedPoint) {
   });
 
   window.eventListeners.add('keydown', 'switchShape', function(e) {
-    switch(e.which) {
-      case charCodes['c']:
-        middle.group.intersectShapes.pop();
-        middle.group.intersectShapes.push(new Circle(front.startPoint, front.usePoint));
-        middle.group.shapes.forEach(function(shape) {
-          shape.intersectShapes.pop();
-          shape.intersectShapes.push(middle.group.intersectShapes.last());
-        });
-        middle.group.intersectShapes.last().guideline = true;
-      break;
+    if(['c', 'e', 'r'].find(function(letter) {
+      return e.which === charCodes[letter];
+    })) {
+      var intersectShape;
+      switch(e.which) {
+        case charCodes['c']:
+          intersectShape = new Circle(front.startPoint, front.usePoint);
+        break;
+        case charCodes['e']:
+          intersectShape = new Ellipse(front.startPoint, front.usePoint);
+        break;
+        case charCodes['e']:
+          intersectShape = new Rectangle(front.startPoint, front.usePoint);
+        break;
+      }
+      middle.group.intersectShapes.pop();
+      middle.group.intersectShapes.push(intersectShape);
+      middle.group.shapes.forEach(function(shape) {
+        shape.intersectShapes.pop();
+        shape.intersectShapes.push(middle.group.intersectShapes.last());
+      });
+      middle.group.intersectShapes.last().guideline = true;
     }
   });
 }

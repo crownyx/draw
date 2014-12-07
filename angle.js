@@ -40,6 +40,13 @@ Object.defineProperty(Angle.prototype, 'refAngle', {
   }
 });
 
+Angle.prototype.sin  = function() { return Math.sin(this.rad); }
+Angle.prototype.cos  = function() { return Math.cos(this.rad); }
+Angle.prototype.tan  = function() { return Math.tan(this.rad); }
+Angle.prototype.asin = function() { return Math.atan(this.rad); }
+Angle.prototype.acos = function() { return Math.acos(this.rad); }
+Angle.prototype.atan = function() { return Math.atan(this.rad); }
+
 Angle.prototype.plus  = function(otherAngle) {
   return new Angle(this.rad + (otherAngle instanceof Angle ? otherAngle.rad : otherAngle));
 }
