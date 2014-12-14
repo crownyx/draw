@@ -124,7 +124,8 @@ Object.defineProperty(Shape.prototype, 'name', {
   get: function() { return this.constructor.name; },
 });
 
-Shape.prototype.intersection = function(otherShape, params = { inclusive: false }) {
+Shape.prototype.intersection = function(otherShape, params) {
+  params = params || { inclusive: false };
   var intersections = this.intersections(otherShape);
   var intersection;
   if(intersections.length <= 1 || (intersections.length === 2 && intersections[0].same(intersections[1]))) {

@@ -288,7 +288,8 @@ Rectangle.prototype.intersections = function(otherShape) {
   }).flatten());
 }
 
-Rectangle.prototype.difference = function(otherShapes, params = { inclusive: true }) {
+Rectangle.prototype.difference = function(otherShapes, params) {
+  params = { inclusive: true };
   var intersections = otherShapes.mapProperty('intersections', this).flatten();
   var allPoints = intersections.concat(this.points.filter(function(point) {
     return otherShapes.every(function(shape) {
