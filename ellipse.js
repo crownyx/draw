@@ -243,7 +243,8 @@ Ellipse.prototype.difference = function(otherShapes) {
   return arcs;
 }
 
-Ellipse.prototype._intersection = function(otherShape, params = { inclusive: true }) {
+Ellipse.prototype._intersection = function(otherShape, params) {
+  params = params || { inclusive: true };
   var intersections = this.intersections(otherShape);
   var arcs = [];
   var ellipse = this;

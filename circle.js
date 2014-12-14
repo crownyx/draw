@@ -144,7 +144,8 @@ Circle.prototype.intersections = function(otherShape) {
   }
 }
 
-Circle.prototype.intersection = function(otherShape, params = { inclusive: true }) {
+Circle.prototype.intersection = function(otherShape, params) {
+  params = params || { inclusive: true };
   var intersections = this.intersections(otherShape);
   var lines = [];
   var first = intersections.shift();

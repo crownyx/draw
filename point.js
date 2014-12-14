@@ -4,7 +4,8 @@ function Point(x, y) {
 
   this.toString = function() { return "(x: " + this.x + ", y: " + this.y + ")"; }
 
-  this.fill = function(context, params = {}) {
+  this.fill = function(context, params) {
+    params = params || {};
     context.save();
       context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
       context.beginPath();

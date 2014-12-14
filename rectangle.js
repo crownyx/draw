@@ -253,7 +253,8 @@ Rectangle.prototype.drawPath = function(context) {
   context.closePath();
 }
 
-Rectangle.prototype.rotate = function(rotation, params = {}) {
+Rectangle.prototype.rotate = function(rotation, params) {
+  params = params || {};
   this.diagonal.rotate(rotation, { about: params.about });
   this.rotation = this.rotation.plus(rotation);
 }

@@ -22,7 +22,8 @@ Shape.prototype.nextStep = function() {
   changeMode(commandMode);
 }
 
-Shape.prototype.sketch = function(context, params = {}) {
+Shape.prototype.sketch = function(context, params) {
+  params = params || {};
   context.save();
     context.strokeStyle = params.strokeStyle || "blue";
     context.setLineDash([5]);

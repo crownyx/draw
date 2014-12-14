@@ -75,7 +75,8 @@ Angle.prototype.equals = function(otherAngle) {
   return Math.round(thisRad * 1000) === Math.round(otherRad * 1000);
 }
 
-Angle.prototype.draw = function(context, params = {}) {
+Angle.prototype.draw = function(context, params) {
+  params = params || {};
   new Arc(
     this.center,
     this.center.plus(params.radius || 10),

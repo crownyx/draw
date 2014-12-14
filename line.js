@@ -51,7 +51,8 @@ Line.prototype.infoText = function() {
   return "length: " + commaSep(Math.round(this.length));
 }
 
-Line.prototype.setEnd = function(point, params = {}) {
+Line.prototype.setEnd = function(point, params) {
+  params = params || {};
   if(this.fixedLength || this.fixedAngle || params.fixedLength || params.fixedAngle) {
     var rotation = this.fixedAngle || params.fixedAngle || new Line(this.start, point).angle;
     var length   = this.fixedLength || params.fixedLength || new Line(this.start, point).length;
