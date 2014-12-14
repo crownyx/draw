@@ -33,7 +33,8 @@ Shape.prototype.sketch = function(context, params) {
   context.restore();
 }
 
-Shape.prototype.draw = function(context, params = {}) {
+Shape.prototype.draw = function(context, params) {
+  params = params || {};
   if(this.guideline) {
     this.sketch(context);
   } else {
@@ -63,7 +64,8 @@ Shape.prototype.draw = function(context, params = {}) {
   }
 }
 
-Shape.prototype.fill = function(context, params = {}) {
+Shape.prototype.fill = function(context, params) {
+  params = params || {};
   context.save();
     context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
     context.beginPath();

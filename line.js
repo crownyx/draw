@@ -123,7 +123,8 @@ Line.prototype.sketchPreview = function() {
   if(this.fixedLength || this.fixedAngle) this.end.round().label(middle.context);
 }
 
-Line.prototype._translate = function(point, params = {}) {
+Line.prototype._translate = function(point, params) {
+  params = params || {};
   if(params.by == 'start') {
     (function(start, end) {
       this.start = point;

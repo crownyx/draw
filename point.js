@@ -36,7 +36,8 @@ function Point(x, y) {
     }
   }
 
-  this.circle = function(context, params = {}) {
+  this.circle = function(context, params) {
+    params = params || {};
     context.save();
       context.strokeStyle = this.strokeStyle || params.strokeStyle || context.strokeStyle;
       context.beginPath();
@@ -121,7 +122,8 @@ function Point(x, y) {
     }
   }
 
-  this.preview = function(angle, quadAdd = -1, params = {}) {
+  this.preview = function(angle, quadAdd = -1, params) {
+    params = params || {};
     new AxisPair(this).sketch(middle.context, params);
     this.round().showCoords(middle.context, angle, quadAdd + 2 ? quadAdd : -1);
   }
