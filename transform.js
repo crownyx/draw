@@ -2,12 +2,14 @@ function translate(refPoint) {
   front.startPoint = refPoint;
   middle.group.origin = refPoint;
 
+  front.refresh();
+
   infopanel.top = 'choose translation point, then click';
-  infopanel.buttons.add(
+  infopanel.buttons = [
     Button('A',   'set angle',    'blue'),
     Button('D',   'set distance', 'blue'),
     Button('esc', 'cancel',       'red')
-  );
+  ];
 
   window.eventListeners.add('keydown', 'setDistance', function(e) {
     if(e.shiftKey && e.which == charCodes['d']) {
@@ -66,23 +68,24 @@ function translate(refPoint) {
   });
 
   middle.group.setEnd = function() {
-    if(middle.group.fixedDistance || middle.group.fixedAngle) {
-      var distance = middle.group.fixedDistance || new Line(refPoint, front.usePoint).length;
-      var angle = middle.group.fixedAngle || Angle.from(refPoint, front.usePoint);
+    var point = front.usePoint;
+    if(this.fixedDistance || this.fixedAngle) {
+      var distance = this.fixedDistance || new Line(refPoint, front.usePoint).length;
+      var angle = this.fixedAngle || Angle.from(refPoint, front.usePoint);
       point = refPoint.plus(distance).translate(refPoint, angle);
     }
-    this.origin = front.usePoint;
+    this.origin = point;
     refLines.forEach(function(refLine) {
-      refLine.translate(front.usePoint);
+      refLine.translate(point, { by: 'start' });
       refLine.shape.translate(refLine.end);
     });
   }
 
   middle.group.preview = function() {
-    var translationPath = new Line(refPoint, middle.group.origin);
+    var translationPath = new Line(refPoint, this.origin);
     translationPath.sketchPreview();
-    if(middle.group.fixedDistance || middle.group.fixedAngle)
-      middle.group.origin.round().preview(0, 2, { strokeStyle: 'green' });
+    if(this.fixedDistance || this.fixedAngle)
+      this.origin.round().preview(0, 2, { strokeStyle: 'green' });
     middle.context.fillText('distance: ' + Math.round(translationPath.length), 10, 15);
     this.draw(middle.context);
   }
@@ -105,11 +108,13 @@ function translate(refPoint) {
 function rotate(refPoint) {
   front.startPoint = refPoint;
 
+  front.refresh();
+
   infopanel.top = 'choose angle of rotation, then click.';
-  infopanel.buttons.add(
+  infopanel.buttons = [
     Button('A',   'set angle', 'blue'),
     Button('esc', 'cancel',    'red')
-  );
+  ];
 
   var refLines = middle.group.shapes.map(function(shape) {
     var refLine = new Line(refPoint, shape.center);
@@ -139,8 +144,10 @@ function rotate(refPoint) {
   middle.group.rotation = new Angle(0);
 
   front.eventListeners.add('mousemove', 'setRotation', function() {
+    middle.clear(); // clear to remove findNearPoint from draw.js so no lapse in findNearPoint below. need better solution
     middle.group.setEnd();
     middle.group.preview();
+    if(middle.showPoints) findNearPoint(front.lastPoint);
   }, true);
 
   window.eventListeners.add('keydown', 'setAngle', function(e) {
@@ -155,7 +162,7 @@ function rotate(refPoint) {
           } else {
             middle.group.fixedRotation = Angle.fromDeg(parseFloat(deg));
             infopanel.bottom.add({
-              main: 'fixed angle: ' + middle.group.fixedRotation.deg + unescape("\xB0"),
+              main: 'fixed angle: ' + middle.group.fixedRotation.deg.round(2) + unescape("\xB0"),
               subtext: 'To undo, type "A", then "x"'
             }, 'fixedAngle');
           }
@@ -248,6 +255,8 @@ function intersect(pickedPoint) {
   middle.group.intersectShapes = [];
 
   front.startPoint = pickedPoint;
+
+  front.eventListeners.clear();
 
   middle.group.intersectShapes.push(new Rectangle(front.startPoint, front.usePoint));
 

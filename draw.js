@@ -11,7 +11,7 @@ window.onload = function() {
     front.lastPoint = Point.from(e);
     front.redraw();
     middle.clear();
-    if(middle.showPoints) { findNearPoint(front.lastPoint); }
+    if(middle.showPoints) findNearPoint(front.lastPoint);
   }, false);
 
   front.canvas.addEventListener('click', function(e) {
@@ -78,17 +78,19 @@ function setPoint(xy) {
 ///////////////////
 
 function findNearPoint(e) {
-  allPoints  = back.shapes.concat(
+  var allShapes = back.shapes.concat(
+    []//middle.shape || (middle.group ? middle.group.shapes : [])
+  ).concat(
     front.showGuideShapes ? front.guideShapes : []
-  ).flatMap(function(shape) {
+  );
+
+  var allPoints = allShapes.flatMap(function(shape) {
     var points = shape.points;
     points.eachSet('shape', shape);
     return points;
   });
 
-  allCenters = back.shapes.concat(
-    front.showGuideShapes ? front.guideShapes : []
-  ).map(function(shape) {
+  var allCenters = allShapes.map(function(shape) {
     var center = shape.center;
     center.shape = shape;
     return center;
@@ -195,13 +197,15 @@ function commandMode() {
     window.eventListeners.add('keydown', 'drawCommands', drawCommands);
   });
 
-  window.eventListeners.add('keydown', 'switchMode', function(e) {
-    switch(e.which) {
-      case charCodes['e']: changeMode(editMode); break;
-      case charCodes['s']: changeMode(selectMode); break;
-      case charCodes['x']: exportImage(); break;
-    }
-  });
+  if(back.shapes.length) {
+    window.eventListeners.add('keydown', 'switchMode', function(e) {
+      switch(e.which) {
+        case charCodes['e']: changeMode(editMode); break;
+        case charCodes['s']: changeMode(selectMode); break;
+        case charCodes['x']: exportImage(); break;
+      }
+    });
+  }
 }
 
 function drawCommands(e) {

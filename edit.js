@@ -3,6 +3,9 @@ function editMode() {
   middle.showPoints = true;
   findNearPoint(front.lastPoint);
 
+  window.removeEventListener('keydown', setOrPickPoint, false);
+  // ^^^ defined in draw.js; need to remove separately because not included in window.eventListeners
+
   infopanel.top = 'select point to begin editing';
   infopanel.buttons = [Button('esc', 'cancel', 'red')];
   infopanel.bottom.add('select outer point of a shape to resize');
@@ -11,6 +14,7 @@ function editMode() {
   var exit = function() {
     middle.showPoints = showPoints;
     back.redraw();
+    window.addEventListener('keydown', setOrPickPoint, false);
     changeMode(commandMode);
   }
 
@@ -48,7 +52,7 @@ function editMode() {
           Button('r',   'rotate',    'green'),
           Button('s',   'style',     'green'),
           Button('t',   'translate', 'green'),
-          Button('u',   'unite',     'green'),
+          //Button('u',   'unite',     'green'),
           Button('esc', 'cancel',    'red')
         ];
         infopanel.bottom.clear();
@@ -86,7 +90,8 @@ function editMode() {
                 Button('r', 'rotate',      'green'),
                 Button('s', 'style',       'green'),
                 Button('t', 'translate',   'green'),
-                Button('u', 'unite',       'green'),
+                //Button('u', 'unite',       'green'),
+                Button('.', ['show', 'hide'][middle.showPoints * 1] + ' points', 'yellow'),
                 Button('>', 'go to point', 'yellow')
               ];
               middle.group = new Group([shape.copy()]);
@@ -96,6 +101,7 @@ function editMode() {
                 middle.clear();
                 editMode(startPoint);
                 front.redraw();
+                window.addEventListener('keydown', setOrPickPoint, false);
               }
 
               switch(e.which) {
@@ -123,9 +129,9 @@ function editMode() {
                 case charCodes['t']:
                   setUpEditMode(translate, pickedPoint);
                 break;
-                case charCodes['u']:
-                  unite();
-                break;
+                //case charCodes['u']:
+                //  unite();
+                //break;
               }
             } else if(e.which === charCodes['d']) {
               changeMode(commandMode);
@@ -142,10 +148,12 @@ function editMode() {
         shape.prepareForEdit(pickedPoint);
         changeMode();
         design(shape);
+        window.addEventListener('keydown', setOrPickPoint, false);
       }
       window.eventListeners.add('keydown', 'exitMode', exitMode = function(e) {
         if(e.which === charCodes['esc']) {
           back.shapes.push(origShape);
+          window.addEventListener('keydown', setOrPickPoint, false);
           exit();
         }
       });
@@ -197,14 +205,18 @@ Arc.prototype.prepareForEdit = function(pickedPoint) {
     var otherRadius = pickedPoint.same(this.startRadius.end) ? this.endRadius : this.startRadius;
     this._workingRadius = function() { return workingRadius; }
     this._otherRadius = function() { return otherRadius; }
+    this.nextStep = Shape.prototype.nextStep;
   } else {
     this.setEnd = function(point) {
       this.startRadius.setEnd(point, { fixedAngle: this.startRadius.angle });
       this.endRadius.setEnd(point, { fixedAngle: this.endRadius.angle });
-      this.center.shape = this;
+    }
+    this.nextStep = function() {
+      this.setEnd = this.constructor.prototype.setEnd;
+      this.nextStep = Shape.prototype.nextStep;
+      this.nextStep();
     }
   }
-  this.nextStep = Shape.prototype.nextStep;
   this.setEnd(pickedPoint);
   front.startPoint = this.center;
 }

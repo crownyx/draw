@@ -100,7 +100,13 @@ Shape.prototype.deleteFixedProperty = function() {
 Shape.prototype.copy = function() {
   var newShape = this._copy();
   Object.keys(this).forEach(function(key) {
-    newShape[key] = this[key].copy ? this[key].copy() : this[key];
+    if(this[key] instanceof Array) {
+      newShape[key] = this[key].map(function(element) {
+        return element.copy ? element.copy() : element;
+      });
+    } else {
+      newShape[key] = this[key].copy ? this[key].copy() : this[key];
+    }
   }, this);
   return newShape;
 }

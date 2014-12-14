@@ -302,7 +302,7 @@ Rectangle.prototype.difference = function(otherShapes, params = { inclusive: tru
     return angleToA.rad - angleToB.rad;
   });
   allPoints.push(allPoints[0]);
-  for(var i = 0; i < allPoints.length - 1 && lines.length < allPoints.length - 2;) {
+  for(var i = 0; i < allPoints.length - 1 && lines.length < allPoints.length - 1;) {
     var last = allPoints[i];
     var next = allPoints[i + 1];
     if(this.sides.find(function(side) {

@@ -1,4 +1,7 @@
-body { background-color: rgb(25,25,50); margin: 5px; }
+body {
+  background-color: rgb(25,25,50);
+  margin: 5px;
+}
 
 canvas {
   position: absolute;

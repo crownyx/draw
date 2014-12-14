@@ -140,6 +140,7 @@ middle.refresh = function() {
 
 middle.redraw = function() {
   this.clear();
-  if(this.shape) this.shape.preview();
-  if(this.group) this.group.preview();
+  if(shape = this.shape) shape.preview();
+  if(group = this.group)
+    group.preview ? group.preview() : group.draw(this.context);
 }

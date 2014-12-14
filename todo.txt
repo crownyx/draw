@@ -1,14 +1,15 @@
-move circle.intersection over to circle (and ellipse)
+fine tune select and edit some more
+circle-circle intersections
 edit intersection - show previous intersection shapes to re-edit
 don't allow switching to same shape in edit mode (undoes fixedLine) or transfer fixedLine
-show points of shape being edited during editing
-
-v1.5
-ellipse-ellipse & ellipse-circle intersections
-intersect with bezier curve: http://students.cs.byu.edu/~tom/557/text/cic.pdf
+show points of shape being edited during editing - fine tune
 
 v2.0
+ellipse-ellipse & ellipse-circle intersections
+intersect with bezier curve: http://students.cs.byu.edu/~tom/557/text/cic.pdf
 mobile compatibility: buttons on sidebar; click once to set startPoint, then press and drag to choose endpoint
 group/link/unlink
 undo
 when more than one point is near, browse through shapes
+triangles
+square

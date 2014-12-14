@@ -2,7 +2,7 @@ function design(shape) {
   middle.shape = shape;
   shape.preview();
 
-  delete front.pickedPoint;
+  if(front.pickedPoint) delete front.pickedPoint;
 
   window.eventListeners.add('keydown', 'drawCommands', drawCommands); // why here and draw.js?
 
@@ -17,6 +17,7 @@ function design(shape) {
 
   front.eventListeners.add('click', 'nextStep', function() {
     shape.setEnd(front.usePoint);
+    shape.preview();
     if(front.setPoint) {
       delete front.setPoint;
       infopanel.bottom.clear();
@@ -36,8 +37,8 @@ function design(shape) {
     Button('e', 'ellipse',      'green'),
     Button('l', 'line',         'green'),
     Button('r', 'rectangle',    'green'),
-    Button('s', 'square',       'green'),
-    Button('t', 'triangle',     'green'),
+    //Button('s', 'square',       'green'),
+    //Button('t', 'triangle',     'green'),
     Button(':', 'show/hide info', 'yellow'),
     Button('>', 'go to point',    'yellow'),
     Button('.', 'show points',    'yellow')
