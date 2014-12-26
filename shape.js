@@ -5,6 +5,8 @@ function Shape() {
 
   this.lineWidth   = 1;
   this.strokeStyle = 'black';
+
+  this.drawSteps = [];
 }
 
 Shape.prototype.complete = function() {
@@ -22,8 +24,9 @@ Shape.prototype.nextStep = function() {
   changeMode(commandMode);
 }
 
-Shape.prototype.sketch = function(context, params) {
+Shape.prototype.sketch = function(canvas, params) {
   params = params || {};
+  var context = canvas.context;
   context.save();
     context.strokeStyle = params.strokeStyle || "blue";
     context.setLineDash([5]);
@@ -33,8 +36,9 @@ Shape.prototype.sketch = function(context, params) {
   context.restore();
 }
 
-Shape.prototype.draw = function(context, params) {
+Shape.prototype.draw = function(canvas, params) {
   params = params || {};
+  var context = canvas.context;
   if(this.guideline) {
     this.sketch(context);
   } else {

@@ -302,17 +302,17 @@ function HorizontalLine(y) {
   return new Line(new Point(0, y), new Point(front.canvas.width, y));
 }
 
-function AxisPair(origin) {
+function AxisPair(origin, canvas) {
   return {
-    vertical: new Line(new Point(origin.x, 0), new Point(origin.x, front.canvas.height)),
-    horizontal: new Line(new Point(0, origin.y), new Point(front.canvas.width, origin.y)),
-    draw: function(context, params) {
-      this.vertical.draw(context, params);
-      this.horizontal.draw(context, params);
+    vertical: new Line(new Point(origin.x, 0), new Point(origin.x, canvas.height)),
+    horizontal: new Line(new Point(0, origin.y), new Point(canvas.width, origin.y)),
+    draw: function(canvas, params) {
+      this.vertical.draw(canvas, params);
+      this.horizontal.draw(canvas, params);
     },
-    sketch: function(context, params) {
-      this.vertical.sketch(context, params);
-      this.horizontal.sketch(context, params);
+    sketch: function(canvas, params) {
+      this.vertical.sketch(canvas, params);
+      this.horizontal.sketch(canvas, params);
     }
   }
 }

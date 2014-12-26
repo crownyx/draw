@@ -148,8 +148,8 @@ function Point(x, y) {
 Point.from = function(point) {
   return(point instanceof Point ? point :
     new Point(
-      point.pageX - front.canvas.offsetLeft,
-      point.pageY - front.canvas.offsetTop
+      point.pageX - this.refCanvas.offsetLeft,
+      point.pageY - this.refCanvas.offsetTop
     )
   );
 }
