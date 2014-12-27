@@ -94,14 +94,13 @@ Object.defineProperty(Circle.prototype, 'area', {
   }
 });
 
-Circle.prototype.drawPath = function(context) {
-  context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
+Circle.prototype.drawPath = function(canvas) {
+  canvas.context.arc(this.center.x, this.center.y, this.radius.length, 0, 2 * Math.PI);
 }
 
-Circle.prototype.preview = function() {
-  this.radius.sketchPreview();
-  this.draw(middle.context);
-  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
+Circle.prototype.preview = function(canvas) {
+  this.radius.sketchPreview(canvas);
+  this.draw(canvas);
 }
 
 Circle.prototype.fill = function(context) {

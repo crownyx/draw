@@ -245,12 +245,12 @@ Object.defineProperty(Rectangle.prototype, 'points', {
   }
 });
 
-Rectangle.prototype.drawPath = function(context) {
-  context.moveTo(this.points[0].x, this.points[0].y);
-  context.lineTo(this.points[1].x, this.points[1].y);
-  context.lineTo(this.points[2].x, this.points[2].y);
-  context.lineTo(this.points[3].x, this.points[3].y);
-  context.closePath();
+Rectangle.prototype.drawPath = function(canvas) {
+  canvas.context.moveTo(this.points[0].x, this.points[0].y);
+  canvas.context.lineTo(this.points[1].x, this.points[1].y);
+  canvas.context.lineTo(this.points[2].x, this.points[2].y);
+  canvas.context.lineTo(this.points[3].x, this.points[3].y);
+  canvas.context.closePath();
 }
 
 Rectangle.prototype.rotate = function(rotation, params) {
@@ -342,12 +342,11 @@ Rectangle.prototype._intersection = function(otherShape) {
   return lines;
 }
 
-Rectangle.prototype.preview = function() {
-  this.draw(middle.context);
-  this.diagonal.sketchPreview();
-  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
+Rectangle.prototype.preview = function(canvas) {
+  this.draw(canvas);
+  this.diagonal.sketchPreview(canvas);
   if(this.fixedLength || this.fixedHeight || this.fixedArea || this.fixedPerimeter || this.fixedRatio) {
-    this.diagonal.end.round().preview(0, 2, { strokeStyle: 'green' });
+    this.diagonal.end.round().preview(canvas, 0, 2, { strokeStyle: 'green' });
   }
 }
 

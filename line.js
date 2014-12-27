@@ -99,28 +99,27 @@ Object.defineProperty(Line.prototype, 'angle', {
   }
 });
 
-Line.prototype.drawPath = function(context) {
-  context.moveTo(this.start.x, this.start.y);
-  context.lineTo(this.end.x, this.end.y);
+Line.prototype.drawPath = function(canvas) {
+  canvas.context.moveTo(this.start.x, this.start.y);
+  canvas.context.lineTo(this.end.x, this.end.y);
 }
 
-Line.prototype.preview = function() {
-  this.start.round().preview(0, 1);
-  this.angle.preview();
-  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
-  this.draw(middle.context);
-  if(this.fixedLength || this.fixedAngle) this.end.round().label(middle.context);
+Line.prototype.preview = function(canvas) {
+  this.start.round().preview(canvas, 0, 1);
+  this.angle.preview(canvas);
+  this.draw(canvas);
+  //if(this.fixedLength || this.fixedAngle) this.end.round().label(canvas);
 }
 
-Line.prototype.sketchPreview = function() {
-  if(this.start.same(front.usePoint)) {
-    this.start.round().showCoords(middle.context, 0, 1);
-  } else {
-    this.start.round().preview(0, 1);
-  }
-  this.angle.preview();
-  this.sketch(middle.context);
-  if(this.fixedLength || this.fixedAngle) this.end.round().label(middle.context);
+Line.prototype.sketchPreview = function(canvas) {
+  //if(this.start.same(front.usePoint)) {
+  //  this.start.round().showCoords(middle.context, 0, 1);
+  //} else {
+    this.start.round().preview(canvas, 0, 1);
+  //}
+  this.angle.preview(canvas);
+  this.sketch(canvas);
+  //if(this.fixedLength || this.fixedAngle) this.end.round().label(middle.context);
 }
 
 Line.prototype._translate = function(point, params) {
@@ -302,10 +301,10 @@ function HorizontalLine(y) {
   return new Line(new Point(0, y), new Point(front.canvas.width, y));
 }
 
-function AxisPair(origin, canvas) {
+function AxisPair(intersection, canvas) {
   return {
-    vertical: new Line(new Point(origin.x, 0), new Point(origin.x, canvas.height)),
-    horizontal: new Line(new Point(0, origin.y), new Point(canvas.width, origin.y)),
+    vertical: new Line(new Point(intersection.x, 0), new Point(intersection.x, canvas.height)),
+    horizontal: new Line(new Point(0, intersection.y), new Point(canvas.width, intersection.y)),
     draw: function(canvas, params) {
       this.vertical.draw(canvas, params);
       this.horizontal.draw(canvas, params);

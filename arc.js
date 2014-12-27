@@ -79,8 +79,8 @@ Arc.prototype.infoText = function() {
   );
 }
 
-Arc.prototype.drawPath = function(context) {
-  context.arc(
+Arc.prototype.drawPath = function(canvas) {
+  canvas.context.arc(
     this.center.x,
     this.center.y,
     this.startRadius.length,

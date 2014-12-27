@@ -122,11 +122,11 @@ function Point(x, y) {
     }
   }
 
-  this.preview = function(angle, quadAdd, params) {
+  this.preview = function(canvas, angle, quadAdd, params) {
     if(!isNum(quadAdd)) quadAdd = -1;
     params = params || {};
-    new AxisPair(this).sketch(middle.context, params);
-    this.round().showCoords(middle.context, angle, quadAdd + 2 ? quadAdd : -1);
+    new AxisPair(this, canvas).sketch(canvas, params);
+    //this.round().showCoords(context, angle, quadAdd + 2 ? quadAdd : -1);
   }
 
   this.showCoords = function(context, angle, quadAdd) {
@@ -146,10 +146,11 @@ function Point(x, y) {
 }
 
 Point.from = function(point) {
+  var canvas = this.refCanvas instanceof Canvas ? this.refCanvas.canvas : this.refCanvas;
   return(point instanceof Point ? point :
     new Point(
-      point.pageX - this.refCanvas.offsetLeft,
-      point.pageY - this.refCanvas.offsetTop
+      point.pageX - canvas.offsetLeft,
+      point.pageY - canvas.offsetTop
     )
   );
 }

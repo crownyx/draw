@@ -85,20 +85,19 @@ Angle.prototype.draw = function(context, params) {
   ).draw(context, params.style);
 }
 
-Angle.prototype.preview = function() {
-  this.draw(middle.context, { style: { strokeStyle: 'blue', lineWidth: 0.5 } });
+Angle.prototype.preview = function(canvas) {
+  this.draw(canvas, { style: { strokeStyle: 'blue', lineWidth: 0.5 } });
 
-  var angle = Angle.from(front.startPoint, front.lastPoint);
-  var textAlignment = front.textAlignments[angle.quadrant % 4];
+  var textAlignment = globals.textAlignments[this.quadrant % 4];
 
-  middle.save();
-    middle.context.textAlign = textAlignment.textAlign;
-    middle.context.fillText(
+  canvas.context.save();
+    canvas.context.textAlign = textAlignment.textAlign;
+    canvas.context.fillText(
       Math.round(this.deg) + unescape("\xB0"),
       this.center.x + textAlignment.xPlus,
       this.center.y + textAlignment.yPlus
     );
-  middle.restore();
+  canvas.context.restore();
 }
 
 Angle.prototype.copy = function() { return new Angle(this.rad); }

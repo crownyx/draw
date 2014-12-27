@@ -26,45 +26,43 @@ Shape.prototype.nextStep = function() {
 
 Shape.prototype.sketch = function(canvas, params) {
   params = params || {};
-  var context = canvas.context;
-  context.save();
-    context.strokeStyle = params.strokeStyle || "blue";
-    context.setLineDash([5]);
-    context.beginPath();
-      this.drawPath(context);
-    context.stroke();
-  context.restore();
+  canvas.context.save();
+    canvas.context.strokeStyle = params.strokeStyle || "blue";
+    canvas.context.setLineDash([5]);
+    canvas.context.beginPath();
+      this.drawPath(canvas);
+    canvas.context.stroke();
+  canvas.context.restore();
 }
 
 Shape.prototype.draw = function(canvas, params) {
   params = params || {};
-  var context = canvas.context;
   if(this.guideline) {
-    this.sketch(context);
+    this.sketch(canvas);
   } else {
-    context.save();
+    canvas.context.save();
       if(this.lineWidth || params.lineWidth) {
-        context.strokeStyle = params.strokeStyle || this.strokeStyle;
-        context.lineWidth   = params.lineWidth   || this.lineWidth;
-        context.setLineDash(this.lineDash || []);
-        context.beginPath();
+        canvas.context.strokeStyle = params.strokeStyle || this.strokeStyle;
+        canvas.context.lineWidth   = params.lineWidth   || this.lineWidth;
+        canvas.context.setLineDash(this.lineDash || []);
+        canvas.context.beginPath();
           if(this.intersectShapes.length) {
             var paths = this.intersectShapes.filterMap(function(shape) {
               return this.intersection(shape, { inclusive: false });
             }, this).flatten();
-            paths.eachDo('drawPath', context);
+            paths.eachDo('drawPath', canvas.context);
           } else {
-            this.drawPath(context);
+            this.drawPath(canvas);
           }
-        context.stroke();
+        canvas.context.stroke();
       }
       if(params.fillStyle || this.fillStyle) {
-        context.fillStyle = params.fillStyle || this.fillStyle;
-        context.beginPath();
-          this.drawPath(context);
-        context.fill();
+        canvas.context.fillStyle = params.fillStyle || this.fillStyle;
+        canvas.context.beginPath();
+          this.drawPath(canvas);
+        canvas.context.fill();
       }
-    context.restore();
+    canvas.context.restore();
   }
 }
 
@@ -78,7 +76,7 @@ Shape.prototype.fill = function(context, params) {
   context.restore();
 }
 
-Shape.prototype.preview = function() { this.draw(front.context); }
+Shape.prototype.preview = function(canvas) { this.draw(canvas); }
 
 Shape.prototype.rotate = function(rotation) { this.rotation = rotation; }
 
