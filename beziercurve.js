@@ -8,6 +8,11 @@ function BezierCurve(start, end, control1, control2) {
   this.control1 = control1;
   this.control2 = control2;
 
+  this.drawSteps = [
+    function() { this.setEnd = function(point) { this.control1 = point; } },
+    function() { this.setEnd = function(point) { this.control2 = point; } }
+  ]; // remove second step when quadratic
+
   this.shiftCommands = [
     {
       key: 'q',
@@ -24,17 +29,17 @@ function BezierCurve(start, end, control1, control2) {
 BezierCurve.prototype = new Shape;
 BezierCurve.prototype.constructor = BezierCurve;
 
-BezierCurve.prototype.drawPath = function(context) {
-  context.moveTo(this.start.x, this.start.y);
+BezierCurve.prototype.drawPath = function(canvas) {
+  canvas.context.moveTo(this.start.x, this.start.y);
   if(this.quadratic) {
-    context.quadraticCurveTo(
+    canvas.context.quadraticCurveTo(
       (this.control1 || this.start).x,
       (this.control1 || this.start).y,
       this.end.x,
       this.end.y
     );
   } else {
-    context.bezierCurveTo(
+    canvas.context.bezierCurveTo(
       (this.control1 || this.start).x,
       (this.control1 || this.start).y,
       (this.control2 || this.control1 || this.end).x,
@@ -45,21 +50,21 @@ BezierCurve.prototype.drawPath = function(context) {
   }
 }
 
-BezierCurve.prototype.preview = function() {
+BezierCurve.prototype.preview = function(canvas) {
   if(this.control1) {
-    new Line(this.start, this.control1).sketchPreview();
+    new Line(this.start, this.control1).sketchPreview(canvas);
     if(this.control2) {
-      new Line(this.end, this.control2).sketchPreview();
+      new Line(this.end, this.control2).sketchPreview(canvas);
     } else {
-      new Line(this.end, this.control1).sketchPreview();
+      new Line(this.end, this.control1).sketchPreview(canvas);
     }
-    if(!this.control1.same(front.usePoint))
-      this.control1.label(middle.context);
-    if(this.control2 && !this.control2.same(front.usePoint))
-      this.control2.label(middle.context);
-    this.draw(middle.context);
+    //if(!this.control1.same(front.usePoint))
+    //  this.control1.label(middle.context);
+    //if(this.control2 && !this.control2.same(front.usePoint))
+    //  this.control2.label(middle.context);
+    this.draw(canvas);
   } else {
-    new Line(this.start, this.end).preview();
+    new Line(this.start, this.end).preview(canvas);
   }
 }
 
@@ -71,7 +76,6 @@ BezierCurve.prototype.nextStep = function() {
     if(this.quadratic) {
       Shape.prototype.nextStep.call(this);
     } else {
-      this.setEnd = function(point) { this.control2 = point; }
       this.nextStep = Shape.prototype.nextStep;
     }
   }

@@ -90,7 +90,7 @@ Object.defineProperty(Ellipse.prototype, 'points', {
   }
 });
 
-Ellipse.prototype.drawPath = function(context) {
+Ellipse.prototype.drawPath = function(canvas) {
   var startAngle = this.startAngle || new Angle(0);
   var endAngle   = this.endAngle   || new Angle(2 * Math.PI);
   var distanceToGo = this.clockwise ? endAngle.minus(startAngle).rad : startAngle.minus(endAngle).rad;
@@ -98,23 +98,22 @@ Ellipse.prototype.drawPath = function(context) {
     var currAngle = this.clockwise ? startAngle.plus(t) : startAngle.minus(t);
     var radiusEnd = this.radiusAt(currAngle).end;
     if(t === 0) {
-      context.moveTo(radiusEnd.x, radiusEnd.y);
+      canvas.context.moveTo(radiusEnd.x, radiusEnd.y);
     } else {
-      context.lineTo(radiusEnd.x, radiusEnd.y);
+      canvas.context.lineTo(radiusEnd.x, radiusEnd.y);
     }
     if(t < distanceToGo && t + 0.02 > distanceToGo)
       t = distanceToGo - 0.02;
   }
 }
 
-Ellipse.prototype.preview = function() {
-  this.draw(middle.context);
-  this.center.preview(0, 2);
+Ellipse.prototype.preview = function(canvas) {
+  this.draw(canvas);
+  this.center.preview(canvas, 0, 2);
   if(this.rotation.deg % 90) {
-    this.yAxis.sketch(middle.context);
-    this.xAxis.sketch(middle.context);
+    this.yAxis.sketch(canvas);
+    this.xAxis.sketch(canvas);
   }
-  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
 }
 
 Object.defineProperty(Ellipse.prototype, 'circumference', {

@@ -15,6 +15,13 @@ function Arc(radiusStart, radiusEnd, startAngle, endAngle) {
 
   this.clockwise = true;
 
+  this.drawSteps = [
+    function() {
+      this._workingRadius = function() { return this.endRadius; }
+      this._otherRadius = function() { return this.startRadius; }
+    }
+  ];
+
   this._workingRadius = function() { return this.startRadius; }
   this._otherRadius = function() { return this.endRadius; }
 
@@ -95,23 +102,16 @@ Arc.prototype.setEnd = function(point) {
   this._otherRadius().setEnd(point, { fixedAngle: this._otherRadius().angle });
 }
 
-Arc.prototype.nextStep = function() {
-  this._workingRadius = function() { return this.endRadius; }
-  this._otherRadius = function() { return this.startRadius; }
-  this.nextStep = Shape.prototype.nextStep;
-}
-
 Arc.prototype.rotate = function(rotation) {
   this.endRadius.rotate(rotation);
   this.startRadius.rotate(rotation);
   this.rotation = rotation;
 }
 
-Arc.prototype.preview = function() {
-  this._workingRadius().sketchPreview();
-  this._otherRadius().sketch(middle.context);
-  this.draw(middle.context);
-  if(middle.showText) middle.context.fillText(this.infoText(), 10, 15);
+Arc.prototype.preview = function(canvas) {
+  this._workingRadius().sketchPreview(canvas);
+  this._otherRadius().sketch(canvas);
+  this.draw(canvas);
 }
 
 Arc.prototype._copy = function() {
