@@ -1,14 +1,19 @@
-function Line(start, endOrParams) {
+function Line(start, endOrParams, endX, endY) {
   Shape.call(this);
+
+  if(endX && endY) {
+    start = new Point(start, endOrParams);
+    endOrParams = new Point(endX, endY);
+  }
 
   this.start = start;
 
-  if(endOrParams instanceof Point) {
-    this.setEnd(endOrParams);
-  } else {
+  if(endOrParams.angle) {
     var refLine = this.start.to(this.start.plus(front.canvas.width));
     refLine.rotate(endOrParams.angle, { about: 'start' });
     this.setEnd(refLine.intersections(front.boundingRect)[0]);
+  } else {
+    this.setEnd(endOrParams);
   }
 
   var line = this;
@@ -277,6 +282,7 @@ Line.prototype.rotate = function(rotation, params) {
     if(this.fixedAngle)
       this.fixedAngle = this.fixedAngle.plus(rotation);
   }
+  return this;
 }
 
 Line.prototype.copy = function() {

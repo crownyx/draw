@@ -66,14 +66,15 @@ Shape.prototype.draw = function(canvas, params) {
   }
 }
 
-Shape.prototype.fill = function(context, params) {
+Shape.prototype.fill = function(canvas, params) {
   params = params || {};
-  context.save();
-    context.fillStyle = params.fillStyle || this.fillStyle || context.fillStyle;
-    context.beginPath();
-      this.drawPath(context);
-    context.fill();
-  context.restore();
+  canvas.context.save();
+    canvas.context.fillStyle = params.fillStyle || this.fillStyle || canvas.context.fillStyle;
+    canvas.context.beginPath();
+      this.drawPath(canvas);
+    canvas.context.fill();
+  canvas.context.restore();
+  return this;
 }
 
 Shape.prototype.preview = function(canvas) { this.draw(canvas); }

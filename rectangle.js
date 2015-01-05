@@ -1,5 +1,10 @@
-function Rectangle(diagStart, diagEnd) {
+function Rectangle(diagStart, diagEnd, width, height) {
   Shape.call(this);
+
+  if(width && height) {
+    diagStart = new Point(diagStart, diagEnd);
+    diagEnd = new Point(diagStart.x + width, diagStart.y + height);
+  }
 
   this.diagonal = diagStart.to(diagEnd);
 
